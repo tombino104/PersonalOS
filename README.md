@@ -1,6 +1,6 @@
 # Personal OS
 
-A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a container on UmbrelOS, behind Tailscale.
+A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (expecially on UmbrelOS), behind Tailscale.
 
 > **Status: v0.0.0, initial skeleton.** There is no working code yet.
 
