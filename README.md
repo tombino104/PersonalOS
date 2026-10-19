@@ -1,7 +1,5 @@
 # Personal OS
 
-🇬🇧 English · 🇮🇹 [Italiano](README.it.md)
-
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a container on UmbrelOS, behind Tailscale.
 
 > **Status: v0.0.0, initial skeleton.** There is no working code yet.
@@ -15,7 +13,7 @@ A personal growth system for one person: six life areas, a relative score and an
 
 ## Development
 
-Work follows the checklist in [ROADMAP.md](ROADMAP.md) (in Italian), one step at a time.
+Work follows the checklist in [ROADMAP.md](ROADMAP.md), one step at a time.
 
 ## Versioning
 

@@ -31,3 +31,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+
+# Versioni italiane: solo in locale
+*.it.md
