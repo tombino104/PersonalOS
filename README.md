@@ -11,8 +11,6 @@ A personal growth system for one person: six life areas, a relative score and an
 - A day left blank is empty, not 0%.
 - Your data stays yours: the database and backups live outside the repo.
 
-## Development
-
 Work follows the checklist in [ROADMAP.md](ROADMAP.md), one step at a time.
 
 ## Versioning

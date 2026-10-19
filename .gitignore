@@ -34,3 +34,8 @@ Thumbs.db
 
 # Versioni italiane: solo in locale
 *.it.md
+
+# Documenti di lavoro personali: solo in locale
+ROADMAP.md
+CLAUDE.md
+AGENTS.md
