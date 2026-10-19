@@ -1,8 +1,8 @@
 # Changelog
 
-Formato basato su [Keep a Changelog](https://keepachangelog.com/it-IT/1.1.0/). Versioni secondo [SemVer](https://semver.org/lang/it/).
+Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [SemVer](https://semver.org/).
 
-## [Non rilasciato]
+## [Unreleased]
 
-### Aggiunto
-- Scheletro iniziale del progetto: README, licenza PolyForm Noncommercial, `.gitignore`, `.env.example`, ROADMAP.
+### Added
+- Initial project skeleton: README (English and Italian), PolyForm Noncommercial license, `.gitignore`, `.env.example`, ROADMAP.

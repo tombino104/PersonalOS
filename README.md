@@ -1,24 +1,26 @@
 # Personal OS
 
-Un sistema personale di crescita per una sola persona: sei ambiti, punteggio relativo e un questionario serale. Leggero, modulare a plugin, pensato per girare in un container su UmbrelOS, dietro Tailscale.
+🇬🇧 English · 🇮🇹 [Italiano](README.it.md)
 
-> **Stato: v0.0.0, scheletro iniziale.** Non c'è ancora codice funzionante.
+A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a container on UmbrelOS, behind Tailscale.
 
-## Idee guida
+> **Status: v0.0.0, initial skeleton.** There is no working code yet.
 
-- Specchio, non tribunale. Non è un gioco.
-- Si misurano i comportamenti, mai i risultati.
-- Un giorno non compilato è vuoto, non 0%.
-- I tuoi dati restano tuoi: database e backup vivono fuori dal repo.
+## Guiding ideas
 
-## Sviluppo
+- A mirror, not a judge. It is not a game.
+- It measures behaviors, never results.
+- A day left blank is empty, not 0%.
+- Your data stays yours: the database and backups live outside the repo.
 
-Il lavoro segue la scaletta in [ROADMAP.md](ROADMAP.md), un passo alla volta.
+## Development
 
-## Versioni
+Work follows the checklist in [ROADMAP.md](ROADMAP.md) (in Italian), one step at a time.
 
-[Versionamento semantico](https://semver.org/lang/it/): `0.x.y` fino alla v1. Le modifiche sono in [CHANGELOG.md](CHANGELOG.md). I messaggi di commit seguono [Conventional Commits](https://www.conventionalcommits.org/it/) (`feat:`, `fix:`, `docs:`, `chore:`).
+## Versioning
 
-## Licenza
+[Semantic Versioning](https://semver.org/): `0.x.y` until v1. Changes are listed in [CHANGELOG.md](CHANGELOG.md). Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`).
 
-[PolyForm Noncommercial 1.0.0](LICENSE): puoi leggere, usare, modificare e condividere il codice per scopi **non commerciali**. L'uso commerciale non è consentito senza il permesso dell'autore.
+## License
+
+[PolyForm Noncommercial 1.0.0](LICENSE): you may read, use, modify and share the code for **noncommercial** purposes. Commercial use is not allowed without the author's permission.
