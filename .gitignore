@@ -1,0 +1,33 @@
+# Dati e segreti: MAI nel repo
+.env
+.env.*
+!.env.example
+data/
+backup/
+backups/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.key
+*.pem
+
+# Documenti personali (specifica, concept, scansioni)
+Concept/
+docs/privato/
+
+# Dipendenze e build
+node_modules/
+dist/
+build/
+.svelte-kit/
+coverage/
+
+# Sistema e editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
