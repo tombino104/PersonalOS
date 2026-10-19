@@ -11,8 +11,6 @@ A personal growth system for one person: six life areas, a relative score and an
 - A day left blank is empty, not 0%.
 - Your data stays yours: the database and backups live outside the repo.
 
-Work follows the checklist in [ROADMAP.md](ROADMAP.md), one step at a time.
-
 ## Versioning
 
 [Semantic Versioning](https://semver.org/): `0.x.y` until v1. Changes are listed in [CHANGELOG.md](CHANGELOG.md). Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`).
