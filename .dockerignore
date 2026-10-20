@@ -14,3 +14,5 @@ Dockerfile
 .dockerignore
 pytest.ini
 requirements-dev.txt
+web/node_modules
+web/dist
