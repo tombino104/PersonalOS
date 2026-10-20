@@ -5,6 +5,8 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from . import __version__, config, db, seed
+from .api import errors
+from .api.v1 import router as api_v1
 
 
 @asynccontextmanager
@@ -20,6 +22,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Personal OS", version=__version__, lifespan=lifespan)
+errors.install(app)
+app.include_router(api_v1)
 
 
 @app.get("/health")
