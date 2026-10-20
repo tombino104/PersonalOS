@@ -1,0 +1,14 @@
+services:
+  personal-os:
+    build: .
+    image: personal-os:dev
+    container_name: personal-os
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT:-3100}:3000"
+    environment:
+      PORT: 3000
+      DATA_DIR: /data
+    volumes:
+      # I dati vivono fuori dal repo (la cartella ./data è ignorata da git)
+      - ./data:/data

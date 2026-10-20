@@ -1,0 +1,14 @@
+{
+  "name": "personal-os",
+  "version": "0.0.0",
+  "description": "Personal growth system for one person, running in a container.",
+  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/server.js"
+  }
+}
