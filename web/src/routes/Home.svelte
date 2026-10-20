@@ -5,6 +5,7 @@
   import { AREAS, buildHeatGrid, trendGeometry } from '../lib/charts.js';
   import { addDays, formatDate, lastDays } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
+  import { widgets } from '../lib/plugins.svelte.js';
 
   let status = $state('loading');
   let today = $state('');
@@ -81,6 +82,7 @@
   );
   const weekdayLabels = ['2024-01-01', '', '2024-01-03', '', '2024-01-05', '', ''];
 
+  const pluginWidgets = $derived(widgets());
   const round = (value) => Math.round(value);
   const weekday = $derived(today ? formatDate(today, locale(), { weekday: 'long' }) : '');
   const dateText = $derived(today ? formatDate(today, locale(), { day: 'numeric', month: 'long' }) : '');
@@ -211,10 +213,20 @@
         <div class="legend"><span class="cell empty"></span><span>{t('home.notFilled')}</span></div>
       </div>
     </section>
+
+    {#each pluginWidgets as widget (widget.pluginId + widget.widgetId)}
+      <section class="card widget rise">
+        <widget.component />
+      </section>
+    {/each}
   {/if}
 </div>
 
 <style>
+  .widget {
+    padding: 22px 24px;
+  }
+
   .defs {
     position: absolute;
   }

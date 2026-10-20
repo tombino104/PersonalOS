@@ -15,4 +15,22 @@ export const icons = {
     { tag: 'circle', attrs: { cx: 9, cy: 17, r: 2.5 } },
   ],
   check: [path('m5 12.5 4.5 4.5L19 7.5')],
+  smile: [
+    { tag: 'circle', attrs: { cx: 12, cy: 12, r: 8.5 } },
+    path('M8.5 14.2c1 1.4 2.2 2 3.5 2s2.5-.6 3.5-2'),
+    { tag: 'circle', attrs: { cx: 9.3, cy: 9.8, r: 0.6, fill: 'currentColor' } },
+    { tag: 'circle', attrs: { cx: 14.7, cy: 9.8, r: 0.6, fill: 'currentColor' } },
+  ],
+  tree: [
+    { tag: 'circle', attrs: { cx: 12, cy: 5.5, r: 2.2 } },
+    { tag: 'circle', attrs: { cx: 6, cy: 18, r: 2.2 } },
+    { tag: 'circle', attrs: { cx: 18, cy: 18, r: 2.2 } },
+    path('M12 7.7v3.3M12 11l-5 5M12 11l5 5'),
+  ],
+  calendar: [
+    { tag: 'rect', attrs: { x: 4, y: 5, width: 16, height: 15, rx: 2 } },
+    path('M4 10h16M9 3v4M15 3v4'),
+  ],
+  bell: [path('M6 16v-5a6 6 0 1 1 12 0v5l1.5 2h-15z'), path('M10 20a2 2 0 0 0 4 0')],
+  plug: [path('M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0z'), path('M12 16v5')],
 };

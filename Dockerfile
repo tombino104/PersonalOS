@@ -3,8 +3,10 @@ WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web/index.html web/vite.config.js ./
+COPY web/scripts ./scripts
 COPY web/src ./src
 COPY web/public ./public
+COPY plugins /plugins
 RUN npm test && npm run build
 
 FROM python:3.13-slim
@@ -19,6 +21,7 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 COPY migrations ./migrations
+COPY plugins ./plugins
 COPY --from=web /web/dist ./web/dist
 
 RUN useradd --system --uid 1000 appuser \

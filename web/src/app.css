@@ -619,3 +619,37 @@ textarea.field {
     transform: none;
   }
 }
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 3px;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  color: var(--ink-2);
+  text-decoration: none;
+  font: 500 13px/1 var(--sans);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--ink);
+}
+
+.tab.on {
+  background: var(--ink);
+  color: var(--paper);
+}

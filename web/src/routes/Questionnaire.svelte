@@ -8,6 +8,7 @@
   import { locale, t } from '../lib/i18n.svelte.js';
   import { navigate, router } from '../lib/router.svelte.js';
   import { session } from '../lib/session.svelte.js';
+  import { questionnaireBlocks } from '../lib/plugins.svelte.js';
 
   let status = $state('loading');
   let report = $state(null);
@@ -87,6 +88,7 @@
     }
   }
 
+  const blocks = $derived(questionnaireBlocks());
   const weekday = $derived(day ? formatDate(day, locale(), { weekday: 'long' }) : '');
   const fullDate = $derived(day ? formatDate(day, locale(), { day: 'numeric', month: 'long' }) : '');
 </script>
@@ -145,6 +147,12 @@
               <span class="name">{task.name}</span>
             </button>
           {/each}
+        </section>
+      {/each}
+
+      {#each blocks as block (block.pluginId + block.blockId)}
+        <section class="rise" aria-label={t(`plugin.${block.pluginId}.title`)}>
+          <block.component {day} editable={report.editable} />
         </section>
       {/each}
 

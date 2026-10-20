@@ -6,7 +6,9 @@
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { session } from '../lib/session.svelte.js';
+  import { moreEntries } from '../lib/plugins.svelte.js';
 
+  const pluginEntries = $derived(moreEntries());
   let recorded = $state(0);
   let since = $state('');
 
@@ -65,9 +67,32 @@
       </Link>
     </div>
   </section>
+
+  {#if pluginEntries.length > 0}
+    <section aria-label={t('more.fromPlugins')}>
+      <h2 class="eyebrow heading">{t('more.fromPlugins')}</h2>
+      <div class="entries">
+        {#each pluginEntries as entry (entry.key)}
+          <Link class="entry" href={entry.href}>
+            <span class="ico"><Icon name={entry.icon} /></span>
+            <span class="text">
+              <span class="entry-title">{entry.label}</span>
+            </span>
+            <span class="go"><Icon name="forward" small /></span>
+          </Link>
+        {/each}
+      </div>
+      <p class="muted plugin-note">{t('more.pluginsNote')}</p>
+    </section>
+  {/if}
 </div>
 
 <style>
+  .plugin-note {
+    margin: 16px 2px 0;
+    font: 400 13px/1.5 var(--sans);
+  }
+
   .profile {
     display: flex;
     align-items: center;

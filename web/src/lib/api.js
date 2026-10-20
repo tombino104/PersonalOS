@@ -35,6 +35,10 @@ async function request(method, path, body) {
   return data;
 }
 
+export function pluginRequest(pluginId, method, path, body) {
+  return request(method, `/plugins/${pluginId}${path}`, body);
+}
+
 const query = (params) => new URLSearchParams(params).toString();
 const range = (from, to) => `?${query({ from, to })}`;
 
@@ -63,6 +67,10 @@ export const api = {
   setReflection: (day, text) => request('PUT', `/reports/${day}/reflection`, { text }),
   syncReport: (day) => request('POST', `/reports/${day}/sync`),
   completeReport: (day) => request('POST', `/reports/${day}/complete`),
+
+  plugins: () => request('GET', '/plugins'),
+  activatePlugin: (id) => request('POST', `/plugins/${id}/activate`, { accept_permissions: true }),
+  deactivatePlugin: (id) => request('POST', `/plugins/${id}/deactivate`),
 
   scores: (from, to) => request('GET', `/scores${range(from, to)}`),
   areaStats: (from, to) => request('GET', `/stats/areas${range(from, to)}`),

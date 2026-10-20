@@ -6,9 +6,9 @@ const STORAGE_KEY = 'personal-os-language';
 
 function read() {
   try {
-    return localStorage.getItem(STORAGE_KEY) ?? 'auto';
+    return localStorage.getItem(STORAGE_KEY) ?? 'en';
   } catch {
-    return 'auto';
+    return 'en';
   }
 }
 
@@ -28,8 +28,7 @@ export function setLanguage(preference) {
   i18n.preference = preference;
   i18n.lang = resolve(preference);
   try {
-    if (preference === 'auto') localStorage.removeItem(STORAGE_KEY);
-    else localStorage.setItem(STORAGE_KEY, preference);
+    localStorage.setItem(STORAGE_KEY, preference);
   } catch {
   }
   applyLanguage();
@@ -38,6 +37,11 @@ export function setLanguage(preference) {
 export function t(key, params = {}) {
   const text = dictionaries[i18n.lang][key] ?? dictionaries.en[key] ?? key;
   return text.replace(/\{(\w+)\}/g, (_, name) => String(params[name] ?? ''));
+}
+
+export function addMessages(lang, prefix, messages) {
+  if (!(lang in dictionaries)) return;
+  for (const [key, value] of Object.entries(messages)) dictionaries[lang][`${prefix}.${key}`] = value;
 }
 
 export function has(key) {

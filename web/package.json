@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "test": "vitest run"
+    "sync-plugins": "node scripts/sync-plugins.js",
+    "dev": "npm run sync-plugins && vite",
+    "build": "npm run sync-plugins && vite build",
+    "test": "npm run sync-plugins && vitest run"
   },
   "devDependencies": {
     "@fontsource/dm-sans": "^5.3.0",

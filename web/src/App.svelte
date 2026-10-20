@@ -11,8 +11,10 @@
   import Archive from './routes/Archive.svelte';
   import More from './routes/More.svelte';
   import Settings from './routes/Settings.svelte';
+  import PluginPage from './routes/PluginPage.svelte';
   import { router, navigate } from './lib/router.svelte.js';
   import { session, bootstrap } from './lib/session.svelte.js';
+  import { loadPlugins } from './lib/plugins.svelte.js';
   import { applyTheme } from './lib/theme.svelte.js';
   import { applyLanguage } from './lib/i18n.svelte.js';
 
@@ -23,13 +25,22 @@
     '/questionnaire/done': Completion,
     '/archive': Archive,
     '/more': More,
-    '/settings': Settings,
   };
 
-  const Page = $derived(pages[router.path]);
+  function resolve(path) {
+    if (path === '/settings' || path.startsWith('/settings/')) return Settings;
+    if (path.startsWith('/p/')) return PluginPage;
+    return pages[path];
+  }
+
+  const Page = $derived(resolve(router.path));
 
   $effect(() => {
-    if (session.status === 'authenticated' && !pages[router.path]) navigate('/', { replace: true });
+    if (session.status === 'authenticated' && !resolve(router.path)) navigate('/', { replace: true });
+  });
+
+  $effect(() => {
+    if (session.status === 'authenticated') loadPlugins();
   });
 
   onMount(() => {
