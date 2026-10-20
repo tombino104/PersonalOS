@@ -9,6 +9,22 @@ class ReportClosed(Exception):
     pass
 
 
+class ReportCompleted(Exception):
+    pass
+
+
+class FutureDay(ValueError):
+    pass
+
+
+class ReportNotFound(KeyError):
+    pass
+
+
+class NotInReport(KeyError):
+    pass
+
+
 def _iso(moment: datetime) -> str:
     return moment.astimezone(timezone.utc).isoformat(timespec="seconds")
 
@@ -18,7 +34,7 @@ def _require_editable(conn: sqlite3.Connection, report_id: int, now: datetime) -
         "SELECT status, editable_until FROM reports WHERE id = ?", (report_id,)
     ).fetchone()
     if row is None:
-        raise KeyError(f"report {report_id} not found")
+        raise ReportNotFound(f"report {report_id} not found")
     if row["status"] == "closed" or now >= datetime.fromisoformat(row["editable_until"]):
         raise ReportClosed(f"report {report_id} is closed")
 
@@ -51,7 +67,7 @@ def open_report(
     if existing is not None:
         return existing["id"]
     if day > logical_day(now, rules):
-        raise ValueError("cannot open a report for a future day")
+        raise FutureDay("cannot open a report for a future day")
     deadline = edit_deadline(day, rules)
     if now >= deadline:
         raise ReportClosed(f"the edit window for {day.isoformat()} has ended")
@@ -81,7 +97,7 @@ def set_done(
             (int(done), report_id, activity_id),
         )
         if cursor.rowcount == 0:
-            raise KeyError(f"activity {activity_id} is not part of report {report_id}")
+            raise NotInReport(f"activity {activity_id} is not part of report {report_id}")
         completed = conn.execute(
             "SELECT completed_at FROM reports WHERE id = ?", (report_id,)
         ).fetchone()["completed_at"]
@@ -128,3 +144,147 @@ def scores_for_day(conn: sqlite3.Connection, user_id: int, day: date) -> list[di
         }
         for row in rows
     ]
+
+
+def _effective_status(row, now: datetime) -> str:
+    if row["status"] == "closed" or now >= datetime.fromisoformat(row["editable_until"]):
+        return "closed"
+    return "open"
+
+
+def _score_entry(row) -> dict:
+    return {
+        "area": row["slug"],
+        "maximum": row["maximum"],
+        "obtained": row["obtained"],
+        "score": score(row["maximum"], row["obtained"]),
+    }
+
+
+def report_id_for_day(conn: sqlite3.Connection, user_id: int, day: date) -> int | None:
+    row = conn.execute(
+        "SELECT id FROM reports WHERE user_id = ? AND day = ?", (user_id, day.isoformat())
+    ).fetchone()
+    return None if row is None else row["id"]
+
+
+def report_detail(conn: sqlite3.Connection, report_id: int, now: datetime) -> dict:
+    row = conn.execute(
+        "SELECT id, day, status, completed_at, editable_until, reflection "
+        "FROM reports WHERE id = ?",
+        (report_id,),
+    ).fetchone()
+    if row is None:
+        raise ReportNotFound(f"report {report_id} not found")
+    completions = conn.execute(
+        "SELECT c.activity_id, c.name_at_time, c.weight_at_time, c.done, a.slug "
+        "FROM completions c JOIN areas a ON a.id = c.area_id "
+        "WHERE c.report_id = ? ORDER BY a.position, c.id",
+        (report_id,),
+    ).fetchall()
+    scores = None
+    if row["completed_at"] is not None:
+        scores = [
+            _score_entry(r)
+            for r in conn.execute(
+                "SELECT a.slug, s.maximum, s.obtained FROM daily_scores s "
+                "JOIN areas a ON a.id = s.area_id WHERE s.report_id = ? ORDER BY a.position",
+                (report_id,),
+            )
+        ]
+    status = _effective_status(row, now)
+    return {
+        "day": row["day"],
+        "status": status,
+        "editable": status == "open",
+        "completed": row["completed_at"] is not None,
+        "completed_at": row["completed_at"],
+        "editable_until": row["editable_until"],
+        "reflection": row["reflection"],
+        "completions": [
+            {
+                "activity_id": c["activity_id"],
+                "name": c["name_at_time"],
+                "weight": c["weight_at_time"],
+                "area": c["slug"],
+                "done": bool(c["done"]),
+            }
+            for c in completions
+        ],
+        "scores": scores,
+    }
+
+
+def list_reports(
+    conn: sqlite3.Connection, user_id: int, start: date, end: date, now: datetime
+) -> list[dict]:
+    rows = conn.execute(
+        "SELECT day, status, completed_at, editable_until FROM reports "
+        "WHERE user_id = ? AND day BETWEEN ? AND ? ORDER BY day DESC",
+        (user_id, start.isoformat(), end.isoformat()),
+    ).fetchall()
+    return [
+        {
+            "day": r["day"],
+            "status": _effective_status(r, now),
+            "completed": r["completed_at"] is not None,
+            "completed_at": r["completed_at"],
+            "editable_until": r["editable_until"],
+        }
+        for r in rows
+    ]
+
+
+def scores_range(conn: sqlite3.Connection, user_id: int, start: date, end: date) -> list[dict]:
+    rows = conn.execute(
+        "SELECT r.day, a.slug, s.maximum, s.obtained "
+        "FROM reports r "
+        "JOIN daily_scores s ON s.report_id = r.id "
+        "JOIN areas a ON a.id = s.area_id "
+        "WHERE r.user_id = ? AND r.day BETWEEN ? AND ? AND r.completed_at IS NOT NULL "
+        "ORDER BY r.day, a.position",
+        (user_id, start.isoformat(), end.isoformat()),
+    ).fetchall()
+    days: dict[str, list[dict]] = {}
+    for row in rows:
+        days.setdefault(row["day"], []).append(_score_entry(row))
+    return [{"day": day, "areas": areas} for day, areas in days.items()]
+
+
+def set_reflection(
+    conn: sqlite3.Connection, report_id: int, text: str | None, now: datetime
+) -> None:
+    _require_editable(conn, report_id, now)
+    with conn:
+        conn.execute("UPDATE reports SET reflection = ? WHERE id = ?", (text, report_id))
+
+
+def sync_draft(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
+    _require_editable(conn, report_id, now)
+    completed = conn.execute(
+        "SELECT completed_at FROM reports WHERE id = ?", (report_id,)
+    ).fetchone()["completed_at"]
+    if completed is not None:
+        raise ReportCompleted(f"report {report_id} is already completed")
+    with conn:
+        conn.execute(
+            "DELETE FROM completions WHERE report_id = ? AND activity_id IN "
+            "(SELECT id FROM activities WHERE archived_at IS NOT NULL)",
+            (report_id,),
+        )
+        conn.execute(
+            "UPDATE completions SET "
+            "name_at_time = (SELECT name FROM activities WHERE id = completions.activity_id), "
+            "weight_at_time = (SELECT weight FROM activities WHERE id = completions.activity_id), "
+            "area_id = (SELECT area_id FROM activities WHERE id = completions.activity_id) "
+            "WHERE report_id = ?",
+            (report_id,),
+        )
+        conn.execute(
+            "INSERT INTO completions "
+            "(report_id, activity_id, name_at_time, weight_at_time, area_id) "
+            "SELECT ?, id, name, weight, area_id FROM activities "
+            "WHERE archived_at IS NULL AND id NOT IN "
+            "(SELECT activity_id FROM completions WHERE report_id = ?)",
+            (report_id, report_id),
+        )
