@@ -5,6 +5,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-20
+
+### Added
+- Password login: `POST /api/v1/auth/login`, `logout`, `me` and `password` (change). Everything except login and `/health` now requires a session.
+- Passwords hashed with scrypt (standard library); minimum length of 10 characters.
+- Server-side sessions in an HttpOnly, SameSite=Strict cookie; only a hash of the token is stored. Sessions last 30 days and renew on use.
+- Account lock for 15 minutes after 5 failed attempts.
+- Command line: `python -m app.cli create-user` and `reset-password` (also unlocks the account and closes all sessions).
+- Write requests from a foreign `Origin` are refused (`ALLOWED_ORIGINS` adds trusted hosts).
+
+### Changed
+- Interactive API docs are off unless `ENABLE_DOCS=1`.
+- The placeholder user from 0.3.0 is adopted by `create-user`, so existing reports are kept.
+
 ## [0.3.0] - 2026-10-20
 
 ### Added
@@ -42,7 +56,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/tombino104/PersonalOS/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/tombino104/PersonalOS/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/tombino104/PersonalOS/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/tombino104/PersonalOS/compare/v0.0.0...v0.1.0

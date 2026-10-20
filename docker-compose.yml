@@ -9,5 +9,8 @@ services:
     environment:
       PORT: 3000
       DATA_DIR: /data
+      COOKIE_SECURE: ${COOKIE_SECURE:-auto}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
+      ENABLE_DOCS: ${ENABLE_DOCS:-0}
     volumes:
       - ./data:/data

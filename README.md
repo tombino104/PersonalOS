@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.3.0.** Core API under `/api/v1` is in place; there is no login and no user interface yet, so the port is bound to localhost only.
+> **Status: v0.4.0.** Core API under `/api/v1` and password login are in place; there is no user interface yet.
 
 ## Guiding ideas
 
@@ -20,9 +20,21 @@ docker compose up -d --build
 curl http://127.0.0.1:47213/health
 ```
 
-The server listens on `127.0.0.1` only. Interactive API docs: `http://127.0.0.1:47213/docs`.
+The server listens on `127.0.0.1` only. Data lives in `./data` (mounted as a volume, ignored by git). The host port (47213 by default) can be changed with `HOST_PORT`.
 
-Data lives in `./data` (mounted as a volume, ignored by git). The host port (47213 by default) can be changed with `HOST_PORT`.
+Create the first user (nothing is reachable without logging in):
+
+```bash
+docker compose exec personal-os python -m app.cli create-user --name <your-name>
+```
+
+If you forget the password, or the account is locked after too many failed attempts, set a new one the same way:
+
+```bash
+docker compose exec personal-os python -m app.cli reset-password
+```
+
+Other settings (see `.env.example`): `COOKIE_SECURE` (`auto`, `1` or `0`), `ALLOWED_ORIGINS` (extra hosts allowed for write requests, comma separated), `ENABLE_DOCS=1` to serve the interactive API docs at `/docs`.
 
 ## Develop
 
