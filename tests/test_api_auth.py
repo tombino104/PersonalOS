@@ -56,7 +56,9 @@ def test_health_stays_public(anon_client):
 
 def test_docs_are_disabled_by_default(anon_client):
     for path in ("/docs", "/openapi.json", "/redoc"):
-        assert anon_client.get(path).status_code == 404
+        body = anon_client.get(path).text.lower()
+        assert "swagger" not in body
+        assert '"openapi"' not in body
 
 
 def test_login_sets_a_hardened_cookie(seeded):

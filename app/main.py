@@ -2,9 +2,10 @@ import os
 import sqlite3
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
 
 from . import __version__, auth, config, db, seed
 from .api import errors
@@ -55,3 +56,51 @@ def health() -> JSONResponse:
         {"status": "ok" if ok else "error", "version": __version__, "database": ok},
         status_code=200 if ok else 503,
     )
+
+
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+}
+
+CONTENT_SECURITY_POLICY = (
+    "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+    "font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; "
+    "form-action 'self'"
+)
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    for name, value in SECURITY_HEADERS.items():
+        response.headers.setdefault(name, value)
+    if not request.url.path.startswith(("/docs", "/openapi.json")):
+        response.headers.setdefault("Content-Security-Policy", CONTENT_SECURITY_POLICY)
+    return response
+
+
+def web_dir() -> Path:
+    configured = os.environ.get("WEB_DIR")
+    if configured:
+        return Path(configured)
+    return Path(__file__).resolve().parent.parent / "web" / "dist"
+
+
+@app.get("/{path:path}", include_in_schema=False)
+def web(path: str) -> FileResponse:
+    if path == "api" or path.startswith("api/"):
+        raise HTTPException(status_code=404, detail="not found")
+    root = web_dir().resolve()
+    index = root / "index.html"
+    if not index.is_file():
+        raise HTTPException(status_code=404, detail="web interface not built")
+    if path:
+        candidate = (root / path).resolve()
+        if candidate.is_file() and candidate.is_relative_to(root):
+            headers = {}
+            if path.startswith("assets/"):
+                headers["Cache-Control"] = "public, max-age=31536000, immutable"
+            return FileResponse(candidate, headers=headers)
+    return FileResponse(index, headers={"Cache-Control": "no-cache"})
