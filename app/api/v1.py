@@ -2,17 +2,21 @@ import sqlite3
 from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, Depends, Query, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response
+from starlette.concurrency import run_in_threadpool
 
 from .. import __version__, activities, reports, settings
 from ..logical_day import logical_day
+from ..plugins.manifest import RESERVED_PATHS
 from .auth_routes import protected_router
 from .deps import get_conn, get_now, get_user_id, verify_origin
 from .errors import ApiError
+from .plugin_gateway import AsgiProxy
 from .schemas import (
     ActivityCreate,
     ActivityUpdate,
     DoneUpdate,
+    PluginActivation,
     ReflectionUpdate,
     ReportOpen,
     SettingsUpdate,
@@ -37,6 +41,22 @@ def _resolve_range(
     if (end - start).days >= MAX_RANGE_DAYS:
         raise ApiError(422, "invalid_range", f"range cannot exceed {MAX_RANGE_DAYS} days")
     return start, end
+
+
+def _emit(request: Request, background: BackgroundTasks, event: str, payload: dict, now: datetime) -> None:
+    registry = getattr(request.app.state, "plugins", None)
+    if registry is not None:
+        background.add_task(registry.dispatch, event, payload, now)
+
+
+def _report_payload(detail: dict) -> dict:
+    return {
+        "day": detail["day"],
+        "completions": detail["completions"],
+        "reflection": detail["reflection"],
+        "scores": detail["scores"],
+        "overall": detail["overall"],
+    }
 
 
 def _report_id(conn: sqlite3.Connection, user_id: int, day: date) -> int:
@@ -103,10 +123,13 @@ def list_activities(
 @router.post("/activities", status_code=201)
 def create_activity(
     body: ActivityCreate,
+    request: Request,
+    background: BackgroundTasks,
     conn: sqlite3.Connection = Depends(get_conn),
     now: datetime = Depends(get_now),
 ) -> dict:
     activity = activities.create(conn, body.area, body.name, body.weight, now)
+    _emit(request, background, "activity.created", {"activity": activity}, now)
     return {"activity": activity, "warnings": activities.warnings(conn)}
 
 
@@ -114,13 +137,19 @@ def create_activity(
 def update_activity(
     activity_id: int,
     body: ActivityUpdate,
+    request: Request,
+    background: BackgroundTasks,
     conn: sqlite3.Connection = Depends(get_conn),
     now: datetime = Depends(get_now),
 ) -> dict:
     changes = body.model_dump(exclude_unset=True)
     if any(value is None for value in changes.values()):
         raise ApiError(422, "validation_error", "fields cannot be null")
+    before = activities.get(conn, activity_id)
     activity = activities.update(conn, activity_id, changes, now)
+    archived_now = activity["archived_at"] is not None and before["archived_at"] is None
+    event = "activity.archived" if archived_now else "activity.modified"
+    _emit(request, background, event, {"activity": activity}, now)
     return {"activity": activity, "warnings": activities.warnings(conn)}
 
 
@@ -165,12 +194,17 @@ def set_completion(
     day: date,
     activity_id: int,
     body: DoneUpdate,
+    request: Request,
+    background: BackgroundTasks,
     conn: sqlite3.Connection = Depends(get_conn),
     user_id: int = Depends(get_user_id),
     now: datetime = Depends(get_now),
 ) -> dict:
     report_id = _report_id(conn, user_id, day)
     reports.set_done(conn, report_id, activity_id, body.done, now)
+    detail = reports.report_detail(conn, report_id, now)
+    if detail["completed"]:
+        _emit(request, background, "report.modified", _report_payload(detail), now)
     return {"activity_id": activity_id, "done": body.done}
 
 
@@ -178,12 +212,17 @@ def set_completion(
 def set_reflection(
     day: date,
     body: ReflectionUpdate,
+    request: Request,
+    background: BackgroundTasks,
     conn: sqlite3.Connection = Depends(get_conn),
     user_id: int = Depends(get_user_id),
     now: datetime = Depends(get_now),
 ) -> dict:
     report_id = _report_id(conn, user_id, day)
     reports.set_reflection(conn, report_id, body.text, now)
+    detail = reports.report_detail(conn, report_id, now)
+    if detail["completed"]:
+        _emit(request, background, "report.modified", _report_payload(detail), now)
     return {"reflection": body.text}
 
 
@@ -202,13 +241,19 @@ def sync_report(
 @router.post("/reports/{day}/complete")
 def complete_report(
     day: date,
+    request: Request,
+    background: BackgroundTasks,
     conn: sqlite3.Connection = Depends(get_conn),
     user_id: int = Depends(get_user_id),
     now: datetime = Depends(get_now),
 ) -> dict:
     report_id = _report_id(conn, user_id, day)
+    was_completed = reports.report_detail(conn, report_id, now)["completed"]
     reports.complete_report(conn, report_id, now)
-    return reports.report_detail(conn, report_id, now)
+    detail = reports.report_detail(conn, report_id, now)
+    event = "report.modified" if was_completed else "report.completed"
+    _emit(request, background, event, _report_payload(detail), now)
+    return detail
 
 
 @router.get("/scores")
@@ -247,3 +292,68 @@ def update_settings(body: SettingsUpdate, conn: sqlite3.Connection = Depends(get
             raise ApiError(422, "invalid_day_cutoff", "expected a time like 04:00") from None
         settings.put(conn, "day_cutoff", changes["day_cutoff"])
     return get_settings(conn)
+
+
+def _registry(request: Request):
+    registry = getattr(request.app.state, "plugins", None)
+    if registry is None:
+        raise ApiError(503, "plugins_unavailable", "the plugin system is not running")
+    return registry
+
+
+@router.get("/plugins")
+def list_plugins(request: Request, conn: sqlite3.Connection = Depends(get_conn)) -> dict:
+    return {"plugins": _registry(request).describe(conn)}
+
+
+@router.post("/plugins/{plugin_id}/activate")
+def activate_plugin(
+    plugin_id: str,
+    body: PluginActivation,
+    request: Request,
+    background: BackgroundTasks,
+    conn: sqlite3.Connection = Depends(get_conn),
+    now: datetime = Depends(get_now),
+) -> dict:
+    registry = _registry(request)
+    registry.activate(conn, plugin_id, body.accept_permissions, now)
+    _emit(request, background, "plugin.activated", {"plugin": plugin_id}, now)
+    return {"plugins": registry.describe(conn)}
+
+
+@router.post("/plugins/{plugin_id}/deactivate")
+def deactivate_plugin(
+    plugin_id: str,
+    request: Request,
+    background: BackgroundTasks,
+    conn: sqlite3.Connection = Depends(get_conn),
+    now: datetime = Depends(get_now),
+) -> dict:
+    registry = _registry(request)
+    registry.deactivate(conn, plugin_id, now)
+    _emit(request, background, "plugin.deactivated", {"plugin": plugin_id}, now)
+    return {"plugins": registry.describe(conn)}
+
+
+@router.api_route(
+    "/plugins/{plugin_id}/{path:path}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
+    include_in_schema=False,
+)
+async def plugin_gateway(
+    plugin_id: str,
+    path: str,
+    request: Request,
+    conn: sqlite3.Connection = Depends(get_conn),
+    user_id: int = Depends(get_user_id),
+    now: datetime = Depends(get_now),
+):
+    registry = _registry(request)
+    loaded = registry.get(plugin_id)
+    first_segment = path.split("/", 1)[0]
+    active = loaded is not None and await run_in_threadpool(registry.is_active, conn, plugin_id)
+    if not active or loaded.app is None or first_segment in RESERVED_PATHS:
+        raise ApiError(404, "plugin_inactive", "this plugin is not active")
+    request.scope["plugin_now"] = now
+    request.scope["plugin_user_id"] = user_id
+    return AsgiProxy(loaded.app, "/" + path)

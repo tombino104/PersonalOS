@@ -8,3 +8,10 @@ def data_dir() -> Path:
 
 def db_path() -> Path:
     return data_dir() / "personal_os.db"
+
+
+def plugins_dir() -> Path:
+    configured = os.environ.get("PLUGINS_DIR")
+    if configured:
+        return Path(configured)
+    return Path(__file__).resolve().parent.parent / "plugins"

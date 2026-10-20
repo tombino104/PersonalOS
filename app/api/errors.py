@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .. import activities, auth, reports, security, setup
+from ..plugins import registry as plugin_registry
 
 
 class ApiError(Exception):
@@ -34,6 +35,9 @@ _DOMAIN_ERRORS = [
     (setup.SetupDone, 409, "setup_done"),
     (setup.InvalidSetupCode, 401, "invalid_setup_code"),
     (auth.UserExists, 409, "setup_done"),
+    (plugin_registry.PluginNotFound, 404, "not_found"),
+    (plugin_registry.PluginUnavailable, 409, "plugin_unavailable"),
+    (plugin_registry.PermissionsNotAccepted, 422, "permissions_not_accepted"),
 ]
 
 

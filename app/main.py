@@ -1,3 +1,4 @@
+import asyncio
 import os
 import sqlite3
 from contextlib import asynccontextmanager
@@ -11,6 +12,8 @@ from . import __version__, auth, config, db, seed, setup
 from .api import errors
 from .api.auth_routes import public_router
 from .api.v1 import router as api_v1
+from .plugins import scheduler
+from .plugins.registry import Registry
 
 
 @asynccontextmanager
@@ -24,7 +27,15 @@ async def lifespan(app: FastAPI):
         setup.ensure_code(conn)
     finally:
         conn.close()
-    yield
+    registry = Registry()
+    registry.load(config.plugins_dir(), datetime.now(timezone.utc))
+    app.state.plugins = registry
+    scheduler_task = asyncio.create_task(scheduler.run(registry))
+    try:
+        yield
+    finally:
+        scheduler_task.cancel()
+        registry.shutdown()
 
 
 _docs_enabled = os.environ.get("ENABLE_DOCS") == "1"

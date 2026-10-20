@@ -115,14 +115,21 @@ def complete_report(conn: sqlite3.Connection, report_id: int, now: datetime) -> 
         _write_scores(conn, report_id)
 
 
-def close_expired(conn: sqlite3.Connection, now: datetime) -> int:
+def expire_reports(conn: sqlite3.Connection, now: datetime) -> list[dict]:
+    expired = conn.execute(
+        "SELECT id, day FROM reports WHERE status = 'open' AND editable_until <= ?",
+        (_iso(now),),
+    ).fetchall()
     with conn:
-        cursor = conn.execute(
-            "UPDATE reports SET status = 'closed' "
-            "WHERE status = 'open' AND editable_until <= ?",
+        conn.execute(
+            "UPDATE reports SET status = 'closed' WHERE status = 'open' AND editable_until <= ?",
             (_iso(now),),
         )
-    return cursor.rowcount
+    return [{"report_id": row["id"], "day": row["day"]} for row in expired]
+
+
+def close_expired(conn: sqlite3.Connection, now: datetime) -> int:
+    return len(expire_reports(conn, now))
 
 
 def scores_for_day(conn: sqlite3.Connection, user_id: int, day: date) -> list[dict]:

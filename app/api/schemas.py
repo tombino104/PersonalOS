@@ -31,6 +31,12 @@ class Login(BaseModel):
     password: Annotated[str, StringConstraints(min_length=1, max_length=1024)]
 
 
+class PluginActivation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    accept_permissions: bool
+
+
 class Setup(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
