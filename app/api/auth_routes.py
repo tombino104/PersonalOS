@@ -4,7 +4,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, Request, Response
 
-from .. import auth
+from .. import auth, setup
 from .deps import (
     COOKIE_NAME,
     get_conn,
@@ -13,7 +13,7 @@ from .deps import (
     get_user_id,
     verify_origin,
 )
-from .schemas import Login, PasswordChange
+from .schemas import Login, PasswordChange, Setup
 
 public_router = APIRouter(prefix="/api/v1/auth", dependencies=[Depends(verify_origin)])
 protected_router = APIRouter(prefix="/auth")
@@ -29,15 +29,7 @@ def _cookie_secure(request: Request) -> bool:
     return request.url.scheme == "https" or forwarded == "https"
 
 
-@public_router.post("/login")
-def login(
-    body: Login,
-    request: Request,
-    response: Response,
-    conn: sqlite3.Connection = Depends(get_conn),
-    now: datetime = Depends(get_now),
-) -> dict:
-    token = auth.login(conn, body.name, body.password, now)
+def _set_session_cookie(request: Request, response: Response, token: str) -> None:
     response.set_cookie(
         COOKIE_NAME,
         token,
@@ -47,6 +39,41 @@ def login(
         secure=_cookie_secure(request),
         path="/",
     )
+
+
+@public_router.get("/status")
+def status(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
+    return {"setup_required": auth.setup_required(conn)}
+
+
+@public_router.post("/setup")
+def first_run_setup(
+    body: Setup,
+    request: Request,
+    response: Response,
+    conn: sqlite3.Connection = Depends(get_conn),
+    now: datetime = Depends(get_now),
+) -> dict:
+    if not auth.setup_required(conn):
+        raise setup.SetupDone("an account already exists")
+    setup.verify(body.code, now)
+    auth.create_user(conn, body.name, body.password)
+    setup.finish()
+    token = auth.login(conn, body.name, body.password, now)
+    _set_session_cookie(request, response, token)
+    return {"name": body.name}
+
+
+@public_router.post("/login")
+def login(
+    body: Login,
+    request: Request,
+    response: Response,
+    conn: sqlite3.Connection = Depends(get_conn),
+    now: datetime = Depends(get_now),
+) -> dict:
+    token = auth.login(conn, body.name, body.password, now)
+    _set_session_cookie(request, response, token)
     return {"name": body.name}
 
 

@@ -7,7 +7,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 
-from . import __version__, auth, config, db, seed
+from . import __version__, auth, config, db, seed, setup
 from .api import errors
 from .api.auth_routes import public_router
 from .api.v1 import router as api_v1
@@ -21,6 +21,7 @@ async def lifespan(app: FastAPI):
         db.migrate(conn)
         seed.sample_activities(conn)
         auth.purge_expired_sessions(conn, datetime.now(timezone.utc))
+        setup.ensure_code(conn)
     finally:
         conn.close()
     yield

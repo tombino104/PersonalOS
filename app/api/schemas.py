@@ -31,6 +31,14 @@ class Login(BaseModel):
     password: Annotated[str, StringConstraints(min_length=1, max_length=1024)]
 
 
+class Setup(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    code: Annotated[str, StringConstraints(min_length=1, max_length=64)]
+    name: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
+    password: Annotated[str, StringConstraints(max_length=2048)]
+
+
 class PasswordChange(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

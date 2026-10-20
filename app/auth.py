@@ -37,6 +37,13 @@ def _parse(value: str) -> datetime:
     return datetime.fromisoformat(value)
 
 
+def setup_required(conn: sqlite3.Connection) -> bool:
+    row = conn.execute(
+        "SELECT COUNT(*) FROM users WHERE password_hash != ?", (PLACEHOLDER_HASH,)
+    ).fetchone()
+    return row[0] == 0
+
+
 def create_user(conn: sqlite3.Connection, name: str, password: str) -> int:
     security.validate_new_password(password)
     rows = conn.execute("SELECT id, password_hash FROM users").fetchall()

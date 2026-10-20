@@ -4,7 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from .. import activities, auth, reports, security
+from .. import activities, auth, reports, security, setup
 
 
 class ApiError(Exception):
@@ -31,6 +31,9 @@ _DOMAIN_ERRORS = [
     (activities.UnknownArea, 422, "unknown_area"),
     (auth.InvalidCredentials, 401, "invalid_credentials"),
     (security.WeakPassword, 422, "weak_password"),
+    (setup.SetupDone, 409, "setup_done"),
+    (setup.InvalidSetupCode, 401, "invalid_setup_code"),
+    (auth.UserExists, 409, "setup_done"),
 ]
 
 
