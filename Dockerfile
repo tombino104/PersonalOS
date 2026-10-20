@@ -1,19 +1,24 @@
-FROM node:24-alpine
+FROM python:3.13-slim
 
-ENV NODE_ENV=production \
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
     PORT=3000 \
     DATA_DIR=/data
 
-WORKDIR /app
-COPY package.json ./
-COPY src ./src
+WORKDIR /srv
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY app ./app
+COPY migrations ./migrations
 
-RUN mkdir -p /data && chown node:node /data
-USER node
+RUN useradd --system --uid 1000 appuser \
+    && mkdir -p /data \
+    && chown appuser /data
+USER appuser
 VOLUME /data
 
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+process.env.PORT+'/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD python -c "import os,sys,urllib.request as u; sys.exit(0 if u.urlopen('http://127.0.0.1:'+os.environ['PORT']+'/health', timeout=2).status==200 else 1)"
 
-CMD ["node", "src/server.js"]
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
