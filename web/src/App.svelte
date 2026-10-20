@@ -3,6 +3,7 @@
   import Grain from './components/Grain.svelte';
   import Dock from './components/Dock.svelte';
   import Login from './routes/Login.svelte';
+  import Setup from './routes/Setup.svelte';
   import Home from './routes/Home.svelte';
   import Stella from './routes/Stella.svelte';
   import Questionnaire from './routes/Questionnaire.svelte';
@@ -51,4 +52,6 @@
   </div>
 {:else if session.status === 'anonymous'}
   <Login />
+{:else if session.status === 'setup'}
+  <Setup />
 {/if}

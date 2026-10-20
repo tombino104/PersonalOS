@@ -79,7 +79,6 @@
   "home.trends": "Andamento per ambito",
   "home.week": "Settimana",
 
-  "login.hint": "Non hai ancora un account? Crealo dal terminale con il comando create-user.",
   "login.invalid": "Nome o password sbagliati.",
   "login.lede": "Un posto tranquillo per le tue giornate.",
   "login.locked": "Troppi tentativi. Riprova tra circa {minutes} minuti.",
@@ -118,6 +117,18 @@
   "questionnaire.reflection": "Riflessione",
   "questionnaire.reflectionPlaceholder": "Com'è andata, davvero?",
   "questionnaire.save": "Salva le modifiche",
+
+  "setup.code": "Codice di setup",
+  "setup.codeHelp": "Apri il file setup-code.txt nella cartella data accanto all'app, oppure trova il codice nei log del container.",
+  "setup.invalidCode": "Quel codice non è corretto.",
+  "setup.lede": "Crea il tuo account. Ci vuole un minuto.",
+  "setup.mismatch": "Le due password non coincidono.",
+  "setup.name": "Il tuo nome",
+  "setup.password": "Password (almeno 10 caratteri)",
+  "setup.repeat": "Ripeti la password",
+  "setup.submit": "Crea l'account",
+  "setup.title": "Benvenuto",
+  "setup.weak": "La password deve avere almeno 10 caratteri.",
 
   "settings.account": "Account",
   "settings.accountLede": "Una sola persona, una sola password.",

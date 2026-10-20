@@ -2,9 +2,14 @@ import { api, setUnauthorizedHandler } from './api.js';
 
 export const session = $state({ status: 'loading', name: '' });
 
-function signedOut() {
-  session.status = 'anonymous';
+async function signedOut() {
   session.name = '';
+  try {
+    const result = await api.authStatus();
+    session.status = result.setup_required ? 'setup' : 'anonymous';
+  } catch {
+    session.status = 'anonymous';
+  }
 }
 
 setUnauthorizedHandler(signedOut);
@@ -15,7 +20,7 @@ export async function bootstrap() {
     session.name = me.name;
     session.status = 'authenticated';
   } catch {
-    signedOut();
+    await signedOut();
   }
 }
 
@@ -25,10 +30,16 @@ export async function login(name, password) {
   session.status = 'authenticated';
 }
 
+export async function setup(code, name, password) {
+  const result = await api.setup(code, name, password);
+  session.name = result.name;
+  session.status = 'authenticated';
+}
+
 export async function logout() {
   try {
     await api.logout();
   } catch {
   }
-  signedOut();
+  await signedOut();
 }

@@ -68,8 +68,6 @@
       {/if}
       <button class="btn solid" type="submit" disabled={busy}>{t('login.submit')}</button>
     </form>
-
-    <p class="muted hint">{t('login.hint')}</p>
   </div>
 </main>
 
@@ -84,10 +82,5 @@
     flex-direction: column;
     gap: 20px;
     padding: 24px;
-  }
-
-  .hint {
-    margin: 0;
-    font: 400 13px/1.5 var(--sans);
   }
 </style>

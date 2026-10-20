@@ -40,6 +40,8 @@ const range = (from, to) => `?${query({ from, to })}`;
 
 export const api = {
   me: () => request('GET', '/auth/me'),
+  authStatus: () => request('GET', '/auth/status'),
+  setup: (code, name, password) => request('POST', '/auth/setup', { code, name, password }),
   login: (name, password) => request('POST', '/auth/login', { name, password }),
   logout: () => request('POST', '/auth/logout'),
   changePassword: (current_password, new_password) =>
