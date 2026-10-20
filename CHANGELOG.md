@@ -5,6 +5,18 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-20
+
+### Added
+- Versioned core API under `/api/v1`: areas, activities (create, edit, archive, restore), reports (open, tick, reflection, sync, complete, list), scores by period and settings.
+- Uniform error format: `{"error": {"code", "message"}}`.
+- Free-text `reflection` on reports, frozen with the rest of the report.
+- Soft warning when an area has more than 5 active activities.
+- A draft report can be re-synced with the current activities until it is completed.
+
+### Changed
+- The container port is bound to `127.0.0.1` only until login exists.
+
 ## [0.2.0] - 2026-10-20
 
 ### Changed
@@ -30,7 +42,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/tombino104/PersonalOS/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/tombino104/PersonalOS/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/tombino104/PersonalOS/compare/v0.0.0...v0.1.0
 [0.0.0]: https://github.com/tombino104/PersonalOS/releases/tag/v0.0.0

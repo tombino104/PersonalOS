@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.2.0.** Data model and scoring engine are in place; there is no user interface yet.
+> **Status: v0.3.0.** Core API under `/api/v1` is in place; there is no login and no user interface yet, so the port is bound to localhost only.
 
 ## Guiding ideas
 
@@ -19,6 +19,8 @@ Requires Docker.
 docker compose up -d --build
 curl http://127.0.0.1:47213/health
 ```
+
+The server listens on `127.0.0.1` only. Interactive API docs: `http://127.0.0.1:47213/docs`.
 
 Data lives in `./data` (mounted as a volume, ignored by git). The host port (47213 by default) can be changed with `HOST_PORT`.
 

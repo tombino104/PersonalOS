@@ -5,7 +5,7 @@ services:
     container_name: personal-os
     restart: unless-stopped
     ports:
-      - "${HOST_PORT:-47213}:3000"
+      - "127.0.0.1:${HOST_PORT:-47213}:3000"
     environment:
       PORT: 3000
       DATA_DIR: /data
