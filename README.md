@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.4.0.** Core API under `/api/v1` and password login are in place; there is no user interface yet.
+> **Status: v0.5.0.** Core API, password login and the web interface are in place (login, questionnaire, home, star, past reports, settings). Plugins, backups, reminders and agents come next.
 
 ## Guiding ideas
 
@@ -21,6 +21,8 @@ curl http://127.0.0.1:47213/health
 ```
 
 The server listens on `127.0.0.1` only. Data lives in `./data` (mounted as a volume, ignored by git). The host port (47213 by default) can be changed with `HOST_PORT`.
+
+The image builds the web interface too (Svelte + Vite) and the server serves it, so there is only one container. Open `http://127.0.0.1:47213` once a user exists.
 
 Create the first user (nothing is reachable without logging in):
 
@@ -47,6 +49,18 @@ python -m venv .venv
 ```
 
 Database changes are numbered SQL files in `migrations/`, applied automatically at startup.
+
+The web interface lives in `web/` (Svelte 5 + Vite). Node 24 or newer:
+
+```bash
+cd web
+npm install
+npm test          # unit tests for dates, charts and translations
+npm run dev       # dev server; proxies /api to http://127.0.0.1:47213 (change with BACKEND_URL)
+npm run build     # writes web/dist, which the server serves
+```
+
+Texts live in `web/src/locales/` (English is the source, Italian is a translation). Colors come only from the theme tokens in `web/src/app.css`.
 
 ## Versioning
 

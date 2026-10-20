@@ -5,6 +5,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-21
+
+### Added
+- Web interface (Svelte 5 + Vite), built inside the Docker image and served by the same container: login, home (trends per area and a six-month heatmap), evening questionnaire with a completion stamp, star (radar of the six areas), past reports, more menu and settings (activities, account, appearance).
+- Light and dark themes from a single set of tokens, plus a six-area color palette; fonts are bundled, nothing is loaded from other sites.
+- English and Italian texts (English is the source); the language follows the device unless changed in the settings.
+- API: `GET /api/v1/today`, `GET /api/v1/stats/areas`, `GET /api/v1/stats/activities`, and an `overall` score per day (mean of the area scores, empty areas ignored).
+- Security headers and a content security policy on every response.
+
+### Changed
+- The Docker image is now multi-stage and runs the web unit tests while building.
+- The dock has four entries until plugins add their own (calendar, mood, skills).
+
 ## [0.4.0] - 2026-10-20
 
 ### Added
@@ -56,7 +69,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/tombino104/PersonalOS/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/tombino104/PersonalOS/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/tombino104/PersonalOS/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/tombino104/PersonalOS/compare/v0.1.0...v0.2.0
