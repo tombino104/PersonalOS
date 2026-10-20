@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.5.0.** Core API, password login and the web interface are in place (login, questionnaire, home, star, past reports, settings). Plugins, backups, reminders and agents come next.
+> **Status: v0.5.1.** Core API, password login and the web interface are in place (login, questionnaire, home, star, past reports, settings). Plugins, backups, reminders and agents come next.
 
 ## Guiding ideas
 
@@ -22,15 +22,17 @@ curl http://127.0.0.1:47213/health
 
 The server listens on `127.0.0.1` only. Data lives in `./data` (mounted as a volume, ignored by git). The host port (47213 by default) can be changed with `HOST_PORT`.
 
-The image builds the web interface too (Svelte + Vite) and the server serves it, so there is only one container. Open `http://127.0.0.1:47213` once a user exists.
+The image builds the web interface too (Svelte + Vite) and the server serves it, so there is only one container.
 
-Create the first user (nothing is reachable without logging in):
+On the first run there is no account yet. Open `http://127.0.0.1:47213`: the setup page asks for a one-time setup code. The code is saved in `data/setup-code.txt` (and printed in the container logs); a new code is generated at every start until an account exists. After five wrong codes the page locks for 15 minutes. Nothing else is reachable without logging in.
+
+You can also create the first user from the command line:
 
 ```bash
 docker compose exec personal-os python -m app.cli create-user --name <your-name>
 ```
 
-If you forget the password, or the account is locked after too many failed attempts, set a new one the same way:
+If you forget the password, or the account is locked after too many failed attempts, set a new one:
 
 ```bash
 docker compose exec personal-os python -m app.cli reset-password

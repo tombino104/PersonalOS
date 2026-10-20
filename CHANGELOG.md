@@ -5,6 +5,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-21
+
+### Added
+- First-run setup page: until an account exists, the interface asks for a one-time setup code (saved in `data/setup-code.txt` and printed in the logs), then creates the account and signs in. Five wrong codes lock the page for 15 minutes.
+- `GET /api/v1/auth/status` and `POST /api/v1/auth/setup`.
+
+### Changed
+- Creating the first user from the command line is now optional.
+
 ## [0.5.0] - 2026-10-21
 
 ### Added
@@ -69,7 +78,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/tombino104/PersonalOS/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/tombino104/PersonalOS/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/tombino104/PersonalOS/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/tombino104/PersonalOS/compare/v0.2.0...v0.3.0
