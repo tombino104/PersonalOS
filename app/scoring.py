@@ -24,3 +24,10 @@ def score(maximum: int, obtained: int) -> float | None:
     if maximum == 0:
         return None
     return obtained / maximum * 100
+
+
+def mean_score(values: Iterable[float | None]) -> float | None:
+    present = [value for value in values if value is not None]
+    if not present:
+        return None
+    return sum(present) / len(present)

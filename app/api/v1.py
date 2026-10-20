@@ -51,6 +51,37 @@ def info() -> dict:
     return {"api": "1", "version": __version__}
 
 
+@router.get("/today")
+def today(
+    conn: sqlite3.Connection = Depends(get_conn), now: datetime = Depends(get_now)
+) -> dict:
+    return {"day": logical_day(now, settings.day_rules(conn)).isoformat()}
+
+
+@router.get("/stats/areas")
+def area_stats(
+    start: date | None = Query(None, alias="from"),
+    end: date | None = Query(None, alias="to"),
+    conn: sqlite3.Connection = Depends(get_conn),
+    user_id: int = Depends(get_user_id),
+    now: datetime = Depends(get_now),
+) -> dict:
+    start, end = _resolve_range(conn, now, start, end)
+    return reports.area_averages(conn, user_id, start, end)
+
+
+@router.get("/stats/activities")
+def activity_stats(
+    start: date | None = Query(None, alias="from"),
+    end: date | None = Query(None, alias="to"),
+    conn: sqlite3.Connection = Depends(get_conn),
+    user_id: int = Depends(get_user_id),
+    now: datetime = Depends(get_now),
+) -> dict:
+    start, end = _resolve_range(conn, now, start, end)
+    return {"activities": reports.activity_stats(conn, user_id, start, end)}
+
+
 @router.get("/areas")
 def list_areas(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
     rows = conn.execute(

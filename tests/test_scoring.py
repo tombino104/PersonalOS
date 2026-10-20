@@ -29,3 +29,22 @@ def test_tally_of_nothing_is_zero_zero():
 def test_invalid_values_are_rejected(maximum, obtained):
     with pytest.raises(ValueError):
         score(maximum, obtained)
+
+
+def test_mean_score_skips_missing_values():
+    from app.scoring import mean_score
+
+    assert mean_score([100.0, None, 50.0]) == 75.0
+
+
+def test_mean_score_of_nothing_is_null_not_zero():
+    from app.scoring import mean_score
+
+    assert mean_score([]) is None
+    assert mean_score([None, None]) is None
+
+
+def test_mean_score_keeps_real_zeros():
+    from app.scoring import mean_score
+
+    assert mean_score([0.0, 100.0]) == 50.0

@@ -183,3 +183,64 @@ def test_sample_seed_runs_once_and_not_over_existing_data(conn):
     assert first > 0
     assert seed.sample_activities(conn) is False
     assert conn.execute("SELECT COUNT(*) FROM activities").fetchone()[0] == first
+
+
+def complete_day(conn, user_id, rules, day, now, done_ids=()):
+    report_id = reports.open_report(conn, user_id, day, now, rules)
+    for activity_id in done_ids:
+        reports.set_done(conn, report_id, activity_id, True, now)
+    reports.complete_report(conn, report_id, now)
+    return report_id
+
+
+def test_overall_is_the_mean_of_area_scores_ignoring_empty_areas(conn, user_id, rules, add_activity):
+    physical = add_activity("physical", "Workout", 2)
+    add_activity("intellect", "Reading", 2)
+    report_id = complete_day(conn, user_id, rules, DAY, EVENING, [physical])
+    detail = reports.report_detail(conn, report_id, EVENING)
+    assert detail["overall"] == 50.0
+    days = reports.scores_range(conn, user_id, DAY, DAY)
+    assert days[0]["overall"] == 50.0
+
+
+def test_overall_is_null_for_drafts_and_for_days_without_activities(conn, user_id, rules, add_activity):
+    add_activity("physical", "Workout", 2)
+    report_id = reports.open_report(conn, user_id, DAY, EVENING, rules)
+    assert reports.report_detail(conn, report_id, EVENING)["overall"] is None
+    conn.execute("UPDATE activities SET archived_at = datetime('now')")
+    conn.commit()
+    other = reports.open_report(conn, user_id, date(2026, 10, 19), EVENING, rules)
+    reports.complete_report(conn, other, EVENING)
+    assert reports.report_detail(conn, other, EVENING)["overall"] is None
+
+
+def test_area_averages_use_completed_days_only(conn, user_id, rules, add_activity):
+    workout = add_activity("physical", "Workout", 2)
+    complete_day(conn, user_id, rules, date(2026, 10, 19), utc(2026, 10, 19, 20), [workout])
+    complete_day(conn, user_id, rules, DAY, EVENING)
+    reports.open_report(conn, user_id, date(2026, 10, 21), utc(2026, 10, 21, 20), rules)
+    result = reports.area_averages(conn, user_id, date(2026, 10, 1), date(2026, 10, 31))
+    assert result["filled_days"] == 2
+    by_area = {a["area"]: a["average"] for a in result["areas"]}
+    assert by_area["physical"] == 50.0
+    assert by_area["mindset"] is None
+    assert [a["area"] for a in result["areas"]][0] == "physical"
+
+
+def test_area_averages_with_no_reports(conn, user_id):
+    result = reports.area_averages(conn, user_id, date(2026, 10, 1), date(2026, 10, 31))
+    assert result["filled_days"] == 0
+    assert all(a["average"] is None for a in result["areas"])
+
+
+def test_activity_stats_count_done_over_filled_days(conn, user_id, rules, add_activity):
+    workout = add_activity("physical", "Workout", 2)
+    reading = add_activity("intellect", "Reading", 1)
+    complete_day(conn, user_id, rules, date(2026, 10, 19), utc(2026, 10, 19, 20), [workout, reading])
+    complete_day(conn, user_id, rules, DAY, EVENING, [workout])
+    stats = reports.activity_stats(conn, user_id, date(2026, 10, 1), date(2026, 10, 31))
+    by_name = {s["name"]: s for s in stats}
+    assert (by_name["Workout"]["done"], by_name["Workout"]["total"]) == (2, 2)
+    assert (by_name["Reading"]["done"], by_name["Reading"]["total"]) == (1, 2)
+    assert by_name["Workout"]["area"] == "physical" and by_name["Workout"]["archived"] is False
+    assert [s["name"] for s in stats] == ["Workout", "Reading"]

@@ -268,3 +268,38 @@ def test_reports_belong_to_the_logged_in_user(client, tmp_path):
     ).fetchone()
     conn.close()
     assert owner["name"] == USER
+
+
+def test_today_follows_the_day_cutoff(client, clock):
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-20"}
+    clock.now = datetime(2026, 10, 21, 1, 30, tzinfo=timezone.utc)
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-20"}
+    clock.now = datetime(2026, 10, 21, 2, 0, tzinfo=timezone.utc)
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-21"}
+
+
+def test_overall_and_stats_over_the_api(client):
+    report = open_day(client)
+    physical = [c for c in report["completions"] if c["area"] == "physical"]
+    for completion in physical:
+        client.put(f"/api/v1/reports/{DAY}/completions/{completion['activity_id']}", json={"done": True})
+    done = client.post(f"/api/v1/reports/{DAY}/complete").json()
+    assert done["overall"] == pytest.approx(100 / 6)
+
+    days = client.get("/api/v1/scores", params={"from": DAY, "to": DAY}).json()["days"]
+    assert days[0]["overall"] == pytest.approx(100 / 6)
+
+    averages = client.get("/api/v1/stats/areas", params={"from": DAY, "to": DAY}).json()
+    assert averages["filled_days"] == 1
+    assert averages["areas"][0] == {"area": "physical", "average": 100.0}
+
+    stats = client.get("/api/v1/stats/activities", params={"from": DAY, "to": DAY}).json()["activities"]
+    assert len(stats) == len(report["completions"])
+    first = stats[0]
+    assert (first["done"], first["total"]) == (1, 1)
+
+
+def test_stats_validate_the_range(client):
+    for path in ("/api/v1/stats/areas", "/api/v1/stats/activities"):
+        response = client.get(path, params={"from": "2026-10-20", "to": "2026-10-01"})
+        assert (response.status_code, response.json()["error"]["code"]) == (422, "invalid_range")

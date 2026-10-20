@@ -2,7 +2,7 @@ import sqlite3
 from datetime import date, datetime, timezone
 
 from .logical_day import DayRules, edit_deadline, logical_day
-from .scoring import Item, score, tally
+from .scoring import Item, mean_score, score, tally
 
 
 class ReportClosed(Exception):
@@ -212,6 +212,7 @@ def report_detail(conn: sqlite3.Connection, report_id: int, now: datetime) -> di
             for c in completions
         ],
         "scores": scores,
+        "overall": None if scores is None else mean_score(s["score"] for s in scores),
     }
 
 
@@ -248,7 +249,10 @@ def scores_range(conn: sqlite3.Connection, user_id: int, start: date, end: date)
     days: dict[str, list[dict]] = {}
     for row in rows:
         days.setdefault(row["day"], []).append(_score_entry(row))
-    return [{"day": day, "areas": areas} for day, areas in days.items()]
+    return [
+        {"day": day, "areas": areas, "overall": mean_score(a["score"] for a in areas)}
+        for day, areas in days.items()
+    ]
 
 
 def set_reflection(
@@ -288,3 +292,53 @@ def sync_draft(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
             "(SELECT activity_id FROM completions WHERE report_id = ?)",
             (report_id, report_id),
         )
+
+
+def area_averages(conn: sqlite3.Connection, user_id: int, start: date, end: date) -> dict:
+    per_area: dict[str, list[float | None]] = {
+        row["slug"]: [] for row in conn.execute("SELECT slug FROM areas ORDER BY position")
+    }
+    filled_days: set[str] = set()
+    rows = conn.execute(
+        "SELECT r.day, a.slug, s.maximum, s.obtained "
+        "FROM reports r "
+        "JOIN daily_scores s ON s.report_id = r.id "
+        "JOIN areas a ON a.id = s.area_id "
+        "WHERE r.user_id = ? AND r.day BETWEEN ? AND ? AND r.completed_at IS NOT NULL",
+        (user_id, start.isoformat(), end.isoformat()),
+    ).fetchall()
+    for row in rows:
+        filled_days.add(row["day"])
+        per_area[row["slug"]].append(score(row["maximum"], row["obtained"]))
+    return {
+        "filled_days": len(filled_days),
+        "areas": [{"area": slug, "average": mean_score(v)} for slug, v in per_area.items()],
+    }
+
+
+def activity_stats(conn: sqlite3.Connection, user_id: int, start: date, end: date) -> list[dict]:
+    rows = conn.execute(
+        "SELECT c.activity_id, c.name_at_time, c.weight_at_time, c.done, a.slug, a.position, "
+        "act.archived_at "
+        "FROM completions c "
+        "JOIN reports r ON r.id = c.report_id "
+        "JOIN areas a ON a.id = c.area_id "
+        "JOIN activities act ON act.id = c.activity_id "
+        "WHERE r.user_id = ? AND r.day BETWEEN ? AND ? AND r.completed_at IS NOT NULL "
+        "ORDER BY r.day, c.id",
+        (user_id, start.isoformat(), end.isoformat()),
+    ).fetchall()
+    stats: dict[int, dict] = {}
+    positions: dict[int, int] = {}
+    for row in rows:
+        entry = stats.setdefault(row["activity_id"], {"activity_id": row["activity_id"], "done": 0, "total": 0})
+        entry.update(
+            name=row["name_at_time"],
+            weight=row["weight_at_time"],
+            area=row["slug"],
+            archived=row["archived_at"] is not None,
+        )
+        entry["done"] += row["done"]
+        entry["total"] += 1
+        positions[row["activity_id"]] = row["position"]
+    return sorted(stats.values(), key=lambda e: (positions[e["activity_id"]], e["activity_id"]))
