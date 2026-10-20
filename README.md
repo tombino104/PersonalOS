@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.5.1.** Core API, password login and the web interface are in place (login, questionnaire, home, star, past reports, settings). Plugins, backups, reminders and agents come next.
+> **Status: v0.6.0.** Core API, password login, the web interface and the plugin system are in place. Real plugins (mood, skills), backups, reminders and agents come next.
 
 ## Guiding ideas
 
@@ -38,7 +38,7 @@ If you forget the password, or the account is locked after too many failed attem
 docker compose exec personal-os python -m app.cli reset-password
 ```
 
-Other settings (see `.env.example`): `COOKIE_SECURE` (`auto`, `1` or `0`), `ALLOWED_ORIGINS` (extra hosts allowed for write requests, comma separated), `ENABLE_DOCS=1` to serve the interactive API docs at `/docs`.
+Other settings (see `.env.example`): `COOKIE_SECURE` (`auto`, `1` or `0`), `ALLOWED_ORIGINS` (extra hosts allowed for write requests, comma separated), `ENABLE_DOCS=1` to serve the interactive API docs at `/docs`, `PLUGINS_DIR` (where plugins are loaded from), `PLUGIN_HANDLER_TIMEOUT` (seconds a plugin may take to react to an event, 5 by default).
 
 ## Develop
 
@@ -62,7 +62,11 @@ npm run dev       # dev server; proxies /api to http://127.0.0.1:47213 (change w
 npm run build     # writes web/dist, which the server serves
 ```
 
-Texts live in `web/src/locales/` (English is the source, Italian is a translation). Colors come only from the theme tokens in `web/src/app.css`.
+Texts live in `web/src/locales/` (English is the source and the default, Italian is a translation you can pick in the settings). Colors come only from the theme tokens in `web/src/app.css`.
+
+## Plugins
+
+Features beyond the core are plugins: a folder in `plugins/` with a manifest, a Python backend and a Svelte interface. Turn them on and off in Settings > Plugins; each one lists the permissions it asks for. `plugins/example` is a small working example, and [docs/plugins.md](docs/plugins.md) explains how to write your own.
 
 ## Versioning
 

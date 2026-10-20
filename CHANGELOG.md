@@ -5,6 +5,21 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-21
+
+### Added
+- Plugin system: manifests, discovery, install on first activation, numbered migrations, per-plugin API routes, events delivered after saving, a sandboxed database connection per plugin and fault isolation (errors are recorded, repeated errors switch the plugin off).
+- Plugin extension points in the interface: questionnaire blocks, Home widgets, pages, dock and More entries, and a settings panel. Plugin texts are merged into the translations.
+- Settings > Plugins: turn plugins on and off after confirming the permissions they ask for, with their state and last error.
+- `plugins/example`: a small example plugin, off by default, with a developer guide in `docs/plugins.md`.
+- Audit log table; the app now closes reports whose edit window ended and announces it to plugins (`report.closed`).
+- Events: `report.completed`, `report.modified`, `report.closed`, `activity.created`, `activity.modified`, `activity.archived`, `plugin.activated`, `plugin.deactivated`.
+- `GET /api/v1/plugins` and `POST /api/v1/plugins/{id}/activate` and `.../deactivate`.
+
+### Changed
+- Settings are split into separate tabs: Activities, Account, Appearance, Plugins.
+- English is now the default interface language; Italian and automatic detection are options in Settings > Appearance.
+
 ## [0.5.1] - 2026-10-21
 
 ### Added
@@ -78,7 +93,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/tombino104/PersonalOS/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/tombino104/PersonalOS/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/tombino104/PersonalOS/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/tombino104/PersonalOS/compare/v0.3.0...v0.4.0

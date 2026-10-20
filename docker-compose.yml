@@ -12,5 +12,6 @@ services:
       COOKIE_SECURE: ${COOKIE_SECURE:-auto}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-}
       ENABLE_DOCS: ${ENABLE_DOCS:-0}
+      PLUGIN_HANDLER_TIMEOUT: ${PLUGIN_HANDLER_TIMEOUT:-5}
     volumes:
       - ./data:/data
