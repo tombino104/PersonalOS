@@ -1,4 +1,3 @@
-# Dati e segreti: MAI nel repo
 .env
 .env.*
 !.env.example
@@ -13,29 +12,12 @@ backups/
 *.sqlite3
 *.key
 *.pem
-
-# Documenti personali (specifica, concept, scansioni)
-Concept/
-docs/privato/
-
-# Dipendenze e build
 node_modules/
 dist/
 build/
-.svelte-kit/
 coverage/
-
-# Sistema e editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
 *.log
-
-# Versioni italiane: solo in locale
-*.it.md
-
-# Documenti di lavoro personali: solo in locale
-ROADMAP.md
-CLAUDE.md
-AGENTS.md

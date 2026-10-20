@@ -7,7 +7,7 @@ const { version } = JSON.parse(
   readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
 );
 
-function cartellaDatiScrivibile() {
+function dataDirIsWritable() {
   try {
     accessSync(DATA_DIR, constants.R_OK | constants.W_OK);
     return true;
@@ -18,19 +18,19 @@ function cartellaDatiScrivibile() {
 
 const server = createServer((req, res) => {
   if (req.method === 'GET' && req.url === '/health') {
-    const datiOk = cartellaDatiScrivibile();
-    res.writeHead(datiOk ? 200 : 503, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ stato: datiOk ? 'ok' : 'errore', versione: version, dati: datiOk }));
+    const dataOk = dataDirIsWritable();
+    res.writeHead(dataOk ? 200 : 503, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ status: dataOk ? 'ok' : 'error', version, data: dataOk }));
     return;
   }
   res.writeHead(404, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ errore: 'non trovato' }));
+  res.end(JSON.stringify({ error: 'not found' }));
 });
 
 server.listen(PORT, () => {
-  console.log(`Personal OS v${version} in ascolto sulla porta ${PORT}`);
+  console.log(`Personal OS v${version} listening on port ${PORT}`);
 });
 
-for (const segnale of ['SIGTERM', 'SIGINT']) {
-  process.on(segnale, () => server.close(() => process.exit(0)));
+for (const signal of ['SIGTERM', 'SIGINT']) {
+  process.on(signal, () => server.close(() => process.exit(0)));
 }

@@ -8,7 +8,6 @@ WORKDIR /app
 COPY package.json ./
 COPY src ./src
 
-# Cartella dati separata dal codice, montata come volume; l'app gira senza privilegi di root
 RUN mkdir -p /data && chown node:node /data
 USER node
 VOLUME /data

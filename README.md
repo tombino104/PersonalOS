@@ -17,10 +17,10 @@ Requires Docker.
 
 ```bash
 docker compose up -d --build
-curl http://127.0.0.1:3100/health
+curl http://127.0.0.1:47213/health
 ```
 
-Data lives in `./data` (mounted as a volume, ignored by git). The host port can be changed with `HOST_PORT`.
+Data lives in `./data` (mounted as a volume, ignored by git). The host port (47213 by default) can be changed with `HOST_PORT`.
 
 ## Versioning
 
