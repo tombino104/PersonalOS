@@ -4,7 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from .. import activities, reports
+from .. import activities, auth, reports, security
 
 
 class ApiError(Exception):
@@ -29,6 +29,8 @@ _DOMAIN_ERRORS = [
     (reports.NotInReport, 404, "not_found"),
     (activities.ActivityNotFound, 404, "not_found"),
     (activities.UnknownArea, 422, "unknown_area"),
+    (auth.InvalidCredentials, 401, "invalid_credentials"),
+    (security.WeakPassword, 422, "weak_password"),
 ]
 
 
@@ -36,6 +38,12 @@ def install(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def api_error(_: Request, exc: ApiError):
         return _response(exc.status_code, exc.code, exc.message)
+
+    @app.exception_handler(auth.LockedOut)
+    async def locked_out(_: Request, exc: auth.LockedOut):
+        response = _response(429, "locked_out", "too many failed attempts, try again later")
+        response.headers["Retry-After"] = str(exc.retry_after)
+        return response
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(_: Request, exc: RequestValidationError):

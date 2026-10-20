@@ -1,32 +1,11 @@
 from datetime import datetime, timezone
 
 import pytest
-from fastapi.testclient import TestClient
 
-from app.api.deps import get_now
-from app.main import app
+from app import db
+from tests.conftest import USER
 
 DAY = "2026-10-20"
-EVENING = datetime(2026, 10, 20, 20, 0, tzinfo=timezone.utc)
-
-
-class Clock:
-    def __init__(self):
-        self.now = EVENING
-
-
-@pytest.fixture
-def clock():
-    return Clock()
-
-
-@pytest.fixture
-def client(tmp_path, monkeypatch, clock):
-    monkeypatch.setenv("DATA_DIR", str(tmp_path))
-    app.dependency_overrides[get_now] = lambda: clock.now
-    with TestClient(app) as test_client:
-        yield test_client
-    app.dependency_overrides.clear()
 
 
 def activity_ids(client, area=None):
@@ -281,11 +260,11 @@ def test_settings_change_applies_to_new_reports_only(client, clock):
     assert stored.startswith("2026-10-22T00:00")
 
 
-def test_single_owner_user_is_created_once(client, tmp_path):
+def test_reports_belong_to_the_logged_in_user(client, tmp_path):
     open_day(client)
-    open_day(client, "2026-10-19")
-    import sqlite3
-
-    conn = sqlite3.connect(tmp_path / "personal_os.db")
-    assert conn.execute("SELECT COUNT(*) FROM users").fetchone()[0] == 1
+    conn = db.connect(tmp_path / "personal_os.db")
+    owner = conn.execute(
+        "SELECT user_id, name FROM reports r JOIN users u ON u.id = r.user_id"
+    ).fetchone()
     conn.close()
+    assert owner["name"] == USER

@@ -6,7 +6,8 @@ from fastapi import APIRouter, Depends, Query, Response
 
 from .. import __version__, activities, reports, settings
 from ..logical_day import logical_day
-from .deps import get_conn, get_now, get_user_id
+from .auth_routes import protected_router
+from .deps import get_conn, get_now, get_user_id, verify_origin
 from .errors import ApiError
 from .schemas import (
     ActivityCreate,
@@ -17,7 +18,10 @@ from .schemas import (
     SettingsUpdate,
 )
 
-router = APIRouter(prefix="/api/v1")
+router = APIRouter(
+    prefix="/api/v1", dependencies=[Depends(verify_origin), Depends(get_user_id)]
+)
+router.include_router(protected_router)
 
 MAX_RANGE_DAYS = 366
 DEFAULT_RANGE_DAYS = 90

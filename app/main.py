@@ -1,11 +1,14 @@
+import os
 import sqlite3
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from . import __version__, config, db, seed
+from . import __version__, auth, config, db, seed
 from .api import errors
+from .api.auth_routes import public_router
 from .api.v1 import router as api_v1
 
 
@@ -16,13 +19,24 @@ async def lifespan(app: FastAPI):
     try:
         db.migrate(conn)
         seed.sample_activities(conn)
+        auth.purge_expired_sessions(conn, datetime.now(timezone.utc))
     finally:
         conn.close()
     yield
 
 
-app = FastAPI(title="Personal OS", version=__version__, lifespan=lifespan)
+_docs_enabled = os.environ.get("ENABLE_DOCS") == "1"
+
+app = FastAPI(
+    title="Personal OS",
+    version=__version__,
+    lifespan=lifespan,
+    docs_url="/docs" if _docs_enabled else None,
+    redoc_url=None,
+    openapi_url="/openapi.json" if _docs_enabled else None,
+)
 errors.install(app)
+app.include_router(public_router)
 app.include_router(api_v1)
 
 

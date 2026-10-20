@@ -24,6 +24,20 @@ class ActivityUpdate(BaseModel):
     archived: bool | None = None
 
 
+class Login(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: Annotated[str, StringConstraints(min_length=1, max_length=100)]
+    password: Annotated[str, StringConstraints(min_length=1, max_length=1024)]
+
+
+class PasswordChange(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    current_password: Annotated[str, StringConstraints(min_length=1, max_length=1024)]
+    new_password: Annotated[str, StringConstraints(max_length=2048)]
+
+
 class ReportOpen(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
