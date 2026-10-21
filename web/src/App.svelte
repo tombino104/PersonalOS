@@ -18,6 +18,7 @@
   import { loadPlugins } from './lib/plugins.svelte.js';
   import { applyTheme } from './lib/theme.svelte.js';
   import { applyLanguage } from './lib/i18n.svelte.js';
+  import { syncAppearance } from './lib/appearance.js';
 
   const pages = {
     '/': Home,
@@ -41,7 +42,10 @@
   });
 
   $effect(() => {
-    if (session.status === 'authenticated') loadPlugins();
+    if (session.status === 'authenticated') {
+      loadPlugins();
+      syncAppearance();
+    }
   });
 
   onMount(() => {

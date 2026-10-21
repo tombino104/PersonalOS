@@ -8,6 +8,7 @@ from starlette.concurrency import run_in_threadpool
 from .. import __version__, activities, reports, settings
 from ..logical_day import logical_day
 from ..plugins.manifest import RESERVED_PATHS
+from . import backup_routes
 from .auth_routes import protected_router
 from .deps import get_conn, get_now, get_user_id, verify_origin
 from .errors import ApiError
@@ -27,6 +28,7 @@ router = APIRouter(
     prefix="/api/v1", dependencies=[Depends(verify_origin), Depends(get_user_id)]
 )
 router.include_router(protected_router)
+router.include_router(backup_routes.router)
 
 MAX_RANGE_DAYS = 366
 DEFAULT_RANGE_DAYS = 90
@@ -272,7 +274,12 @@ def get_scores(
 @router.get("/settings")
 def get_settings(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
     rules = settings.day_rules(conn)
-    return {"timezone": rules.timezone, "day_cutoff": rules.cutoff.strftime("%H:%M")}
+    return {
+        "timezone": rules.timezone,
+        "day_cutoff": rules.cutoff.strftime("%H:%M"),
+        "theme": settings.get(conn, "theme"),
+        "language": settings.get(conn, "language"),
+    }
 
 
 @router.patch("/settings")
@@ -292,6 +299,9 @@ def update_settings(body: SettingsUpdate, conn: sqlite3.Connection = Depends(get
         except ValueError:
             raise ApiError(422, "invalid_day_cutoff", "expected a time like 04:00") from None
         settings.put(conn, "day_cutoff", changes["day_cutoff"])
+    for key in ("theme", "language"):
+        if key in changes:
+            settings.put(conn, key, changes[key])
     return get_settings(conn)
 
 

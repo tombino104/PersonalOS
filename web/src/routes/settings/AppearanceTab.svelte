@@ -1,6 +1,7 @@
 <script>
-  import { i18n, setLanguage, t } from '../../lib/i18n.svelte.js';
-  import { setTheme, theme } from '../../lib/theme.svelte.js';
+  import { saveLanguage, saveTheme } from '../../lib/appearance.js';
+  import { i18n, t } from '../../lib/i18n.svelte.js';
+  import { theme } from '../../lib/theme.svelte.js';
 
   const themes = [
     ['light', 'settings.themeLight'],
@@ -20,13 +21,13 @@
   <span class="label" id="theme-label">{t('settings.theme')}</span>
   <div class="segmented fit" role="group" aria-labelledby="theme-label">
     {#each themes as [mode, label]}
-      <button class="seg" class:on={theme.mode === mode} aria-pressed={theme.mode === mode} onclick={() => setTheme(mode)}>{t(label)}</button>
+      <button class="seg" class:on={theme.mode === mode} aria-pressed={theme.mode === mode} onclick={() => saveTheme(mode)}>{t(label)}</button>
     {/each}
   </div>
   <span class="label spaced" id="language-label">{t('settings.language')}</span>
   <div class="segmented fit" role="group" aria-labelledby="language-label">
     {#each languages as [value, label]}
-      <button class="seg" class:on={i18n.preference === value} aria-pressed={i18n.preference === value} onclick={() => setLanguage(value)}>{t(label)}</button>
+      <button class="seg" class:on={i18n.preference === value} aria-pressed={i18n.preference === value} onclick={() => saveLanguage(value)}>{t(label)}</button>
     {/each}
   </div>
 </section>

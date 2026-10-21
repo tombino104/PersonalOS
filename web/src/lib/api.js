@@ -14,12 +14,18 @@ export function setUnauthorizedHandler(handler) {
 }
 
 async function request(method, path, body) {
-  const response = await fetch(`/api/v1${path}`, {
-    method,
+  return send(method, path, {
     headers: body === undefined ? {} : { 'Content-Type': 'application/json' },
     body: body === undefined ? undefined : JSON.stringify(body),
-    credentials: 'same-origin',
   });
+}
+
+function upload(path, file) {
+  return send('POST', path, { headers: { 'Content-Type': 'application/zip' }, body: file });
+}
+
+async function send(method, path, { headers, body }) {
+  const response = await fetch(`/api/v1${path}`, { method, headers, body, credentials: 'same-origin' });
   let data = null;
   try {
     data = await response.json();
@@ -52,6 +58,13 @@ export const api = {
   changePassword: (current_password, new_password) =>
     request('POST', '/auth/password', { current_password, new_password }),
 
+  settings: () => request('GET', '/settings'),
+  updateSettings: (body) => request('PATCH', '/settings', body),
+  backups: () => request('GET', '/backups'),
+  createBackup: () => request('POST', '/backups'),
+  backupUrl: (name) => `/api/v1/backups/${name}`,
+  restoreStored: (name) => request('POST', `/backups/${name}/restore?confirm=restore`),
+  restoreUpload: (file) => upload('/backups/restore?confirm=restore', file),
   today: () => request('GET', '/today'),
   areas: () => request('GET', '/areas'),
 

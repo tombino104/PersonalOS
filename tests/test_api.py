@@ -241,7 +241,12 @@ def test_range_validation(client):
 
 
 def test_settings_roundtrip_and_validation(client):
-    assert client.get("/api/v1/settings").json() == {"timezone": "Europe/Rome", "day_cutoff": "04:00"}
+    assert client.get("/api/v1/settings").json() == {
+        "timezone": "Europe/Rome",
+        "day_cutoff": "04:00",
+        "theme": None,
+        "language": None,
+    }
     bad_zone = client.patch("/api/v1/settings", json={"timezone": "Mars/Base"})
     assert (bad_zone.status_code, bad_zone.json()["error"]["code"]) == (422, "invalid_timezone")
     bad_time = client.patch("/api/v1/settings", json={"day_cutoff": "25:99"})
@@ -250,11 +255,21 @@ def test_settings_roundtrip_and_validation(client):
     assert client.get("/api/v1/settings").json()["timezone"] == "Europe/Rome"
 
 
+def test_theme_and_language_are_kept_on_the_server(client):
+    saved = client.patch("/api/v1/settings", json={"theme": "dark", "language": "it"})
+    assert (saved.json()["theme"], saved.json()["language"]) == ("dark", "it")
+    assert client.get("/api/v1/settings").json()["theme"] == "dark"
+    assert client.patch("/api/v1/settings", json={"theme": "purple"}).status_code == 422
+    assert client.patch("/api/v1/settings", json={"language": "fr"}).status_code == 422
+    assert client.patch("/api/v1/settings", json={"theme": None}).status_code == 422
+    assert client.get("/api/v1/settings").json()["language"] == "it"
+
+
 def test_settings_change_applies_to_new_reports_only(client, clock):
     clock.now = datetime(2026, 10, 20, 1, 30, tzinfo=timezone.utc)
     assert client.post("/api/v1/reports", json={"day": DAY}).status_code == 422
     updated = client.patch("/api/v1/settings", json={"timezone": "UTC", "day_cutoff": "00:00"})
-    assert updated.json() == {"timezone": "UTC", "day_cutoff": "00:00"}
+    assert (updated.json()["timezone"], updated.json()["day_cutoff"]) == ("UTC", "00:00")
     assert client.post("/api/v1/reports", json={"day": DAY}).status_code == 201
     stored = client.get(f"/api/v1/reports/{DAY}").json()["editable_until"]
     assert stored.startswith("2026-10-22T00:00")

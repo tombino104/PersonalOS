@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
@@ -81,3 +81,5 @@ class SettingsUpdate(BaseModel):
 
     timezone: str | None = None
     day_cutoff: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
+    theme: Literal["light", "dark", "auto"] | None = None
+    language: Literal["en", "it", "auto"] | None = None

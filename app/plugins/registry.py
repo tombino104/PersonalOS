@@ -259,6 +259,10 @@ class Registry:
                 finally:
                     conn.close()
 
+    def refresh(self, now: datetime) -> None:
+        self._upgrade_installed(now)
+        self.apply_defaults(now)
+
     def apply_defaults(self, now: datetime) -> None:
         conn = db.connect(config.db_path())
         try:

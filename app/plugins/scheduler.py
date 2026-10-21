@@ -1,15 +1,22 @@
 import asyncio
+import logging
 import os
 from datetime import datetime, timezone
 
-from .. import config, db, reports
+from .. import backup, config, db, reports
 from .registry import Registry
+
+logger = logging.getLogger("uvicorn.error")
 
 
 def tick(registry: Registry, now: datetime) -> list[dict]:
     conn = db.connect(config.db_path())
     try:
         expired = reports.expire_reports(conn, now)
+        try:
+            backup.run_nightly(conn, now)
+        except Exception:
+            logger.exception("the nightly backup failed")
     finally:
         conn.close()
     for item in expired:

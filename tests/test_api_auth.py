@@ -32,6 +32,11 @@ PROTECTED = [
     ("GET", "/api/v1/auth/me"),
     ("POST", "/api/v1/auth/logout"),
     ("POST", "/api/v1/auth/password"),
+    ("GET", "/api/v1/backups"),
+    ("POST", "/api/v1/backups"),
+    ("GET", "/api/v1/backups/personal-os-manual-20261020-200000.zip"),
+    ("POST", "/api/v1/backups/restore?confirm=restore"),
+    ("POST", "/api/v1/backups/personal-os-manual-20261020-200000.zip/restore?confirm=restore"),
 ]
 
 
