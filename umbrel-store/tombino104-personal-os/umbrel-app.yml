@@ -2,7 +2,7 @@ manifestVersion: 1
 id: tombino104-personal-os
 category: productivity
 name: Personal OS
-version: "0.10.2"
+version: "0.11.0"
 tagline: A quiet place for your days
 description: >-
   A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
@@ -26,5 +26,6 @@ gallery:
   - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
-  You can now erase all data from Settings > Account, using the setup code from the app's data folder.
+  The first run no longer needs a setup code: umbrelOS asks for its password, then the app asks you to create your
+  account. The project is now released under the AGPL-3.0.
 submitter: tombino104
