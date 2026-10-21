@@ -43,6 +43,11 @@ def get_user_id(
 def verify_origin(request: Request) -> None:
     if request.method in SAFE_METHODS:
         return
+    fetch_site = request.headers.get("sec-fetch-site")
+    if fetch_site is not None:
+        if fetch_site in ("same-origin", "none"):
+            return
+        raise ApiError(403, "bad_origin", "request origin not allowed")
     origin = request.headers.get("origin")
     if origin is None:
         return

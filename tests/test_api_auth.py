@@ -176,3 +176,23 @@ def test_allowed_origins_setting(client, monkeypatch):
         headers={"Origin": "https://machine.example.ts.net"},
     )
     assert response.status_code == 201
+
+
+@pytest.mark.parametrize("site", ["cross-site", "same-site"])
+def test_browsers_marking_a_request_as_not_same_origin_are_refused(client, site):
+    response = client.post("/api/v1/reports", json={"day": "2026-10-20"}, headers={"Sec-Fetch-Site": site})
+    assert (response.status_code, response.json()["error"]["code"]) == (403, "bad_origin")
+
+
+@pytest.mark.parametrize("site", ["same-origin", "none"])
+def test_same_origin_requests_work_behind_a_proxy_that_rewrites_the_host(client, site):
+    headers = {"Sec-Fetch-Site": site, "Origin": "https://machine.example.ts.net", "Host": "internal:3000"}
+    response = client.post("/api/v1/reports", json={"day": "2026-10-20"}, headers=headers)
+    assert response.status_code == 201
+
+
+def test_a_cross_site_login_is_refused_too(anon_client):
+    response = anon_client.post(
+        LOGIN, json={"name": USER, "password": PASSWORD}, headers={"Sec-Fetch-Site": "cross-site"}
+    )
+    assert response.status_code == 403
