@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-10-22
+
+### Fixed
+- The login and first-run setup pages are now centered vertically on phones too (they were pushed up by the space reserved for the dock).
+
 ## [0.7.1] - 2026-10-21
 
 ### Added
@@ -118,7 +123,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.7.2...HEAD
+[0.7.2]: https://github.com/tombino104/PersonalOS/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/tombino104/PersonalOS/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/tombino104/PersonalOS/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/tombino104/PersonalOS/compare/v0.5.1...v0.6.0

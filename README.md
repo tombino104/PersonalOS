@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.7.1.** Core API, password login, the web interface, the plugin system and the first plugin (mood tracker) are in place. Backups, reminders and agents come next.
+> **Status: v0.7.2.** Core API, password login, the web interface, the plugin system and the first plugin (mood tracker) are in place. Backups, reminders and agents come next.
 
 ## Guiding ideas
 
