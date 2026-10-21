@@ -2,7 +2,7 @@ manifestVersion: 1
 id: tombino104-personal-os
 category: productivity
 name: Personal OS
-version: "0.9.1"
+version: "0.10.0"
 tagline: A quiet place for your days
 description: >-
   A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
@@ -26,6 +26,6 @@ gallery:
   - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
-  Backups: choose the time of the automatic backup or turn it off in Settings > Backups. If your Umbrel was off at
-  that time, the backup is made as soon as it is on again.
+  New: a Mascot profile with your photo (Settings > Mascot), and a Daily quote plugin you can turn on in
+  Settings > Plugins.
 submitter: tombino104
