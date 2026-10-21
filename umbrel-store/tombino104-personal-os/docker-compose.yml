@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+  app_proxy:
+    environment:
+      APP_HOST: tombino104-personal-os_web_1
+      APP_PORT: 3000
+      PROXY_AUTH_ADD: "false"
+
+  web:
+    image: ghcr.io/tombino104/personalos:0.7.1
+    restart: on-failure
+    stop_grace_period: 1m
+    environment:
+      PORT: 3000
+      DATA_DIR: /data
+      COOKIE_SECURE: auto
+      ENABLE_DOCS: "0"
+    volumes:
+      - ${APP_DATA_DIR}/data:/data

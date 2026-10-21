@@ -1,0 +1,25 @@
+manifestVersion: 1
+id: tombino104-personal-os
+category: productivity
+name: Personal OS
+version: "0.7.1"
+tagline: A quiet place for your days
+description: >-
+  A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
+  It is a mirror, not a judge: it measures behaviors, never results, and a day left blank is empty, not zero.
+
+
+  Everything you write stays in one folder on your Umbrel, so a backup is just a copy of that folder.
+  Extra features (like a mood tracker) are plugins you can turn on and off.
+developer: tombino104
+website: https://github.com/tombino104/PersonalOS
+dependencies: []
+repo: https://github.com/tombino104/PersonalOS
+support: https://github.com/tombino104/PersonalOS/issues
+port: 47213
+gallery: []
+path: ""
+releaseNotes: >-
+  First version for Umbrel. The first time you open the app it asks for a setup code: you find it in the file
+  setup-code.txt inside the app's data folder.
+submitter: tombino104
