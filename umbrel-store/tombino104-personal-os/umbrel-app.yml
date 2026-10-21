@@ -2,7 +2,7 @@ manifestVersion: 1
 id: tombino104-personal-os
 category: productivity
 name: Personal OS
-version: "0.10.0"
+version: "0.10.1"
 tagline: A quiet place for your days
 description: >-
   A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
@@ -26,6 +26,5 @@ gallery:
   - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
-  New: a Mascot profile with your photo (Settings > Mascot), and a Daily quote plugin you can turn on in
-  Settings > Plugins.
+  Home now remembers your period (week or month) and the area filter after a refresh. The example plugin was removed.
 submitter: tombino104
