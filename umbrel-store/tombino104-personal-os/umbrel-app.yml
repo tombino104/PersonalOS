@@ -2,7 +2,7 @@ manifestVersion: 1
 id: tombino104-personal-os
 category: productivity
 name: Personal OS
-version: "0.7.2"
+version: "0.8.0"
 tagline: A quiet place for your days
 description: >-
   A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
@@ -26,6 +26,6 @@ gallery:
   - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
-  First version for Umbrel. The first time you open the app it asks for a setup code: you find it in the file
-  setup-code.txt inside the app's data folder.
+  New: a built-in calendar with repeating events, shown in the dock. The login page now has a "start over" link that
+  erases all data with the setup code (setup-code.txt in the app's data folder) and creates a new account.
 submitter: tombino104
