@@ -140,6 +140,10 @@ a {
   padding: 40px 32px 0;
 }
 
+.page.bare {
+  padding-bottom: 40px;
+}
+
 .content {
   display: flex;
   flex: 1 0 auto;
@@ -464,6 +468,10 @@ textarea.field {
 @media (max-width: 560px) {
   .page {
     padding: 28px 16px 150px;
+  }
+
+  .page.bare {
+    padding: 28px 16px;
   }
 
   .dock-wrap {

@@ -28,7 +28,7 @@
   }
 </script>
 
-<main class="page">
+<main class="page bare">
   <div class="content narrow login stagger">
     <header>
       <div class="eyebrow">Personal OS</div>
@@ -74,7 +74,6 @@
 <style>
   .login {
     justify-content: center;
-    padding-bottom: 48px;
   }
 
   .form {

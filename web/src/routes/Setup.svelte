@@ -31,7 +31,7 @@
   }
 </script>
 
-<main class="page">
+<main class="page bare">
   <div class="content narrow setup stagger">
     <header>
       <div class="eyebrow">Personal OS</div>
@@ -103,7 +103,7 @@
 
 <style>
   .setup {
-    padding-bottom: 48px;
+    justify-content: center;
   }
 
   .form {
