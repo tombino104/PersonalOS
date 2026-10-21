@@ -5,6 +5,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-10-21
+
+### Added
+- GitHub workflows: **CI** runs all tests on every push, **Image** builds and publishes the Docker image (amd64 and arm64) to `ghcr.io/tombino104/personalos` on every release tag.
+- `umbrel-store/`: a community app store for umbrelOS with the Personal OS app, and `docs/umbrel.md` explaining how to install it.
+
+### Changed
+- The container now starts as root, fixes the ownership of the data folder and then drops to a normal user, so it works with any mounted folder (like the one umbrelOS provides).
+- Write requests are now accepted when the browser says they are same-origin (`Sec-Fetch-Site`), which keeps the app working behind proxies that rewrite the host. The previous Origin check remains as a fallback.
+- The Docker build no longer runs the web tests; CI does.
+
 ## [0.7.0] - 2026-10-21
 
 ### Added
@@ -107,7 +118,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/tombino104/PersonalOS/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/tombino104/PersonalOS/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/tombino104/PersonalOS/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/tombino104/PersonalOS/compare/v0.5.0...v0.5.1
