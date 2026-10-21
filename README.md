@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.11.0.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Backups, reminders and agents come next.
+> **Status: v0.12.0.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Backups, reminders and agents come next.
 
 ## Screenshots
 
@@ -40,7 +40,7 @@ The image builds the web interface too (Svelte + Vite) and the server serves it,
 
 On the first run there is no account yet. Open `http://127.0.0.1:47213`: the setup page asks for a one-time setup code. The code is saved in `data/setup-code.txt` (and printed in the container logs while no account exists); a new code is generated at every start and every time it is used. After five wrong codes the page locks for 15 minutes. Nothing else is reachable without logging in.
 
-If you forget the password and want to start from scratch, the login page has a "start over" link: with the code from `data/setup-code.txt` and a new name and password (typed twice) it **erases all data** and creates a fresh account.
+If you forget the password and want to start from scratch, the login page has a "start over" link (also in Settings > Account): with the code from `data/setup-code.txt` it **erases all data**, and the app starts again from the welcome screens, which end with the creation of a new account. A short user guide is in Settings > Guide.
 
 You can also create the first user from the command line:
 

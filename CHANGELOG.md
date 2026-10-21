@@ -5,6 +5,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-10-22
+
+### Added
+- Welcome screens: before creating the account, the first run walks through what the app does (the six areas, the evening questionnaire, the score, Home and the Star, plugins, your data), with smooth transitions. They can be skipped.
+- Settings > Guide: a user guide with the basics (questionnaire, score, activities, Home, calendar, plugins, mascot, backups, account, data), in English and Italian.
+
+### Changed
+- "Erase all data" now needs only the setup code and a confirmation. It wipes everything, including the account, and the app starts again from the welcome screens (`POST /api/v1/auth/reset` takes only `code` and returns `setup_required`). The name and password are chosen in the last welcome step.
+- The theme and language kept in the browser are forgotten too after erasing.
+
 ## [0.11.0] - 2026-10-22
 
 ### Changed
@@ -185,7 +195,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/tombino104/PersonalOS/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/tombino104/PersonalOS/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/tombino104/PersonalOS/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/tombino104/PersonalOS/compare/v0.10.0...v0.10.1

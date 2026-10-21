@@ -15,6 +15,14 @@ export async function syncAppearance() {
   }
 }
 
+export function forgetLocalAppearance() {
+  try {
+    localStorage.removeItem('personal-os-theme');
+    localStorage.removeItem('personal-os-language');
+  } catch {
+  }
+}
+
 export function saveTheme(mode) {
   setTheme(mode);
   api.updateSettings({ theme: mode }).catch(() => {});

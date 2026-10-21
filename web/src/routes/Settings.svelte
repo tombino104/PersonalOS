@@ -6,6 +6,7 @@
   import ActivitiesTab from './settings/ActivitiesTab.svelte';
   import AppearanceTab from './settings/AppearanceTab.svelte';
   import BackupsTab from './settings/BackupsTab.svelte';
+  import GuideTab from './settings/GuideTab.svelte';
   import MascotTab from './settings/MascotTab.svelte';
   import PluginsTab from './settings/PluginsTab.svelte';
 
@@ -16,6 +17,7 @@
     { id: 'appearance', label: 'settings.appearance', component: AppearanceTab },
     { id: 'backups', label: 'settings.backups', component: BackupsTab },
     { id: 'plugins', label: 'settings.plugins', component: PluginsTab },
+    { id: 'guide', label: 'settings.guide', component: GuideTab },
   ];
 
   const tab = $derived(TABS.find((item) => item.id === router.path.split('/')[2]));

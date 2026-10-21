@@ -128,6 +128,6 @@ def test_the_code_can_be_switched_off_for_setup_only(anon_client, tmp_path, monk
     assert response.status_code == 200
     assert anon_client.get("/api/v1/auth/me").json() == {"name": "Alice"}
     assert anon_client.post(SETUP, json={"name": "Mallory", "password": PASSPHRASE}).status_code == 409
-    reset = anon_client.post("/api/v1/auth/reset", json={"name": "Alice", "password": PASSPHRASE})
+    reset = anon_client.post("/api/v1/auth/reset", json={"code": "WRONG-CODE"})
     assert (reset.status_code, reset.json()["error"]["code"]) == (401, "invalid_setup_code")
-    assert anon_client.post("/api/v1/auth/reset", json=payload(read_code(tmp_path))).status_code == 200
+    assert anon_client.post("/api/v1/auth/reset", json={"code": read_code(tmp_path)}).status_code == 200

@@ -1,8 +1,9 @@
+import sqlite3
 from datetime import timedelta
 
 from tests.test_backup import BACKUPS, CONFIRMED
 from tests.test_reset import RESET
-from tests.test_setup import payload, read_code
+from tests.test_setup import read_code
 
 PROFILE = "/api/v1/profile"
 PNG = b"\x89PNG\r\n\x1a\n" + b"\x00" * 64
@@ -78,5 +79,5 @@ def test_the_profile_travels_with_a_backup_and_is_wiped_by_a_reset(client, tmp_p
     restored = client.get(PROFILE).json()
     assert (restored["display_name"], restored["has_photo"]) == ("Sam", True)
     assert client.get(f"{PROFILE}/photo").content == PNG
-    assert client.post(RESET, json=payload(read_code(tmp_path))).status_code == 200
-    assert client.get(PROFILE).json()["display_name"] is None
+    assert client.post(RESET, json={"code": read_code(tmp_path)}).status_code == 200
+    assert sqlite3.connect(tmp_path / "personal_os.db").execute("SELECT COUNT(*) FROM profile").fetchone()[0] == 0

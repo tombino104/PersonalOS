@@ -51,6 +51,12 @@ class Setup(BaseModel):
     password: Annotated[str, StringConstraints(max_length=2048)]
 
 
+class ResetRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    code: Annotated[str, StringConstraints(min_length=1, max_length=64)]
+
+
 class PasswordChange(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

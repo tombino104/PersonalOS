@@ -37,12 +37,6 @@ export async function setup(code, name, password) {
   session.status = 'authenticated';
 }
 
-export async function reset(code, name, password) {
-  const result = await api.reset(code, name, password);
-  session.name = result.name;
-  session.status = 'authenticated';
-}
-
 export async function logout() {
   try {
     await api.logout();

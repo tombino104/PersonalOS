@@ -1,14 +1,11 @@
 <script>
-  import { reset } from '../lib/session.svelte.js';
-  import { ApiError } from '../lib/api.js';
+  import { api, ApiError } from '../lib/api.js';
+  import { forgetLocalAppearance } from '../lib/appearance.js';
   import { t } from '../lib/i18n.svelte.js';
 
   let { onreset, plain = false } = $props();
 
   let code = $state('');
-  let name = $state('');
-  let password = $state('');
-  let repeat = $state('');
   let understood = $state(false);
   let error = $state('');
   let busy = $state(false);
@@ -16,20 +13,15 @@
   async function submit(event) {
     event.preventDefault();
     error = '';
-    if (password !== repeat) {
-      error = t('setup.mismatch');
-      return;
-    }
     busy = true;
     try {
-      await reset(code.trim(), name.trim(), password);
+      await api.reset(code.trim());
+      forgetLocalAppearance();
       onreset();
     } catch (failure) {
       if (failure instanceof ApiError && failure.code === 'invalid_setup_code') error = t('setup.invalidCode');
-      else if (failure instanceof ApiError && failure.code === 'weak_password') error = t('setup.weak');
       else if (failure instanceof ApiError && failure.code === 'locked_out') error = t('login.locked', { minutes: Math.ceil((failure.retryAfter ?? 900) / 60) });
       else error = t('error.generic');
-    } finally {
       busy = false;
     }
   }
@@ -50,44 +42,6 @@
       bind:value={code}
     />
     <p class="muted help">{t('reset.codeHelp')}</p>
-  </div>
-  <div>
-    <label class="label" for="reset-name">{t('setup.name')}</label>
-    <input
-      id="reset-name"
-      class="field"
-      type="text"
-      name="username"
-      autocomplete="username"
-      autocapitalize="words"
-      autocorrect="off"
-      required
-      bind:value={name}
-    />
-  </div>
-  <div>
-    <label class="label" for="reset-password">{t('setup.password')}</label>
-    <input
-      id="reset-password"
-      class="field"
-      type="password"
-      name="password"
-      autocomplete="new-password"
-      minlength="10"
-      required
-      bind:value={password}
-    />
-  </div>
-  <div>
-    <label class="label" for="reset-repeat">{t('setup.repeat')}</label>
-    <input
-      id="reset-repeat"
-      class="field"
-      type="password"
-      autocomplete="new-password"
-      required
-      bind:value={repeat}
-    />
   </div>
   <label class="confirm">
     <input type="checkbox" required bind:checked={understood} />
