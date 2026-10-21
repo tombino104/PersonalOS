@@ -1,6 +1,6 @@
 # Security
 
-Personal OS is made for one person, running in a container on your own device (for example umbrelOS) behind a private network such as Tailscale. It is not meant to be exposed to the public internet.
+Personal OS is made for one person, running in a container on your own device behind a private network such as Tailscale. It is not meant to be exposed to the public internet.
 
 ## Supported versions
 

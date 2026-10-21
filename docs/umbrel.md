@@ -1,6 +1,6 @@
 # Running on umbrelOS
 
-Personal OS ships as a Docker image (`ghcr.io/tombino104/personalos`) and as a community app store for umbrelOS (the `umbrel-store/` folder).
+Personal OS is not specific to umbrelOS: it is a plain Docker image (`ghcr.io/tombino104/personalos`) that runs anywhere, see [running.md](running.md). This page covers the optional community app store for umbrelOS (the `umbrel-store/` folder).
 
 ## How it fits together
 
