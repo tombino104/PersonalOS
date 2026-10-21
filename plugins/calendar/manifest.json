@@ -1,0 +1,18 @@
+{
+  "id": "calendar",
+  "name": "Calendar",
+  "version": "0.1.0",
+  "description": "A calendar to remember things, not to judge them: events with optional repeats. It never creates points.",
+  "core_api": "1.x",
+  "permissions": ["ui_panel", "api_routes"],
+  "default_active": true,
+  "adds": {
+    "pages": ["month"],
+    "entries": [
+      { "id": "calendar", "label": "Calendar", "icon": "calendar", "placement": "dock", "page": "month" }
+    ]
+  },
+  "listens": [],
+  "emits": [],
+  "migrations": "backend/migrations"
+}
