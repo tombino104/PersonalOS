@@ -29,6 +29,7 @@ async def lifespan(app: FastAPI):
         conn.close()
     registry = Registry()
     registry.load(config.plugins_dir(), datetime.now(timezone.utc))
+    registry.apply_defaults(datetime.now(timezone.utc))
     app.state.plugins = registry
     scheduler_task = asyncio.create_task(scheduler.run(registry))
     try:

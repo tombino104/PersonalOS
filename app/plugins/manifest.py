@@ -71,6 +71,7 @@ class Manifest:
     listens: tuple
     emits: tuple
     migrations: str | None
+    default_active: bool = False
 
     def to_public(self) -> dict:
         return {
@@ -95,6 +96,7 @@ class Manifest:
                 for entry in self.entries
             ],
             "settings": self.settings,
+            "default_active": self.default_active,
         }
 
 
@@ -204,6 +206,10 @@ def parse_manifest(data, folder_name: str) -> Manifest:
     if migrations is not None and (not isinstance(migrations, str) or ".." in migrations or migrations.startswith(("/", "\\"))):
         raise ManifestError("'migrations' must be a relative folder inside the plugin")
 
+    default_active = data.get("default_active", False)
+    if not isinstance(default_active, bool):
+        raise ManifestError("'default_active' must be true or false")
+
     return Manifest(
         id=plugin_id,
         name=_text(data, "name", 60),
@@ -220,6 +226,7 @@ def parse_manifest(data, folder_name: str) -> Manifest:
         listens=tuple(listens),
         emits=tuple(emits),
         migrations=migrations,
+        default_active=default_active,
     )
 
 

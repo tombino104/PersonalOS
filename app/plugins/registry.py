@@ -15,7 +15,7 @@ from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from starlette.concurrency import run_in_threadpool
 
-from .. import audit, config, db
+from .. import audit, config, db, settings
 import re
 
 from .access import open_context, table_prefix
@@ -258,6 +258,25 @@ class Registry:
                         )
                 finally:
                     conn.close()
+
+    def apply_defaults(self, now: datetime) -> None:
+        conn = db.connect(config.db_path())
+        try:
+            applied = settings.get(conn, "default_plugins_applied", [])
+            for plugin_id, loaded in self.plugins.items():
+                if loaded.error or loaded.manifest is None or not loaded.manifest.default_active:
+                    continue
+                if plugin_id in applied:
+                    continue
+                try:
+                    self.activate(conn, plugin_id, True, now)
+                except (PluginUnavailable, PluginNotFound) as error:
+                    logger.warning("default plugin %s could not be activated: %s", plugin_id, error)
+                    continue
+                applied.append(plugin_id)
+            settings.put(conn, "default_plugins_applied", applied)
+        finally:
+            conn.close()
 
     def get(self, plugin_id: str) -> Loaded | None:
         return self.plugins.get(plugin_id)

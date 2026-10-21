@@ -86,6 +86,8 @@ def migration_authorizer(plugin_id: str):
         if action in _INDEXES:
             owned = arg1.startswith(prefix) or arg1.startswith(f"sqlite_autoindex_{prefix}")
             return OK if owned and (arg2 or "").startswith(prefix) else DENY
+        if action == sqlite3.SQLITE_REINDEX:
+            return OK if arg1.startswith(prefix) else DENY
         if action in _CREATES_WITH_TABLE:
             return OK if arg1.startswith(prefix) and (arg2 or "").startswith(prefix) else DENY
         if action == sqlite3.SQLITE_ALTER_TABLE:
