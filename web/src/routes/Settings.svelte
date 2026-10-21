@@ -7,6 +7,7 @@
   import AppearanceTab from './settings/AppearanceTab.svelte';
   import BackupsTab from './settings/BackupsTab.svelte';
   import CommunityTab from './settings/CommunityTab.svelte';
+  import DockTab from './settings/DockTab.svelte';
   import GuideTab from './settings/GuideTab.svelte';
   import MascotTab from './settings/MascotTab.svelte';
   import PluginsTab from './settings/PluginsTab.svelte';
@@ -16,6 +17,7 @@
     { id: 'account', label: 'settings.account', component: AccountTab },
     { id: 'mascot', label: 'settings.mascot', component: MascotTab },
     { id: 'appearance', label: 'settings.appearance', component: AppearanceTab },
+    { id: 'dock', label: 'settings.dock', component: DockTab },
     { id: 'backups', label: 'settings.backups', component: BackupsTab },
     { id: 'plugins', label: 'settings.plugins', component: PluginsTab },
     { id: 'guide', label: 'settings.guide', component: GuideTab },

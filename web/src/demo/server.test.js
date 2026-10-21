@@ -86,6 +86,30 @@ describe('demo server', () => {
     expect(synced.scores.find((entry) => entry.area === 'career').maximum).toBeGreaterThanOrEqual(3);
   });
 
+  it('deletes only archived activities and keeps their history', () => {
+    const { call } = demo();
+    const used = call('GET', '/activities').data.activities[0];
+    expect(call('DELETE', `/activities/${used.id}`).data.error.code).toBe('activity_not_archived');
+    call('PATCH', `/activities/${used.id}`, { archived: true });
+    expect(call('DELETE', `/activities/${used.id}`).data).toEqual({ id: used.id, kept_in_history: true });
+    const listed = call('GET', '/activities?include_archived=true').data.activities;
+    expect(listed.some((item) => item.id === used.id)).toBe(false);
+    expect(call('PATCH', `/activities/${used.id}`, { weight: 1 }).status).toBe(404);
+    const fresh = call('POST', '/activities', { area: 'career', name: 'Never used', weight: 1 }).data.activity;
+    call('PATCH', `/activities/${fresh.id}`, { archived: true });
+    expect(call('DELETE', `/activities/${fresh.id}`).data.kept_in_history).toBe(false);
+  });
+
+  it('saves a custom dock and refuses an invalid one', () => {
+    const { call } = demo();
+    expect(call('GET', '/settings').data.dock).toBeNull();
+    const keys = ['questionnaire', 'journal:journal', 'more'];
+    expect(call('PATCH', '/settings', { dock: keys }).data.dock).toEqual(keys);
+    expect(call('PATCH', '/settings', { dock: ['home', 'more'] }).data.error.code).toBe('invalid_dock');
+    expect(call('PATCH', '/settings', { dock: ['questionnaire', 'Bad Key', 'more'] }).status).toBe(422);
+    expect(call('PATCH', '/settings', { dock: [] }).data.dock).toBeNull();
+  });
+
   it('syncs a draft with the current activities', () => {
     const { call } = demo();
     call('POST', '/reports', { day: TODAY });

@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-10-22
+
+### Added
+- Settings > Dock: choose which pages sit in the dock and in what order, up to seven items in all. The questionnaire and the More button always stay, the rest (Home, Star and the pages of plugins) can be added, removed and moved. What is left out of the dock shows in More. The choice is kept on the server (setting `dock`, validated by the API: at most seven different items, with `questionnaire` in it and `more` last), and a button restores the default dock. Closes #8.
+- An archived activity can be deleted (`DELETE /api/v1/activities/{id}`). It leaves every list in the settings for good, while past reports and statistics keep it as it was. An activity that never appeared in a report is erased from the database; one that did is only hidden (`deleted_at`), and the database still refuses to erase it. An activity that is not archived cannot be deleted (`activity_not_archived`). Closes #7.
+
 ## [0.15.0] - 2026-10-22
 
 ### Added
@@ -231,7 +237,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/tombino104/PersonalOS/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/tombino104/PersonalOS/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/tombino104/PersonalOS/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/tombino104/PersonalOS/compare/v0.13.0...v0.13.1

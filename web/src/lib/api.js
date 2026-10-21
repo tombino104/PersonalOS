@@ -77,6 +77,7 @@ export const api = {
     request('GET', `/activities?${query({ include_archived: includeArchived })}`),
   createActivity: (activity) => request('POST', '/activities', activity),
   updateActivity: (id, changes) => request('PATCH', `/activities/${id}`, changes),
+  deleteActivity: (id) => request('DELETE', `/activities/${id}`),
 
   openReport: (day) => request('POST', '/reports', { day }),
   getReport: (day) => request('GET', `/reports/${day}`),

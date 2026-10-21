@@ -26,6 +26,7 @@ _DOMAIN_ERRORS = [
     (reports.ReportClosed, 409, "report_closed"),
     (reports.ReportNotOpen, 409, "report_not_open"),
     (activities.InvalidDays, 422, "invalid_days"),
+    (activities.NotArchived, 409, "activity_not_archived"),
     (reports.FutureDay, 422, "future_day"),
     (reports.ReportNotFound, 404, "not_found"),
     (reports.NotInReport, 404, "not_found"),

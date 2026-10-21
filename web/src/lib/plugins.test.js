@@ -3,7 +3,6 @@ import {
   allEntries,
   dockEntries,
   hasUi,
-  moreEntries,
   pageComponent,
   questionnaireBlocks,
   reportSections,
@@ -56,7 +55,6 @@ describe('plugin helpers', () => {
     expect(pageComponent('mood', 'trend')).not.toBeNull();
     expect(allEntries().map((entry) => entry.href)).toEqual(['/p/mood/trend']);
     expect(dockEntries()).toEqual([]);
-    expect(moreEntries().map((entry) => entry.label)).toEqual(['Mood']);
     setPlugins([{ ...mood, active: false }]);
     expect(reportSections()).toEqual([]);
     expect(allEntries()).toEqual([]);
@@ -74,7 +72,6 @@ describe('plugin helpers', () => {
       },
     ]);
     expect(dockEntries()).toHaveLength(1);
-    expect(moreEntries()).toEqual([]);
   });
 
   it('ignores blocks the interface does not provide', () => {
@@ -99,6 +96,5 @@ describe('plugin helpers', () => {
     expect(pageComponent('mood', 'p')).toBeNull();
     expect(allEntries()).toEqual([]);
     expect(dockEntries()).toEqual([]);
-    expect(moreEntries()).toEqual([]);
   });
 });

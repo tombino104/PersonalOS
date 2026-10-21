@@ -7,9 +7,11 @@
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { displayName } from '../lib/profile.svelte.js';
-  import { moreEntries } from '../lib/plugins.svelte.js';
+  import { dockLayout } from '../lib/dock.svelte.js';
 
-  const pluginEntries = $derived(moreEntries());
+  const hidden = $derived(dockLayout().outOfDock);
+  const hiddenCore = $derived(hidden.filter((item) => !item.text));
+  const pluginEntries = $derived(hidden.filter((item) => item.text));
   let recorded = $state(0);
   let since = $state('');
 
@@ -50,6 +52,15 @@
   <section aria-label={t('more.diary')}>
     <h2 class="eyebrow heading">{t('more.diary')}</h2>
     <div class="entries">
+      {#each hiddenCore as item (item.key)}
+        <Link class="entry" href={item.href}>
+          <span class="ico"><Icon name={item.icon} /></span>
+          <span class="text">
+            <span class="entry-title">{t(item.labelKey)}</span>
+          </span>
+          <span class="go"><Icon name="forward" small /></span>
+        </Link>
+      {/each}
       <Link class="entry" href="/archive">
         <span class="ico"><Icon name="archive" /></span>
         <span class="text">
@@ -77,7 +88,7 @@
           <Link class="entry" href={entry.href}>
             <span class="ico"><Icon name={entry.icon} /></span>
             <span class="text">
-              <span class="entry-title">{entry.label}</span>
+              <span class="entry-title">{entry.text}</span>
             </span>
             <span class="go"><Icon name="forward" small /></span>
           </Link>

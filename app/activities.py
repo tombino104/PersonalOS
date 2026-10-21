@@ -21,6 +21,10 @@ class InvalidDays(ValueError):
     pass
 
 
+class NotArchived(ValueError):
+    pass
+
+
 ALL_DAYS = 127
 
 
@@ -60,14 +64,18 @@ def _as_dict(row) -> dict:
 
 
 def get(conn: sqlite3.Connection, activity_id: int) -> dict:
-    row = conn.execute(f"{_SELECT} WHERE act.id = ?", (activity_id,)).fetchone()
+    row = conn.execute(
+        f"{_SELECT} WHERE act.id = ? AND act.deleted_at IS NULL", (activity_id,)
+    ).fetchone()
     if row is None:
         raise ActivityNotFound(f"activity {activity_id} not found")
     return _as_dict(row)
 
 
 def list_activities(conn: sqlite3.Connection, include_archived: bool = False) -> list[dict]:
-    where = "" if include_archived else " WHERE act.archived_at IS NULL"
+    where = " WHERE act.deleted_at IS NULL"
+    if not include_archived:
+        where += " AND act.archived_at IS NULL"
     rows = conn.execute(f"{_SELECT}{where} ORDER BY a.position, act.id").fetchall()
     return [_as_dict(r) for r in rows]
 
@@ -124,6 +132,21 @@ def update(conn: sqlite3.Connection, activity_id: int, changes: dict, now: datet
                 (*params, activity_id),
             )
     return get(conn, activity_id)
+
+
+def delete(conn: sqlite3.Connection, activity_id: int, now: datetime) -> dict:
+    current = get(conn, activity_id)
+    if current["archived_at"] is None:
+        raise NotArchived("archive the activity before deleting it")
+    used = conn.execute(
+        "SELECT 1 FROM completions WHERE activity_id = ? LIMIT 1", (activity_id,)
+    ).fetchone()
+    with conn:
+        if used is None:
+            conn.execute("DELETE FROM activities WHERE id = ?", (activity_id,))
+        else:
+            conn.execute("UPDATE activities SET deleted_at = ? WHERE id = ?", (_iso(now), activity_id))
+    return {"id": activity_id, "kept_in_history": used is not None}
 
 
 def warnings(conn: sqlite3.Connection) -> list[dict]:

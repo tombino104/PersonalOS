@@ -87,11 +87,10 @@ def test_update_unknown_activity_and_null_fields(client):
     assert response.status_code == 422
 
 
-def test_activities_cannot_be_deleted(client):
+def test_an_active_activity_cannot_be_deleted(client):
     activity_id = activity_ids(client)[0]
     response = client.delete(f"/api/v1/activities/{activity_id}")
-    assert response.status_code == 405
-    assert response.json()["error"]["code"] == "method_not_allowed"
+    assert (response.status_code, response.json()["error"]["code"]) == (409, "activity_not_archived")
 
 
 def test_warning_when_an_area_has_more_than_five_activities(client):
@@ -263,6 +262,7 @@ def test_settings_roundtrip_and_validation(client):
         "home_areas": "all",
         "theme": None,
         "language": None,
+        "dock": None,
     }
     bad_zone = client.patch("/api/v1/settings", json={"timezone": "Mars/Base"})
     assert (bad_zone.status_code, bad_zone.json()["error"]["code"]) == (422, "invalid_timezone")

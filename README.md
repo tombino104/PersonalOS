@@ -44,6 +44,7 @@ More about running it (settings, password reset, command line): [docs/running.md
 - Trends, a six-month heatmap, the "star" of the six areas, past reports
 - Plugins: calendar, mood tracker, journal, daily quote; [write your own](docs/plugins.md)
 - Light and dark theme, English and Italian
+- A dock you arrange yourself: up to seven pages, in the order you like
 - Backups and restore from Settings, a built-in guide
 
 ## Develop

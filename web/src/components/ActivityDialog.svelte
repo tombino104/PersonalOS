@@ -24,6 +24,7 @@
   }
   let error = $state('');
   let busy = $state(false);
+  let confirmDelete = $state(false);
 
   onMount(() => {
     dialog.showModal();
@@ -42,6 +43,22 @@
       onsaved();
     } catch (failure) {
       error = failure instanceof ApiError && failure.status === 422 ? t('activity.invalid') : t('error.generic');
+      busy = false;
+    }
+  }
+
+  async function remove() {
+    if (!confirmDelete) {
+      confirmDelete = true;
+      return;
+    }
+    busy = true;
+    error = '';
+    try {
+      await api.deleteActivity(activity.id);
+      onsaved();
+    } catch {
+      error = t('error.generic');
       busy = false;
     }
   }
@@ -124,9 +141,17 @@
           {activity.archived_at ? t('activity.restore') : t('activity.archive')}
         </button>
       {/if}
+      {#if activity?.archived_at}
+        <button class="btn remove" type="button" disabled={busy} onclick={remove}>
+          {confirmDelete ? t('activity.deleteSure') : t('activity.delete')}
+        </button>
+      {/if}
     </div>
     {#if activity && !activity.archived_at}
       <p class="muted help">{t('activity.archiveHelp')}</p>
+    {/if}
+    {#if activity?.archived_at}
+      <p class="muted help">{t('activity.deleteHelp')}</p>
     {/if}
   </form>
 </dialog>
@@ -166,6 +191,10 @@
 
   .archive {
     margin-left: auto;
+  }
+
+  .remove {
+    color: var(--danger);
   }
 
   .help {

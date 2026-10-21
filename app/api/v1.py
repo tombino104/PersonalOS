@@ -32,6 +32,7 @@ router.include_router(backup_routes.router)
 router.include_router(profile_routes.router)
 
 MAX_RANGE_DAYS = 366
+MAX_DOCK = 7
 DEFAULT_RANGE_DAYS = 90
 
 
@@ -163,6 +164,15 @@ def update_activity(
     return {"activity": activity, "warnings": activities.warnings(conn)}
 
 
+@router.delete("/activities/{activity_id}")
+def delete_activity(
+    activity_id: int,
+    conn: sqlite3.Connection = Depends(get_conn),
+    now: datetime = Depends(get_now),
+) -> dict:
+    return activities.delete(conn, activity_id, now)
+
+
 @router.post("/reports")
 def open_report(
     body: ReportOpen,
@@ -292,6 +302,7 @@ def get_settings(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
         "home_areas": settings.get(conn, "home_areas", "all"),
         "theme": settings.get(conn, "theme"),
         "language": settings.get(conn, "language"),
+        "dock": settings.get(conn, "dock"),
     }
 
 
@@ -328,6 +339,21 @@ def update_settings(body: SettingsUpdate, conn: sqlite3.Connection = Depends(get
         settings.put(conn, "backup_time", changes["backup_time"])
     if "backup_auto" in changes:
         settings.put(conn, "backup_auto", changes["backup_auto"])
+    if "dock" in changes:
+        keys = changes["dock"]
+        if keys and (
+            len(set(keys)) != len(keys)
+            or len(keys) > MAX_DOCK
+            or "questionnaire" not in keys
+            or keys[-1] != "more"
+            or keys.count("more") != 1
+        ):
+            raise ApiError(
+                422,
+                "invalid_dock",
+                f"the dock holds at most {MAX_DOCK} different items, with the questionnaire in it and more last",
+            )
+        settings.put(conn, "dock", keys or None)
     for key in ("home_period", "home_areas", "theme", "language"):
         if key in changes:
             settings.put(conn, key, changes[key])

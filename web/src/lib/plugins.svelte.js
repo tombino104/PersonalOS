@@ -114,8 +114,3 @@ export function dockEntries() {
     .filter((entry) => entry.placement === 'dock')
     .slice(0, Math.max(room, 0));
 }
-
-export function moreEntries() {
-  const inDock = new Set(dockEntries().map((entry) => entry.key));
-  return allEntries().filter((entry) => !inDock.has(entry.key));
-}

@@ -20,6 +20,7 @@
   import { applyLanguage } from './lib/i18n.svelte.js';
   import { syncAppearance } from './lib/appearance.js';
   import { loadProfile } from './lib/profile.svelte.js';
+  import { loadDock } from './lib/dock.svelte.js';
 
   const pages = {
     '/': Home,
@@ -47,6 +48,7 @@
       loadPlugins();
       syncAppearance();
       loadProfile();
+      loadDock();
     }
   });
 

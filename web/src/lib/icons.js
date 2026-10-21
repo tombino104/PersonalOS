@@ -14,6 +14,8 @@ export const icons = {
     { tag: 'circle', attrs: { cx: 15, cy: 7, r: 2.5 } },
     { tag: 'circle', attrs: { cx: 9, cy: 17, r: 2.5 } },
   ],
+  up: [path('m6 14.5 6-6 6 6')],
+  down: [path('m6 9.5 6 6 6-6')],
   check: [path('m5 12.5 4.5 4.5L19 7.5')],
   smile: [
     { tag: 'circle', attrs: { cx: 12, cy: 12, r: 8.5 } },

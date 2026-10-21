@@ -20,6 +20,8 @@ const SOFT_LIMIT_PER_AREA = 5;
 const CATEGORIES = ['personal', 'work', 'study', 'health', 'social', 'other'];
 const REPEATS = ['none', 'daily', 'weekly', 'monthly', 'yearly'];
 const KEEP = { auto: 7, manual: 20, 'before-restore': 5 };
+const MAX_DOCK = 7;
+const DOCK_KEY = /^[a-z0-9_]+(:[a-z0-9_]+)?$/;
 
 class Failure extends Error {
   constructor(status, code, message) {
@@ -68,6 +70,7 @@ function freshState() {
       home_areas: 'all',
       theme: null,
       language: null,
+      dock: null,
     },
     profile: { display_name: null, about: null, birth_year: null, has_photo: false, version: null },
     activities: [],
@@ -206,7 +209,9 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       .sort((a, b) => (a.day < b.day ? -1 : 1));
   }
 
-  const activityOf = (id) => state.activities.find((activity) => activity.id === Number(id)) ?? notFound(`activity ${id} not found`);
+  const activityOf = (id) =>
+    state.activities.find((activity) => activity.id === Number(id) && !activity.deleted_at) ??
+    notFound(`activity ${id} not found`);
 
   function warnings() {
     return AREAS.map((area) => ({
@@ -341,6 +346,17 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     ]) {
       if (key in changes) state.settings[key] = changes[key];
     }
+    if ('dock' in changes) {
+      const keys = changes.dock;
+      if (!Array.isArray(keys) || keys.length > MAX_DOCK || keys.some((key) => !DOCK_KEY.test(key))) invalid();
+      if (
+        keys.length > 0 &&
+        (new Set(keys).size !== keys.length || !keys.includes('questionnaire') || keys.at(-1) !== 'more')
+      ) {
+        refuse(422, 'invalid_dock', `the dock holds at most ${MAX_DOCK} different items, with the questionnaire in it and more last`);
+      }
+      state.settings.dock = keys.length ? keys : null;
+    }
     return { ...state.settings };
   });
 
@@ -366,7 +382,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const includeArchived = query.get('include_archived') === 'true';
     const order = new Map(AREAS.map((area) => [area.slug, area.position]));
     const items = state.activities
-      .filter((activity) => includeArchived || !activity.archived_at)
+      .filter((activity) => !activity.deleted_at && (includeArchived || !activity.archived_at))
       .sort((a, b) => order.get(a.area) - order.get(b.area) || a.id - b.id)
       .map(publicActivity);
     return { activities: items, warnings: warnings() };
@@ -403,6 +419,17 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       activity.archived_at = changes.archived ? (activity.archived_at ?? now().toISOString()) : null;
     }
     return { activity: publicActivity(activity), warnings: warnings() };
+  });
+
+  protectedRoute('DELETE', '/activities/:id', ({ params }) => {
+    const activity = activityOf(params.id);
+    if (!activity.archived_at) refuse(409, 'activity_not_archived', 'archive the activity before deleting it');
+    const used = [...state.reports.values()].some((report) =>
+      report.completions.some((item) => item.activity_id === activity.id),
+    );
+    if (used) activity.deleted_at = now().toISOString();
+    else state.activities = state.activities.filter((candidate) => candidate !== activity);
+    return { id: activity.id, kept_in_history: used };
   });
 
   protectedRoute('POST', '/reports', ({ body }) => {
