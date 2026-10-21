@@ -2,7 +2,7 @@ manifestVersion: 1
 id: tombino104-personal-os
 category: productivity
 name: Personal OS
-version: "0.10.1"
+version: "0.10.2"
 tagline: A quiet place for your days
 description: >-
   A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
@@ -26,5 +26,5 @@ gallery:
   - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
-  Home now remembers your period (week or month) and the area filter after a refresh. The example plugin was removed.
+  You can now erase all data from Settings > Account, using the setup code from the app's data folder.
 submitter: tombino104
