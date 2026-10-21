@@ -1,6 +1,6 @@
 # Writing a plugin
 
-A plugin is a folder in `plugins/` with a manifest, an optional Python backend and an optional Svelte interface. `plugins/mood` is a complete, real plugin (a mood tracker with a questionnaire block, a page and a section in past reports) and `plugins/calendar` is one with a backend, a page and a dock entry. Plugins are bundled into the Docker image: add a folder, rebuild the image, then turn the plugin on in **Settings > Plugins**.
+A plugin is a folder in `plugins/` with a manifest, an optional Python backend and an optional Svelte interface. `plugins/mood` is a complete, real plugin (a mood tracker with a questionnaire block, a page and a section in past reports) and `plugins/calendar` is one with a backend, a page and a dock entry, and `plugins/journal` is a small one with a backend and a page. Plugins are bundled into the Docker image: add a folder, rebuild the image, then turn the plugin on in **Settings > Plugins**.
 
 ```
 plugins/<id>/

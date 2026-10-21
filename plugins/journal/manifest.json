@@ -1,0 +1,17 @@
+{
+  "id": "journal",
+  "name": "Journal",
+  "version": "0.1.0",
+  "description": "A private journal for longer writing, apart from the evening questionnaire. It never enters any average and never creates points.",
+  "core_api": "1.x",
+  "permissions": ["ui_panel", "api_routes"],
+  "adds": {
+    "pages": ["entries"],
+    "entries": [
+      { "id": "journal", "label": "Journal", "icon": "book", "placement": "dock", "page": "entries" }
+    ]
+  },
+  "listens": [],
+  "emits": [],
+  "migrations": "backend/migrations"
+}

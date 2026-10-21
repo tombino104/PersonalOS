@@ -84,7 +84,7 @@
           </div>
         {:else if key === 'plugins'}
           <div class="chips" aria-hidden="true">
-            {#each ['calendar', 'mood', 'quote'] as name}
+            {#each ['calendar', 'mood', 'journal', 'quote'] as name}
               <span class="chip plain">{t(`onboarding.plugin.${name}`)}</span>
             {/each}
           </div>

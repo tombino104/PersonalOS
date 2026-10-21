@@ -97,7 +97,7 @@ describe('demo server', () => {
   it('serves the three plugins and their data', () => {
     const { call } = demo();
     const plugins = call('GET', '/plugins').data.plugins;
-    expect(plugins.map((plugin) => plugin.id)).toEqual(['calendar', 'mood', 'quotes']);
+    expect(plugins.map((plugin) => plugin.id)).toEqual(['calendar', 'journal', 'mood', 'quotes']);
     expect(plugins.every((plugin) => plugin.active)).toBe(true);
     const events = call('GET', `/plugins/calendar/events?start=${TODAY}&end=${addDays(TODAY, 30)}`).data;
     expect(events.occurrences.length).toBeGreaterThan(3);
@@ -108,6 +108,24 @@ describe('demo server', () => {
     expect(summary.distribution).toHaveLength(5);
     call('POST', '/plugins/mood/deactivate');
     expect(call('GET', '/plugins/mood/summary').data.error.code).toBe('plugin_inactive');
+  });
+
+  it('keeps a journal with search, paging and edits', () => {
+    const { call } = demo();
+    const listing = call('GET', '/plugins/journal/entries').data;
+    expect(listing.total).toBeGreaterThan(3);
+    expect(listing.entries[0].day >= listing.entries[1].day).toBe(true);
+    const created = call('POST', '/plugins/journal/entries', { body: ' Found my rhythm ', title: ' Rhythm ' });
+    expect(created.status).toBe(201);
+    expect(created.data).toMatchObject({ body: 'Found my rhythm', title: 'Rhythm', day: TODAY });
+    expect(call('GET', '/plugins/journal/entries?q=RHYTHM').data.total).toBe(1);
+    expect(call('POST', '/plugins/journal/entries', { body: '  ' }).status).toBe(422);
+    expect(call('POST', '/plugins/journal/entries', { body: 'x', day: addDays(TODAY, 1) }).status).toBe(422);
+    const changed = call('PUT', `/plugins/journal/entries/${created.data.id}`, { body: 'Changed' });
+    expect(changed.data.body).toBe('Changed');
+    expect(call('GET', '/plugins/journal/entries?limit=2&offset=1').data.entries).toHaveLength(2);
+    expect(call('DELETE', `/plugins/journal/entries/${created.data.id}`).data).toEqual({ ok: true });
+    expect(call('GET', `/plugins/journal/entries/${created.data.id}`).status).toBe(404);
   });
 
   it('turns off what a static demo cannot do', () => {

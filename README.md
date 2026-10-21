@@ -42,7 +42,7 @@ More about running it (settings, password reset, command line): [docs/running.md
 - Six life areas, a few activities each, a relative score per area
 - An evening questionnaire, with optional days of the week per activity and an optional time before which it stays closed
 - Trends, a six-month heatmap, the "star" of the six areas, past reports
-- Plugins: calendar, mood tracker, daily quote; [write your own](docs/plugins.md)
+- Plugins: calendar, mood tracker, journal, daily quote; [write your own](docs/plugins.md)
 - Light and dark theme, English and Italian
 - Backups and restore from Settings, a built-in guide
 

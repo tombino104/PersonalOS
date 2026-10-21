@@ -10,7 +10,7 @@ import {
   occurrences,
   weekdayOf,
 } from './dates.js';
-import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory } from './seed.js';
+import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory, seedJournal } from './seed.js';
 
 const manifests = import.meta.glob('../../../plugins/*/manifest.json', { eager: true, import: 'default' });
 
@@ -78,6 +78,8 @@ function freshState() {
     events: [],
     nextEventId: 1,
     mood: new Map(),
+    journal: [],
+    nextEntryId: 1,
   };
 }
 
@@ -121,6 +123,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const current = today();
     seedHistory(state, current);
     seedEvents(state, current);
+    seedJournal(state, current);
   }
 
   function blank() {
@@ -549,6 +552,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     delete state.plugins[params.id];
     if (params.id === 'calendar') state.events = [];
     if (params.id === 'mood') state.mood = new Map();
+    if (params.id === 'journal') state.journal = [];
     return { plugins: pluginList() };
   });
 
@@ -618,6 +622,54 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
   guarded('calendar', 'DELETE', '/events/:id', ({ params }) => {
     const event = eventOf(params.id);
     state.events = state.events.filter((candidate) => candidate !== event);
+    return { ok: true };
+  });
+
+  const entryOf = (id) => state.journal.find((entry) => entry.id === Number(id)) ?? notFound('entry not found');
+
+  function checkEntry(body, current = null) {
+    const text = typeof body?.body === 'string' ? body.body.trim() : '';
+    if (text.length < 1 || text.length > 20000) invalid();
+    const title = typeof body?.title === 'string' ? body.title.trim() || null : null;
+    if (title && title.length > 120) invalid();
+    const day = body?.day ?? current?.day ?? today();
+    if (!isDay(day) || day < '1970-01-01' || day > '2100-12-31') invalid();
+    if (day > today()) refuse(422, 'error', 'an entry cannot be dated in the future');
+    return { day, title, body: text };
+  }
+
+  const likeAny = (entry, text) =>
+    entry.body.toLowerCase().includes(text) || (entry.title ?? '').toLowerCase().includes(text);
+
+  guarded('journal', 'GET', '/entries', ({ query }) => {
+    const limit = Number(query.get('limit') ?? 30);
+    const offset = Number(query.get('offset') ?? 0);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100 || !Number.isInteger(offset) || offset < 0) invalid();
+    const text = (query.get('q') ?? '').trim().toLowerCase();
+    const matching = state.journal
+      .filter((entry) => !text || likeAny(entry, text))
+      .sort((a, b) => (a.day === b.day ? b.id - a.id : a.day < b.day ? 1 : -1));
+    return { entries: matching.slice(offset, offset + limit).map((entry) => ({ ...entry })), total: matching.length };
+  });
+
+  guarded('journal', 'GET', '/entries/:id', ({ params }) => ({ ...entryOf(params.id) }));
+
+  guarded('journal', 'POST', '/entries', ({ body }) => {
+    const at = now().toISOString();
+    const entry = { id: state.nextEntryId++, ...checkEntry(body), created_at: at, updated_at: at };
+    state.journal.push(entry);
+    return { status: 201, data: { ...entry } };
+  });
+
+  guarded('journal', 'PUT', '/entries/:id', ({ params, body }) => {
+    const entry = entryOf(params.id);
+    Object.assign(entry, checkEntry(body, entry), { updated_at: now().toISOString() });
+    return { ...entry };
+  });
+
+  guarded('journal', 'DELETE', '/entries/:id', ({ params }) => {
+    const entry = entryOf(params.id);
+    state.journal = state.journal.filter((candidate) => candidate !== entry);
     return { ok: true };
   });
 

@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-10-22
+
+### Added
+- Journal plugin (`plugins/journal`): a private place for longer writing, apart from the evening questionnaire. Entries have an optional title, a day (today by default, never in the future) and a text of up to 20,000 characters; several entries can share a day. The page lists them newest first, grouped by month, with search and "read more" for long ones, and a different writing prompt as a placeholder each time. It never enters any average and never creates points. Off by default: turn it on in Settings > Plugins. It asks for the dock entry first, so it takes the dock slot when the calendar is off and otherwise lives in More. Closes #6.
+
 ## [0.14.0] - 2026-10-21
 
 ### Added
@@ -226,7 +231,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.15.0...HEAD
+[0.15.0]: https://github.com/tombino104/PersonalOS/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/tombino104/PersonalOS/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/tombino104/PersonalOS/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/tombino104/PersonalOS/compare/v0.12.1...v0.13.0
