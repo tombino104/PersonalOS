@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.13.1"
+version: "0.14.0"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,6 +24,7 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  Small fix: the Home page no longer shows a redundant "Home" label next to your avatar.
+  Activities can have a short description, shown in the evening questionnaire. Reports that can still be edited now follow
+  your changes to the activities, also after they are completed.
 submitter: tombino104
 submission: ""
