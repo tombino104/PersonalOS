@@ -5,6 +5,7 @@
   import { AREAS } from '../lib/charts.js';
   import { addDays, formatDate, lastDays } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
+  import { reportSections } from '../lib/plugins.svelte.js';
 
   const SPAN = 60;
 
@@ -67,6 +68,7 @@
         })).filter((group) => group.items.length > 0)
       : [],
   );
+  const sections = $derived(reportSections());
   const editable = $derived(selected !== '' && (selected === today || selected === yesterday));
   const filled = $derived(Boolean(scoreByDay[selected]));
   const longTitle = $derived(
@@ -153,6 +155,11 @@
               <p>«{detail.reflection}»</p>
             </div>
           {/if}
+          {#key selected}
+            {#each sections as section (section.pluginId + section.sectionId)}
+              <div class="plugin-section"><section.component day={selected} /></div>
+            {/each}
+          {/key}
         {/if}
       </section>
     </div>
@@ -325,6 +332,12 @@
 
   .mark.done {
     color: var(--area);
+  }
+
+  .plugin-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
   }
 
   .reflection {

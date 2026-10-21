@@ -1,10 +1,12 @@
+const browser = typeof window !== 'undefined';
+
 export function normalize(pathname) {
   return pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
 }
 
 export const router = $state({
-  path: normalize(location.pathname),
-  query: new URLSearchParams(location.search),
+  path: browser ? normalize(location.pathname) : '/',
+  query: new URLSearchParams(browser ? location.search : ''),
 });
 
 function sync() {
@@ -21,4 +23,4 @@ export function navigate(to, { replace = false } = {}) {
   window.scrollTo(0, 0);
 }
 
-window.addEventListener('popstate', sync);
+if (browser) window.addEventListener('popstate', sync);

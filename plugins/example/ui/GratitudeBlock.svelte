@@ -38,7 +38,7 @@
 
 <h2>{t('plugin.example.title')}</h2>
 <label class="label" for="example-note">
-  {t('plugin.example.label')}{#if saved} · {t('plugin.example.saved')}{/if}
+  {t('plugin.example.label') + (saved ? ` · ${t('plugin.example.saved')}` : '')}
 </label>
 <textarea
   id="example-note"

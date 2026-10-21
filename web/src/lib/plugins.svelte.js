@@ -52,6 +52,18 @@ export function questionnaireBlocks() {
   );
 }
 
+export function reportSections() {
+  return activePlugins().flatMap((plugin) =>
+    plugin.report_sections
+      .map((section) => ({
+        pluginId: plugin.id,
+        sectionId: section,
+        component: ui[plugin.id]?.reportSections?.[section],
+      }))
+      .filter((section) => section.component),
+  );
+}
+
 export function widgets() {
   return activePlugins().flatMap((plugin) =>
     plugin.widgets

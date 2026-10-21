@@ -1,5 +1,6 @@
 <script>
   import PermissionsDialog from '../../components/PermissionsDialog.svelte';
+  import RemoveDataDialog from '../../components/RemoveDataDialog.svelte';
   import { api } from '../../lib/api.js';
   import { has, t } from '../../lib/i18n.svelte.js';
   import { loadPlugins, plugins, setPlugins, settingsPanel } from '../../lib/plugins.svelte.js';
@@ -9,6 +10,8 @@
   let confirming = $state(null);
   let busy = $state(false);
   let failure = $state('');
+  let removing = $state(null);
+  let removeError = $state('');
 
   function name(plugin) {
     const key = `plugin.${plugin.id}.name`;
@@ -52,6 +55,19 @@
     }
   }
 
+  async function removeData(confirmation) {
+    busy = true;
+    removeError = '';
+    try {
+      setPlugins((await api.removePluginData(removing.id, confirmation)).plugins);
+      removing = null;
+    } catch {
+      removeError = t('plugins.removeFailed');
+    } finally {
+      busy = false;
+    }
+  }
+
   async function confirm() {
     busy = true;
     failure = '';
@@ -87,6 +103,9 @@
         {#if plugin.state === 'error' && !plugin.active}
           <span class="problem">{t('plugins.autoOff')}</span>
         {/if}
+        {#if plugin.installed && !plugin.active}
+          <button class="remove" onclick={() => ((removeError = ''), (removing = plugin))}>{t('plugins.removeData')}</button>
+        {/if}
       </span>
       <span class="chip-state {chipClass(plugin)}"><i></i>{stateText(plugin)}</span>
       <button
@@ -105,6 +124,17 @@
     <p class="muted">{t('plugins.none')}</p>
   {/each}
 </section>
+
+{#if removing}
+  <RemoveDataDialog
+    id={removing.id}
+    name={name(removing)}
+    {busy}
+    error={removeError}
+    onconfirm={removeData}
+    oncancel={() => (removing = null)}
+  />
+{/if}
 
 {#if confirming}
   <PermissionsDialog
@@ -189,6 +219,21 @@
 
   .chip-state.bad i {
     background: var(--danger);
+  }
+
+  .remove {
+    margin-top: 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink-3);
+    font: 500 12px/1.4 var(--sans);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .remove:hover {
+    color: var(--danger);
   }
 
   .toggle:disabled {

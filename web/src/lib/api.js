@@ -71,6 +71,7 @@ export const api = {
   plugins: () => request('GET', '/plugins'),
   activatePlugin: (id) => request('POST', `/plugins/${id}/activate`, { accept_permissions: true }),
   deactivatePlugin: (id) => request('POST', `/plugins/${id}/deactivate`),
+  removePluginData: (id, confirm) => request('POST', `/plugins/${id}/remove-data`, { confirm }),
 
   scores: (from, to) => request('GET', `/scores${range(from, to)}`),
   areaStats: (from, to) => request('GET', `/stats/areas${range(from, to)}`),
