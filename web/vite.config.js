@@ -5,7 +5,16 @@ import { svelte } from '@sveltejs/vite-plugin-svelte';
 
 const backend = process.env.BACKEND_URL ?? 'http://127.0.0.1:47213';
 const demo = process.env.DEMO === '1';
-const version = readFileSync(new URL('../app/__init__.py', import.meta.url), 'utf8').match(/__version__ = "([^"]+)"/)?.[1] ?? '';
+
+function appVersion() {
+  try {
+    return readFileSync(new URL('../app/__init__.py', import.meta.url), 'utf8').match(/__version__ = "([^"]+)"/)?.[1] ?? '';
+  } catch {
+    return '';
+  }
+}
+
+const version = appVersion();
 
 export default defineConfig({
   base: demo ? (process.env.DEMO_BASE ?? '/PersonalOS/') : '/',
