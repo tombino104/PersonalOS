@@ -1,0 +1,34 @@
+name: Bug report
+description: Something does not work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected and what you saw instead. Do not paste your database, backups, tokens or the setup code.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Open /health on your instance: the version is in the answer.
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: How do you run it?
+      options:
+        - umbrelOS (community store)
+        - Docker compose
+        - From source
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Optional. Remove anything personal first.

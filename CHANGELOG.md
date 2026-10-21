@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-10-22
+
+### Added
+- Settings > Account > Erase all data: the same reset as the login page, available while logged in (setup code, a name, the password typed twice and a confirmation).
+- `CONTRIBUTING.md`, `SECURITY.md`, issue templates and a pull request template.
+
 ## [0.10.1] - 2026-10-22
 
 ### Changed
@@ -168,7 +174,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.10.1...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.10.2...HEAD
+[0.10.2]: https://github.com/tombino104/PersonalOS/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/tombino104/PersonalOS/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/tombino104/PersonalOS/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/tombino104/PersonalOS/compare/v0.9.0...v0.9.1

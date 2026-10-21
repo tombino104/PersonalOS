@@ -1,4 +1,5 @@
 <script>
+  import EraseDialog from '../../components/EraseDialog.svelte';
   import { api, ApiError } from '../../lib/api.js';
   import { t } from '../../lib/i18n.svelte.js';
   import { logout } from '../../lib/session.svelte.js';
@@ -9,6 +10,7 @@
   let message = $state('');
   let failed = $state(false);
   let busy = $state(false);
+  let erasing = $state(false);
 
   async function changePassword(event) {
     event.preventDefault();
@@ -61,7 +63,31 @@
   </form>
 </section>
 
+<section class="card panel danger-zone" aria-label={t('account.eraseTitle')}>
+  <h2>{t('account.eraseTitle')}</h2>
+  <p class="desc">{t('account.eraseBody')}</p>
+  <button class="btn danger" type="button" onclick={() => (erasing = true)}>{t('account.eraseButton')}</button>
+</section>
+
+{#if erasing}
+  <EraseDialog onclose={() => (erasing = false)} />
+{/if}
+
 <style>
+  .danger-zone {
+    margin-top: 16px;
+  }
+
+  .danger {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--paper);
+  }
+
+  .danger:hover {
+    background: var(--danger);
+  }
+
   .panel {
     padding: 24px;
   }

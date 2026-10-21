@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.10.1.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Backups, reminders and agents come next.
+> **Status: v0.10.2.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Backups, reminders and agents come next.
 
 ## Screenshots
 
@@ -87,6 +87,10 @@ Features beyond the core are plugins: a folder in `plugins/` with a manifest, a 
 ## Umbrel
 
 The image is published to `ghcr.io/tombino104/personalos` at every release, and `umbrel-store/` is a community app store for umbrelOS. See [docs/umbrel.md](docs/umbrel.md).
+
+## Contributing
+
+Issues and pull requests are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). To report a security problem, see [SECURITY.md](SECURITY.md).
 
 ## Versioning
 
