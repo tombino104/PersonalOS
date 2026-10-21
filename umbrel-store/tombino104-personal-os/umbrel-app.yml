@@ -17,7 +17,13 @@ dependencies: []
 repo: https://github.com/tombino104/PersonalOS
 support: https://github.com/tombino104/PersonalOS/issues
 port: 8473
-gallery: []
+icon: https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/icon.svg
+gallery:
+  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/1-home.png
+  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/2-questionnaire.png
+  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/3-stella.png
+  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/4-archive.png
+  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
   First version for Umbrel. The first time you open the app it asks for a setup code: you find it in the file
