@@ -83,5 +83,7 @@ class SettingsUpdate(BaseModel):
     day_cutoff: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
     backup_auto: bool | None = None
     backup_time: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
+    home_period: Literal["week", "month"] | None = None
+    home_areas: Literal["all", "first", "second"] | None = None
     theme: Literal["light", "dark", "auto"] | None = None
     language: Literal["en", "it", "auto"] | None = None

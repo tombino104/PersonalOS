@@ -246,6 +246,8 @@ def test_settings_roundtrip_and_validation(client):
         "day_cutoff": "04:00",
         "backup_auto": True,
         "backup_time": "03:00",
+        "home_period": "week",
+        "home_areas": "all",
         "theme": None,
         "language": None,
     }
@@ -265,6 +267,14 @@ def test_theme_and_language_are_kept_on_the_server(client):
     assert client.patch("/api/v1/settings", json={"language": "fr"}).status_code == 422
     assert client.patch("/api/v1/settings", json={"theme": None}).status_code == 422
     assert client.get("/api/v1/settings").json()["language"] == "it"
+
+
+def test_the_home_view_is_remembered(client):
+    saved = client.patch("/api/v1/settings", json={"home_period": "month", "home_areas": "second"})
+    assert (saved.json()["home_period"], saved.json()["home_areas"]) == ("month", "second")
+    assert client.get("/api/v1/settings").json()["home_areas"] == "second"
+    assert client.patch("/api/v1/settings", json={"home_areas": "third"}).status_code == 422
+    assert client.patch("/api/v1/settings", json={"home_period": "year"}).status_code == 422
 
 
 def test_settings_change_applies_to_new_reports_only(client, clock):

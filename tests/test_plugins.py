@@ -644,27 +644,3 @@ class TestScheduler:
             assert scheduler.tick(registry, later) == []
             assert site.rows("SELECT keys FROM plg_good_events") == [{"keys": "day,report_id"}]
             assert site.rows("SELECT status FROM reports") == [{"status": "closed"}]
-
-
-class TestExamplePlugin:
-    def test_the_bundled_example_plugin_works_end_to_end(self, tmp_path, monkeypatch, clock):
-        import shutil
-        from pathlib import Path
-
-        site = Site(tmp_path, monkeypatch, clock)
-        source = Path(__file__).resolve().parent.parent / "plugins" / "example"
-        shutil.copytree(source, site.plugins / "example")
-        with site.running() as client:
-            item = plugin_state(client, "example")
-            assert item["state"] == "inactive"
-            assert item["questionnaire_blocks"] == ["gratitude"]
-            assert activate(client, "example").status_code == 200
-            open_day(client)
-            assert client.get(f"{PLUGINS}/example/notes/{DAY}").json() == {"text": None}
-            saved = client.put(f"{PLUGINS}/example/notes/{DAY}", json={"text": "Sunshine"})
-            assert saved.status_code == 200
-            assert client.get(f"{PLUGINS}/example/notes/{DAY}").json() == {"text": "Sunshine"}
-            site.clock.now = EVENING + timedelta(days=2)
-            late = client.put(f"{PLUGINS}/example/notes/{DAY}", json={"text": "Too late"})
-            assert (late.status_code, late.json()["error"]["code"]) == (409, "report_closed")
-            assert client.get(f"{PLUGINS}/example/notes/{DAY}").json() == {"text": "Sunshine"}

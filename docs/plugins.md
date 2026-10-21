@@ -1,6 +1,6 @@
 # Writing a plugin
 
-A plugin is a folder in `plugins/` with a manifest, an optional Python backend and an optional Svelte interface. `plugins/example` is a small working example and `plugins/mood` is a complete, real plugin (a mood tracker with a questionnaire block, a page and a section in past reports). Plugins are bundled into the Docker image: add a folder, rebuild the image, then turn the plugin on in **Settings > Plugins**.
+A plugin is a folder in `plugins/` with a manifest, an optional Python backend and an optional Svelte interface. `plugins/mood` is a complete, real plugin (a mood tracker with a questionnaire block, a page and a section in past reports) and `plugins/calendar` is one with a backend, a page and a dock entry. Plugins are bundled into the Docker image: add a folder, rebuild the image, then turn the plugin on in **Settings > Plugins**.
 
 ```
 plugins/<id>/
@@ -19,14 +19,14 @@ Plugins trust the core and the core trusts plugins: they run in the same process
 
 ```json
 {
-  "id": "example",
+  "id": "mood",
   "name": "Example",
   "version": "0.1.0",
   "description": "One line shown in the settings.",
   "core_api": "1.x",
   "permissions": ["read_reports", "questionnaire_block", "api_routes"],
   "adds": {
-    "questionnaire_blocks": ["gratitude"],
+    "questionnaire_blocks": ["mood"],
     "report_sections": [],
     "widgets": [],
     "pages": [],
@@ -75,7 +75,7 @@ from datetime import date
 def setup(api):
     @api.router.get("/notes/{day}")
     def get_note(day: date, ctx=api.ctx):
-        row = ctx.db.execute("SELECT text FROM plg_example_notes WHERE ...").fetchone()
+        row = ctx.db.execute("SELECT note FROM plg_mood_entries WHERE ...").fetchone()
         return {"text": row["text"] if row else None}
 
     @api.on("report.completed")
@@ -118,10 +118,10 @@ A handler that raises, or takes longer than 5 seconds, is recorded in the audit 
 `ui/index.js` default-exports what the plugin adds. Components are compiled into the app, so they use the core's classes and CSS variables (`var(--ink)`, `var(--area-physical)`, ...) and never hard-coded colors.
 
 ```js
-import GratitudeBlock from './GratitudeBlock.svelte';
+import MoodBlock from './MoodBlock.svelte';
 
 export default {
-  questionnaireBlocks: { gratitude: GratitudeBlock },
+  questionnaireBlocks: { mood: MoodBlock },
   reportSections: {},
   widgets: {},
   pages: {},

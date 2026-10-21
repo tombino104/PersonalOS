@@ -27,15 +27,15 @@ const base = {
 describe('plugin helpers', () => {
   beforeEach(() => setPlugins([]));
 
-  it('bundles the interface of the example plugin', () => {
-    expect(hasUi('example')).toBe(true);
+  it('bundles the interface of the bundled plugins', () => {
+    expect(hasUi('mood')).toBe(true);
     expect(hasUi('nothing')).toBe(false);
   });
 
   it('offers questionnaire blocks only for active plugins that ship them', () => {
-    setPlugins([{ ...base, id: 'example', name: 'Example', active: true, questionnaire_blocks: ['gratitude'] }]);
-    expect(questionnaireBlocks().map((block) => block.blockId)).toEqual(['gratitude']);
-    setPlugins([{ ...base, id: 'example', name: 'Example', active: false, questionnaire_blocks: ['gratitude'] }]);
+    setPlugins([{ ...base, id: 'mood', name: 'Mood', active: true, questionnaire_blocks: ['mood'] }]);
+    expect(questionnaireBlocks().map((block) => block.blockId)).toEqual(['mood']);
+    setPlugins([{ ...base, id: 'mood', name: 'Mood', active: false, questionnaire_blocks: ['mood'] }]);
     expect(questionnaireBlocks()).toEqual([]);
   });
 
@@ -78,7 +78,7 @@ describe('plugin helpers', () => {
   });
 
   it('ignores blocks the interface does not provide', () => {
-    setPlugins([{ ...base, id: 'example', name: 'Example', active: true, questionnaire_blocks: ['unknown'] }]);
+    setPlugins([{ ...base, id: 'mood', name: 'Mood', active: true, questionnaire_blocks: ['unknown'] }]);
     expect(questionnaireBlocks()).toEqual([]);
   });
 
@@ -86,8 +86,8 @@ describe('plugin helpers', () => {
     setPlugins([
       {
         ...base,
-        id: 'example',
-        name: 'Example',
+        id: 'mood',
+        name: 'Mood',
         active: true,
         widgets: ['w'],
         pages: ['p'],
@@ -96,7 +96,7 @@ describe('plugin helpers', () => {
     ]);
     expect(widgets()).toEqual([]);
     expect(reportSections()).toEqual([]);
-    expect(pageComponent('example', 'p')).toBeNull();
+    expect(pageComponent('mood', 'p')).toBeNull();
     expect(allEntries()).toEqual([]);
     expect(dockEntries()).toEqual([]);
     expect(moreEntries()).toEqual([]);

@@ -5,6 +5,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-10-22
+
+### Changed
+- Home remembers the period (week or month) and the area filter (all six, or the first or second three), saved with the rest of your settings (`home_period`, `home_areas`).
+- Every release tag now also creates a GitHub release, with its notes taken from this changelog.
+
+### Removed
+- The example plugin. `plugins/mood` and `plugins/calendar` are the references for writing a plugin.
+
 ## [0.10.0] - 2026-10-22
 
 ### Added
@@ -159,7 +168,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.10.1...HEAD
+[0.10.1]: https://github.com/tombino104/PersonalOS/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/tombino104/PersonalOS/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/tombino104/PersonalOS/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/tombino104/PersonalOS/compare/v0.8.0...v0.9.0

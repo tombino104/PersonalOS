@@ -20,7 +20,30 @@
   const length = $derived(period === 'month' ? 30 : 7);
   const days = $derived(today ? lastDays(today, length) : []);
 
+  function remember(changes) {
+    api.updateSettings(changes).catch(() => {});
+  }
+
+  function setPeriod(value) {
+    period = value;
+    remember({ home_period: value });
+  }
+
+  function setAreas(value) {
+    threeOnly = value !== 'all';
+    if (threeOnly) trioPage = value === 'second' ? 1 : 0;
+    remember({ home_areas: value });
+  }
+
   onMount(async () => {
+    api
+      .settings()
+      .then((saved) => {
+        period = saved.home_period;
+        threeOnly = saved.home_areas !== 'all';
+        trioPage = saved.home_areas === 'second' ? 1 : 0;
+      })
+      .catch(() => {});
     try {
       today = (await api.today()).day;
       const result = await api.scores(addDays(today, -181), today);
@@ -124,8 +147,8 @@
     </div>
     <div class="controls">
       <div class="segmented" role="group" aria-label={t('home.period')}>
-        <button class="seg" class:on={period === 'week'} aria-pressed={period === 'week'} onclick={() => (period = 'week')}>{t('home.week')}</button>
-        <button class="seg" class:on={period === 'month'} aria-pressed={period === 'month'} onclick={() => (period = 'month')}>{t('home.month')}</button>
+        <button class="seg" class:on={period === 'week'} aria-pressed={period === 'week'} onclick={() => setPeriod('week')}>{t('home.week')}</button>
+        <button class="seg" class:on={period === 'month'} aria-pressed={period === 'month'} onclick={() => setPeriod('month')}>{t('home.month')}</button>
       </div>
       {#if todayOverall !== null}
         <div class="today-score">{t('home.today')} <b>{round(todayOverall)} %</b></div>
@@ -147,14 +170,14 @@
     <section class="trends" aria-label={t('home.trends')}>
       <div class="trend-controls">
         <div class="segmented" role="group" aria-label={t('home.howMany')}>
-          <button class="seg" class:on={!threeOnly} aria-pressed={!threeOnly} onclick={() => (threeOnly = false)}>{t('home.allSix')}</button>
-          <button class="seg" class:on={threeOnly} aria-pressed={threeOnly} onclick={() => (threeOnly = true)}>{t('home.onlyThree')}</button>
+          <button class="seg" class:on={!threeOnly} aria-pressed={!threeOnly} onclick={() => setAreas('all')}>{t('home.allSix')}</button>
+          <button class="seg" class:on={threeOnly} aria-pressed={threeOnly} onclick={() => setAreas(trioPage === 1 ? 'second' : 'first')}>{t('home.onlyThree')}</button>
         </div>
         {#if threeOnly}
           <div class="pages">
-            <button class="pager" aria-label={t('home.firstThree')} disabled={trioPage === 0} onclick={() => (trioPage = 0)}><Icon name="back" small /></button>
+            <button class="pager" aria-label={t('home.firstThree')} disabled={trioPage === 0} onclick={() => setAreas('first')}><Icon name="back" small /></button>
             <span>{trioPage === 0 ? `${t('area.physical')} · ${t('area.discipline')} · ${t('area.social')}` : `${t('area.intellect')} · ${t('area.career')} · ${t('area.mindset')}`}</span>
-            <button class="pager" aria-label={t('home.lastThree')} disabled={trioPage === 1} onclick={() => (trioPage = 1)}><Icon name="forward" small /></button>
+            <button class="pager" aria-label={t('home.lastThree')} disabled={trioPage === 1} onclick={() => setAreas('second')}><Icon name="forward" small /></button>
           </div>
         {/if}
       </div>

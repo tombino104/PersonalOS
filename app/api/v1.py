@@ -280,6 +280,8 @@ def get_settings(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
         "day_cutoff": rules.cutoff.strftime("%H:%M"),
         "backup_auto": backup.schedule(conn)["auto"],
         "backup_time": backup.schedule(conn)["time"],
+        "home_period": settings.get(conn, "home_period", "week"),
+        "home_areas": settings.get(conn, "home_areas", "all"),
         "theme": settings.get(conn, "theme"),
         "language": settings.get(conn, "language"),
     }
@@ -310,7 +312,7 @@ def update_settings(body: SettingsUpdate, conn: sqlite3.Connection = Depends(get
         settings.put(conn, "backup_time", changes["backup_time"])
     if "backup_auto" in changes:
         settings.put(conn, "backup_auto", changes["backup_auto"])
-    for key in ("theme", "language"):
+    for key in ("home_period", "home_areas", "theme", "language"):
         if key in changes:
             settings.put(conn, key, changes[key])
     return get_settings(conn)
