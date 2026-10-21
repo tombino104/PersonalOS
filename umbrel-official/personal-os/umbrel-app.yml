@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.11.0"
+version: "0.12.0"
 tagline: A quiet place for your days
 description: >-
   A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
