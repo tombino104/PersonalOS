@@ -16,7 +16,7 @@ website: https://github.com/tombino104/PersonalOS
 dependencies: []
 repo: https://github.com/tombino104/PersonalOS
 support: https://github.com/tombino104/PersonalOS/issues
-port: 47213
+port: 8473
 gallery: []
 path: ""
 releaseNotes: >-
