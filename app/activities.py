@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 SOFT_LIMIT_PER_AREA = 5
 
 _SELECT = (
-    "SELECT act.id, act.name, act.weight, act.cadence, act.created_at, act.archived_at, "
+    "SELECT act.id, act.name, act.weight, act.cadence, act.days, act.created_at, act.archived_at, "
     "a.slug AS area FROM activities act JOIN areas a ON a.id = act.area_id"
 )
 
@@ -15,6 +15,23 @@ class ActivityNotFound(KeyError):
 
 class UnknownArea(ValueError):
     pass
+
+
+class InvalidDays(ValueError):
+    pass
+
+
+ALL_DAYS = 127
+
+
+def days_to_mask(days: list[int]) -> int:
+    if not days or len(set(days)) != len(days) or any(day not in range(7) for day in days):
+        raise InvalidDays("days must be a non-empty list of different weekdays, 0 (Monday) to 6 (Sunday)")
+    return sum(1 << day for day in days)
+
+
+def mask_to_days(mask: int) -> list[int]:
+    return [day for day in range(7) if mask & (1 << day)]
 
 
 def _iso(moment: datetime) -> str:
@@ -35,6 +52,7 @@ def _as_dict(row) -> dict:
         "name": row["name"],
         "weight": row["weight"],
         "cadence": row["cadence"],
+        "days": mask_to_days(row["days"]),
         "created_at": row["created_at"],
         "archived_at": row["archived_at"],
     }
@@ -54,13 +72,19 @@ def list_activities(conn: sqlite3.Connection, include_archived: bool = False) ->
 
 
 def create(
-    conn: sqlite3.Connection, area_slug: str, name: str, weight: int, now: datetime
+    conn: sqlite3.Connection,
+    area_slug: str,
+    name: str,
+    weight: int,
+    now: datetime,
+    days: list[int] | None = None,
 ) -> dict:
     area_id = _area_id(conn, area_slug)
+    mask = ALL_DAYS if days is None else days_to_mask(days)
     with conn:
         cursor = conn.execute(
-            "INSERT INTO activities (area_id, name, weight, created_at) VALUES (?, ?, ?, ?)",
-            (area_id, name, weight, _iso(now)),
+            "INSERT INTO activities (area_id, name, weight, days, created_at) VALUES (?, ?, ?, ?, ?)",
+            (area_id, name, weight, mask, _iso(now)),
         )
     return get(conn, cursor.lastrowid)
 
@@ -78,6 +102,9 @@ def update(conn: sqlite3.Connection, activity_id: int, changes: dict, now: datet
     if "weight" in changes:
         assignments.append("weight = ?")
         params.append(changes["weight"])
+    if "days" in changes:
+        assignments.append("days = ?")
+        params.append(days_to_mask(changes["days"]))
     if "archived" in changes:
         assignments.append("archived_at = ?")
         if changes["archived"]:

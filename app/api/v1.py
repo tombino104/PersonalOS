@@ -79,7 +79,13 @@ def info() -> dict:
 def today(
     conn: sqlite3.Connection = Depends(get_conn), now: datetime = Depends(get_now)
 ) -> dict:
-    return {"day": logical_day(now, settings.day_rules(conn)).isoformat()}
+    day = logical_day(now, settings.day_rules(conn))
+    moment = reports.opens_at(conn, day)
+    locked = moment is not None and now < moment
+    return {
+        "day": day.isoformat(),
+        "report_opens_at": moment.strftime("%H:%M") if locked else None,
+    }
 
 
 @router.get("/stats/areas")
@@ -132,7 +138,7 @@ def create_activity(
     conn: sqlite3.Connection = Depends(get_conn),
     now: datetime = Depends(get_now),
 ) -> dict:
-    activity = activities.create(conn, body.area, body.name, body.weight, now)
+    activity = activities.create(conn, body.area, body.name, body.weight, now, body.days)
     _emit(request, background, "activity.created", {"activity": activity}, now)
     return {"activity": activity, "warnings": activities.warnings(conn)}
 
@@ -278,6 +284,8 @@ def get_settings(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
     return {
         "timezone": rules.timezone,
         "day_cutoff": rules.cutoff.strftime("%H:%M"),
+        "report_lock": bool(settings.get(conn, "report_lock", False)),
+        "report_time": settings.get(conn, "report_time", "20:00"),
         "backup_auto": backup.schedule(conn)["auto"],
         "backup_time": backup.schedule(conn)["time"],
         "home_period": settings.get(conn, "home_period", "week"),
@@ -304,6 +312,14 @@ def update_settings(body: SettingsUpdate, conn: sqlite3.Connection = Depends(get
         except ValueError:
             raise ApiError(422, "invalid_day_cutoff", "expected a time like 04:00") from None
         settings.put(conn, "day_cutoff", changes["day_cutoff"])
+    if "report_time" in changes:
+        try:
+            time.fromisoformat(changes["report_time"])
+        except ValueError:
+            raise ApiError(422, "invalid_report_time", "expected a time like 20:00") from None
+        settings.put(conn, "report_time", changes["report_time"])
+    if "report_lock" in changes:
+        settings.put(conn, "report_lock", changes["report_lock"])
     if "backup_time" in changes:
         try:
             time.fromisoformat(changes["backup_time"])

@@ -1,8 +1,10 @@
 <script>
   import ActivityDialog from '../../components/ActivityDialog.svelte';
+  import ReportTimeCard from '../../components/ReportTimeCard.svelte';
   import { api } from '../../lib/api.js';
   import { AREAS } from '../../lib/charts.js';
-  import { t } from '../../lib/i18n.svelte.js';
+  import { daysLabel } from '../../lib/dates.js';
+  import { locale, t } from '../../lib/i18n.svelte.js';
 
   let activities = $state([]);
   let warnings = $state([]);
@@ -65,7 +67,7 @@
         <div class="chips">
           {#each group.items as activity (activity.id)}
             <button class="chip" class:faded={activity.archived_at} onclick={() => open(activity, group.area)}>
-              {activity.name}<b>{activity.archived_at ? t('settings.archivedTag') : t('settings.weightTag', { weight: activity.weight })}</b>
+              {activity.name}<b>{activity.archived_at ? t('settings.archivedTag') : t('settings.weightTag', { weight: activity.weight })}</b>{#if daysLabel(activity.days, locale())}<b>{daysLabel(activity.days, locale())}</b>{/if}
             </button>
           {/each}
           <button class="chip dashed" onclick={() => open(null, group.area)}>{t('settings.add')}</button>
@@ -77,6 +79,8 @@
     </div>
   {/each}
 </section>
+
+<ReportTimeCard />
 
 {#if dialogOpen}
   {#key editing?.id ?? `new-${defaultArea}`}

@@ -2,7 +2,8 @@
   import { onMount, untrack } from 'svelte';
   import { api, ApiError } from '../lib/api.js';
   import { AREAS } from '../lib/charts.js';
-  import { t } from '../lib/i18n.svelte.js';
+  import { weekdayInitials } from '../lib/dates.js';
+  import { locale, t } from '../lib/i18n.svelte.js';
 
   let { activity = null, area = 'physical', onsaved, onclose } = $props();
 
@@ -10,6 +11,16 @@
   let name = $state(untrack(() => activity?.name ?? ''));
   let chosenArea = $state(untrack(() => activity?.area ?? area));
   let weight = $state(untrack(() => activity?.weight ?? 2));
+  let days = $state(untrack(() => activity?.days ?? [0, 1, 2, 3, 4, 5, 6]));
+  const initials = $derived(weekdayInitials(locale()));
+
+  function toggleDay(index) {
+    if (days.includes(index)) {
+      if (days.length > 1) days = days.filter((day) => day !== index);
+    } else {
+      days = [...days, index].sort();
+    }
+  }
   let error = $state('');
   let busy = $state(false);
 
@@ -23,9 +34,9 @@
     error = '';
     try {
       if (activity) {
-        await api.updateActivity(activity.id, { name: name.trim(), area: chosenArea, weight });
+        await api.updateActivity(activity.id, { name: name.trim(), area: chosenArea, weight, days });
       } else {
-        await api.createActivity({ name: name.trim(), area: chosenArea, weight });
+        await api.createActivity({ name: name.trim(), area: chosenArea, weight, days });
       }
       onsaved();
     } catch (failure) {
@@ -73,6 +84,19 @@
         {/each}
       </div>
       <p class="muted help">{t('activity.weightHelp')}</p>
+    </div>
+
+    <div>
+      <span class="label" id="activity-days-label">{t('activity.days')}</span>
+      <div class="days" role="group" aria-labelledby="activity-days-label">
+        {#each initials as letter, index}
+          <button type="button" class="day" class:on={days.includes(index)} aria-pressed={days.includes(index)} onclick={() => toggleDay(index)}>
+            <span aria-hidden="true">{letter}</span>
+            <span class="sr">{new Intl.DateTimeFormat(locale(), { weekday: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2024, 0, 1 + index)))}</span>
+          </button>
+        {/each}
+      </div>
+      <p class="muted help">{t('activity.daysHelp')}</p>
     </div>
 
     {#if error}
@@ -138,5 +162,37 @@
 
   .segmented {
     width: fit-content;
+  }
+
+  .days {
+    display: flex;
+    gap: 6px;
+  }
+
+  .day {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: var(--paper);
+    color: var(--ink-2);
+    font: 500 14px/1 var(--sans);
+    cursor: pointer;
+  }
+
+  .day.on {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
   }
 </style>

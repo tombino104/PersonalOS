@@ -14,6 +14,7 @@
   let report = $state(null);
   let day = $state('');
   let today = $state('');
+  let opensAt = $state('');
   let reflection = $state('');
   let saved = $state(false);
   let failure = $state('');
@@ -31,8 +32,14 @@
 
   async function load(requested) {
     try {
-      today = (await api.today()).day;
+      const info = await api.today();
+      today = info.day;
       day = requested ?? today;
+      if (day === today && info.report_opens_at) {
+        opensAt = info.report_opens_at;
+        status = 'locked';
+        return;
+      }
       let opened = await api.openReport(day);
       if (!opened.completed && opened.editable) opened = await api.syncReport(day);
       report = opened;
@@ -41,6 +48,10 @@
       status = opened.editable ? 'ready' : 'closed';
     } catch (error) {
       status = error instanceof ApiError && error.code === 'report_closed' ? 'closed' : 'error';
+      if (error instanceof ApiError && error.code === 'report_not_open') {
+        opensAt = error.message.match(/\d{2}:\d{2}/)?.[0] ?? '';
+        status = 'locked';
+      }
     }
   }
 
@@ -98,6 +109,15 @@
     <p class="lede" aria-live="polite">{t('common.loading')}</p>
   {:else if status === 'error'}
     <p class="error" role="alert">{t('error.generic')}</p>
+  {:else if status === 'locked'}
+    <header>
+      <div class="eyebrow">{t('questionnaire.eyebrow')}</div>
+      <h1 class="title">{t('questionnaire.lockedTitle')}</h1>
+      <p class="lede">{t('questionnaire.locked', { time: opensAt })}</p>
+    </header>
+    <div class="locked-actions">
+      <Link class="btn" href="/settings/activities">{t('questionnaire.lockedChange')}</Link>
+    </div>
   {:else if status === 'closed'}
     <header>
       <div class="eyebrow">{t('questionnaire.eyebrow')}</div>
@@ -182,6 +202,11 @@
 </div>
 
 <style>
+  .locked-actions {
+    display: flex;
+    gap: 12px;
+  }
+
   .groups {
     display: flex;
     flex-direction: column;

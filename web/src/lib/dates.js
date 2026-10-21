@@ -25,6 +25,18 @@ export function lastDays(endIso, count) {
   return Array.from({ length: count }, (_, index) => addDays(endIso, index - count + 1));
 }
 
+export function weekdayInitials(locale) {
+  return Array.from({ length: 7 }, (_, index) =>
+    new Intl.DateTimeFormat(locale, { weekday: 'narrow', timeZone: 'UTC' }).format(parseDay(addDays('2024-01-01', index))),
+  );
+}
+
+export function daysLabel(days, locale) {
+  if (days.length === 7) return '';
+  const initials = weekdayInitials(locale);
+  return days.map((day) => initials[day]).join(' ');
+}
+
 export function formatDate(iso, locale, options) {
   return new Intl.DateTimeFormat(locale, { ...options, timeZone: 'UTC' }).format(parseDay(iso));
 }

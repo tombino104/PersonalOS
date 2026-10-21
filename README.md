@@ -14,7 +14,7 @@ Yes, there are plenty of habit trackers. This one is built around a different se
 
 Under the hood: a personal growth system for one person, with six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a Docker container (especially on umbrelOS), behind Tailscale.
 
-> **Status: v0.12.1.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Reminders and agents come next.
+> **Status: v0.13.0.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Reminders and agents come next.
 
 ## Screenshots
 

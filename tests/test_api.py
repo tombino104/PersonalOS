@@ -246,6 +246,8 @@ def test_settings_roundtrip_and_validation(client):
         "day_cutoff": "04:00",
         "backup_auto": True,
         "backup_time": "03:00",
+        "report_lock": False,
+        "report_time": "20:00",
         "home_period": "week",
         "home_areas": "all",
         "theme": None,
@@ -298,11 +300,11 @@ def test_reports_belong_to_the_logged_in_user(client, tmp_path):
 
 
 def test_today_follows_the_day_cutoff(client, clock):
-    assert client.get("/api/v1/today").json() == {"day": "2026-10-20"}
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-20", "report_opens_at": None}
     clock.now = datetime(2026, 10, 21, 1, 30, tzinfo=timezone.utc)
-    assert client.get("/api/v1/today").json() == {"day": "2026-10-20"}
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-20", "report_opens_at": None}
     clock.now = datetime(2026, 10, 21, 2, 0, tzinfo=timezone.utc)
-    assert client.get("/api/v1/today").json() == {"day": "2026-10-21"}
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-21", "report_opens_at": None}
 
 
 def test_overall_and_stats_over_the_api(client):

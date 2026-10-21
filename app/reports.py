@@ -1,6 +1,7 @@
 import sqlite3
-from datetime import date, datetime, timezone
+from datetime import date, datetime, time, timezone
 
+from . import settings
 from .logical_day import DayRules, edit_deadline, logical_day
 from .scoring import Item, mean_score, score, tally
 
@@ -17,6 +18,12 @@ class FutureDay(ValueError):
     pass
 
 
+class ReportNotOpen(Exception):
+    def __init__(self, opens_at: str):
+        super().__init__(f"the report opens at {opens_at}")
+        self.opens_at = opens_at
+
+
 class ReportNotFound(KeyError):
     pass
 
@@ -29,14 +36,29 @@ def _iso(moment: datetime) -> str:
     return moment.astimezone(timezone.utc).isoformat(timespec="seconds")
 
 
+def opens_at(conn: sqlite3.Connection, day: date) -> datetime | None:
+    if not settings.get(conn, "report_lock", False):
+        return None
+    zone = settings.day_rules(conn).zone
+    at = time.fromisoformat(settings.get(conn, "report_time", "20:00"))
+    return datetime.combine(day, at, tzinfo=zone)
+
+
+def require_open_time(conn: sqlite3.Connection, day: date, now: datetime) -> None:
+    moment = opens_at(conn, day)
+    if moment is not None and now < moment:
+        raise ReportNotOpen(moment.strftime("%H:%M"))
+
+
 def _require_editable(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
     row = conn.execute(
-        "SELECT status, editable_until FROM reports WHERE id = ?", (report_id,)
+        "SELECT status, editable_until, day FROM reports WHERE id = ?", (report_id,)
     ).fetchone()
     if row is None:
         raise ReportNotFound(f"report {report_id} not found")
     if row["status"] == "closed" or now >= datetime.fromisoformat(row["editable_until"]):
         raise ReportClosed(f"report {report_id} is closed")
+    require_open_time(conn, date.fromisoformat(row["day"]), now)
 
 
 def _write_scores(conn: sqlite3.Connection, report_id: int) -> None:
@@ -71,6 +93,7 @@ def open_report(
     deadline = edit_deadline(day, rules)
     if now >= deadline:
         raise ReportClosed(f"the edit window for {day.isoformat()} has ended")
+    require_open_time(conn, day, now)
     with conn:
         cursor = conn.execute(
             "INSERT INTO reports (user_id, day, status, editable_until) "
@@ -81,8 +104,9 @@ def open_report(
         conn.execute(
             "INSERT INTO completions "
             "(report_id, activity_id, name_at_time, weight_at_time, area_id) "
-            "SELECT ?, id, name, weight, area_id FROM activities WHERE archived_at IS NULL",
-            (report_id,),
+            "SELECT ?, id, name, weight, area_id FROM activities "
+            "WHERE archived_at IS NULL AND (days & ?) != 0",
+            (report_id, 1 << day.weekday()),
         )
     return report_id
 
@@ -277,11 +301,15 @@ def sync_draft(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
     ).fetchone()["completed_at"]
     if completed is not None:
         raise ReportCompleted(f"report {report_id} is already completed")
+    day = date.fromisoformat(
+        conn.execute("SELECT day FROM reports WHERE id = ?", (report_id,)).fetchone()["day"]
+    )
+    bit = 1 << day.weekday()
     with conn:
         conn.execute(
             "DELETE FROM completions WHERE report_id = ? AND activity_id IN "
-            "(SELECT id FROM activities WHERE archived_at IS NOT NULL)",
-            (report_id,),
+            "(SELECT id FROM activities WHERE archived_at IS NOT NULL OR (days & ?) = 0)",
+            (report_id, bit),
         )
         conn.execute(
             "UPDATE completions SET "
@@ -295,9 +323,9 @@ def sync_draft(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
             "INSERT INTO completions "
             "(report_id, activity_id, name_at_time, weight_at_time, area_id) "
             "SELECT ?, id, name, weight, area_id FROM activities "
-            "WHERE archived_at IS NULL AND id NOT IN "
+            "WHERE archived_at IS NULL AND (days & ?) != 0 AND id NOT IN "
             "(SELECT activity_id FROM completions WHERE report_id = ?)",
-            (report_id, report_id),
+            (report_id, bit, report_id),
         )
 
 

@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 ActivityName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
 Weight = Annotated[int, Field(ge=1, le=3)]
+Days = Annotated[list[Annotated[int, Field(ge=0, le=6)]], Field(min_length=1, max_length=7)]
 
 
 class ActivityCreate(BaseModel):
@@ -13,6 +14,7 @@ class ActivityCreate(BaseModel):
     area: str
     name: ActivityName
     weight: Weight
+    days: Days | None = None
 
 
 class ActivityUpdate(BaseModel):
@@ -21,6 +23,7 @@ class ActivityUpdate(BaseModel):
     area: str | None = None
     name: ActivityName | None = None
     weight: Weight | None = None
+    days: Days | None = None
     archived: bool | None = None
 
 
@@ -87,6 +90,8 @@ class SettingsUpdate(BaseModel):
 
     timezone: str | None = None
     day_cutoff: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
+    report_lock: bool | None = None
+    report_time: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
     backup_auto: bool | None = None
     backup_time: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
     home_period: Literal["week", "month"] | None = None

@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-10-22
+
+### Added
+- Each activity can be set for specific days of the week (seven toggles, Monday to Sunday, all on by default). The evening questionnaire of a day lists only the activities scheduled for that weekday; the relative score ignores the others, and an area with nothing scheduled that day is empty, not 0%. Changes apply from today on and past reports are unchanged. Activities now carry `days` (a list of weekdays, 0 for Monday to 6 for Sunday) in the API. Closes #1.
+- Optional report time (Settings > Activities): before the chosen time, the report of the current day is locked, with a message saying when it opens. Yesterday stays editable, and the lock is enforced by the server (`report_not_open`). Settings `report_lock` and `report_time`; `GET /api/v1/today` returns `report_opens_at` while the report is locked. Closes #2.
+
 ## [0.12.1] - 2026-10-22
 
 ### Added
@@ -203,7 +209,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/tombino104/PersonalOS/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/tombino104/PersonalOS/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/tombino104/PersonalOS/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/tombino104/PersonalOS/compare/v0.10.2...v0.11.0
