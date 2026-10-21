@@ -13,7 +13,7 @@ Personal OS ships as a Docker image (`ghcr.io/tombino104/personalos`) and as a c
 1. Create an empty repository for the store and publish `umbrel-store/` as its root (see `umbrel-store/README.md`).
 2. In umbrelOS: App Store, menu at the top right, **Community App Stores**, add the repository address.
 3. Install **Personal OS** from that store.
-4. Open it (`http://umbrel.local:8473`). The first time, it asks for a one-time setup code. Find it in `setup-code.txt` inside the app's data folder (in the Files app: `Apps/tombino104-personal-os/data`). The same file holds the code for the "start over" link on the login page, which erases all data.
+4. Open it (`http://umbrel.local:8473`). The first time, it asks for a one-time setup code. Find it in `setup-code.txt` inside the app's data folder (in the Files app: `Apps/tombino104-personal-os/data`). Backups are in the `backups` folder next to it (Settings > Backups in the app). The same file holds the code for the "start over" link on the login page, which erases all data.
 5. Create your account. The code file disappears.
 
 ## Where the data lives

@@ -5,6 +5,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-22
+
+### Added
+- Backups: a consistent copy of the database in a `.zip` (with a small manifest) made every night at 03:00 in `data/backups` (the last 7 kept), on demand (the last 20 kept), and automatically before every restore (the last 5 kept).
+- Settings > Backups: back up now and download, list, download and restore saved backups, and restore from an uploaded file. A restore needs a typed confirmation, refuses damaged files and backups from a newer version, and upgrades the schema of older ones.
+- API: `GET/POST /api/v1/backups`, `GET /api/v1/backups/{name}`, `POST /api/v1/backups/restore` and `POST /api/v1/backups/{name}/restore` (both need `?confirm=restore`).
+- Theme and language are now kept in the server settings (`theme`, `language`), so they are part of the data folder and the backups. The first time, the choice already made in the browser is copied to the server.
+
 ## [0.8.0] - 2026-10-22
 
 ### Added
@@ -137,7 +145,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/tombino104/PersonalOS/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/tombino104/PersonalOS/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/tombino104/PersonalOS/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/tombino104/PersonalOS/compare/v0.7.0...v0.7.1
