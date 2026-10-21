@@ -2,7 +2,7 @@ manifestVersion: 1
 id: tombino104-personal-os
 category: productivity
 name: Personal OS
-version: "0.7.1"
+version: "0.7.2"
 tagline: A quiet place for your days
 description: >-
   A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
