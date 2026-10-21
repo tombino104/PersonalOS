@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.7.2.** Core API, password login, the web interface, the plugin system and the first plugin (mood tracker) are in place. Backups, reminders and agents come next.
+> **Status: v0.8.0.** Core API, password login, the web interface, the plugin system, a built-in calendar and a mood tracker plugin are in place. Backups, reminders and agents come next.
 
 ## Guiding ideas
 
@@ -24,7 +24,9 @@ The server listens on `127.0.0.1` only. Data lives in `./data` (mounted as a vol
 
 The image builds the web interface too (Svelte + Vite) and the server serves it, so there is only one container.
 
-On the first run there is no account yet. Open `http://127.0.0.1:47213`: the setup page asks for a one-time setup code. The code is saved in `data/setup-code.txt` (and printed in the container logs); a new code is generated at every start until an account exists. After five wrong codes the page locks for 15 minutes. Nothing else is reachable without logging in.
+On the first run there is no account yet. Open `http://127.0.0.1:47213`: the setup page asks for a one-time setup code. The code is saved in `data/setup-code.txt` (and printed in the container logs while no account exists); a new code is generated at every start and every time it is used. After five wrong codes the page locks for 15 minutes. Nothing else is reachable without logging in.
+
+If you forget the password and want to start from scratch, the login page has a "start over" link: with the code from `data/setup-code.txt` and a new name and password (typed twice) it **erases all data** and creates a fresh account.
 
 You can also create the first user from the command line:
 
@@ -66,7 +68,7 @@ Texts live in `web/src/locales/` (English is the source and the default, Italian
 
 ## Plugins
 
-Features beyond the core are plugins: a folder in `plugins/` with a manifest, a Python backend and a Svelte interface. Turn them on and off in Settings > Plugins; each one lists the permissions it asks for. `plugins/mood` (a mood tracker) is the first real plugin, `plugins/example` is a small working example, and [docs/plugins.md](docs/plugins.md) explains how to write your own.
+Features beyond the core are plugins: a folder in `plugins/` with a manifest, a Python backend and a Svelte interface. Turn them on and off in Settings > Plugins; each one lists the permissions it asks for. `plugins/calendar` (a calendar with repeating events) is on from the start and shows in the dock, `plugins/mood` (a mood tracker) is another real plugin, `plugins/example` is a small working example, and [docs/plugins.md](docs/plugins.md) explains how to write your own.
 
 ## Umbrel
 

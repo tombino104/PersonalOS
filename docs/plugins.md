@@ -39,6 +39,8 @@ Plugins trust the core and the core trusts plugins: they run in the same process
 }
 ```
 
+Optional: `"default_active": true` turns the plugin on once, the first time the app sees it (and after a full reset), with the permissions it lists. The user can turn it off afterwards and it stays off. Only use it for features that are part of the app, like the calendar.
+
 - `id` is lowercase letters, digits and underscores, and must equal the folder name. Your tables must start with `plg_<id>_`.
 - `core_api` is the core API major version you need (`1.x`). If it does not match, the plugin shows as incompatible and cannot be turned on.
 - `report_sections` add a section to the detail of a past report (in Past reports).

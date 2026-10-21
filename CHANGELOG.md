@@ -5,6 +5,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-22
+
+### Added
+- Calendar plugin (`plugins/calendar`), on from the start and shown in the dock: a month grid and the agenda of the chosen day, events with a title, a day, an optional time, a category and notes, repeats (daily, weekly, monthly, yearly, with an optional end day), editing and deleting. It never creates points.
+- Manifest field `default_active`: the plugin is turned on once the first time the app sees it, and stays off if the user turns it off.
+- "Start over" on the login page: the setup code plus a new name and a password typed twice erase all data (reports, activities, settings and plugin data) and create a new account (`POST /api/v1/auth/reset`).
+- App icon and gallery screenshots for the Umbrel store entry.
+
+### Changed
+- The setup code file now always exists: a new code is written at every start and each time a code is used, so it can also unlock the reset.
+
+### Fixed
+- Plugin migrations can create indexes.
+
 ## [0.7.2] - 2026-10-22
 
 ### Fixed
@@ -123,7 +137,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.7.2...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/tombino104/PersonalOS/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/tombino104/PersonalOS/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/tombino104/PersonalOS/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/tombino104/PersonalOS/compare/v0.6.0...v0.7.0
