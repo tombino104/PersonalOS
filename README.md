@@ -1,8 +1,20 @@
 # Personal OS
 
-A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
+**Discipline, without the dopamine tricks.**
 
-> **Status: v0.12.0.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Backups, reminders and agents come next.
+A free, self-hosted daily check-in for six areas of your life. No streaks, no points, no subscription, no cloud: your data stays on your own machine.
+
+Yes, there are plenty of habit trackers. This one is built around a different set of rules:
+
+- **Free, really.** No paid tier, no ads, no hidden costs. Open source (AGPL-3.0).
+- **No toxic gamification.** No streaks, ranks or points to chase, no notifications tied to your score. A day you skip is empty, not a failure.
+- **Pure discipline.** You note what you actually did, never what you achieved. It is a mirror, not a judge.
+- **Self-hosted.** One container, made for umbrelOS and any Docker host, behind your own private network.
+- **Your data, under your control.** One folder, a SQLite file, daily backups, no telemetry. Nothing leaves your device.
+
+Under the hood: a personal growth system for one person, with six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a Docker container (especially on umbrelOS), behind Tailscale.
+
+> **Status: v0.12.1.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Reminders and agents come next.
 
 ## Screenshots
 

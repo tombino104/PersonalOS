@@ -3,14 +3,16 @@ id: tombino104-personal-os
 category: productivity
 name: Personal OS
 version: "0.12.0"
-tagline: A quiet place for your days
+tagline: Discipline, without the dopamine tricks
 description: >-
-  A personal growth system for one person: six life areas, a relative score and an evening questionnaire.
-  It is a mirror, not a judge: it measures behaviors, never results, and a day left blank is empty, not zero.
+  A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
+  mindset. No streaks, no points, no subscription, no cloud. It is a mirror, not a judge: it measures behaviors,
+  never results, and a day left blank is empty, not zero.
 
 
-  Everything you write stays in one folder on your Umbrel, so a backup is just a copy of that folder.
-  Extra features (like a mood tracker) are plugins you can turn on and off.
+  Everything you write stays in one folder on your Umbrel, so a backup is just a copy of that folder, and the app
+  makes daily backups for you. Extra features (a built-in calendar, a mood tracker, a daily quote) are plugins you
+  can turn on and off.
 developer: tombino104
 website: https://github.com/tombino104/PersonalOS
 dependencies: []
