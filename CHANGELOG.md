@@ -5,6 +5,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-10-21
+
 ### Added
 - A live demo on GitHub Pages: the real interface running in the browser against a built-in fake server with made-up data, nothing stored anywhere. Built with `DEMO=1 npm run build` (`web/src/demo/`) and deployed by the new Demo workflow.
 
@@ -216,7 +218,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.13.1...HEAD
+[0.13.1]: https://github.com/tombino104/PersonalOS/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/tombino104/PersonalOS/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/tombino104/PersonalOS/compare/v0.12.0...v0.12.1
 [0.12.0]: https://github.com/tombino104/PersonalOS/compare/v0.11.0...v0.12.0
