@@ -207,11 +207,22 @@ def test_sync_brings_a_draft_up_to_date_and_keeps_ticks(client):
     assert items[kept["activity_id"]]["done"] is True
 
 
-def test_sync_is_refused_once_completed(client):
-    open_day(client)
-    client.post(f"/api/v1/reports/{DAY}/complete")
-    response = client.post(f"/api/v1/reports/{DAY}/sync")
-    assert (response.status_code, response.json()["error"]["code"]) == (409, "report_completed")
+def test_sync_updates_a_completed_report_and_its_scores(client):
+    report = open_day(client)
+    first = report["completions"][0]
+    client.put(f"/api/v1/reports/{DAY}/completions/{first['activity_id']}", json={"done": True})
+    before = client.post(f"/api/v1/reports/{DAY}/complete").json()
+    client.patch(f"/api/v1/activities/{first['activity_id']}", json={"weight": 3, "name": "Renamed"})
+    client.post("/api/v1/activities", json={"area": "mindset", "name": "Late", "weight": 3})
+    synced = client.post(f"/api/v1/reports/{DAY}/sync")
+    assert synced.status_code == 200
+    after = client.get(f"/api/v1/reports/{DAY}").json()
+    assert after["completed"] is True
+    names = {item["name"]: item for item in after["completions"]}
+    assert names["Renamed"]["done"] is True and names["Late"]["done"] is False
+    mindset_before = next(s for s in before["scores"] if s["area"] == "mindset")
+    mindset_after = next(s for s in after["scores"] if s["area"] == "mindset")
+    assert mindset_after["maximum"] == mindset_before["maximum"] + 3
 
 
 def test_yesterday_stays_editable_until_the_deadline(client, clock):

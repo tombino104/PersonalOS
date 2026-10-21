@@ -9,6 +9,7 @@
 
   let dialog;
   let name = $state(untrack(() => activity?.name ?? ''));
+  let description = $state(untrack(() => activity?.description ?? ''));
   let chosenArea = $state(untrack(() => activity?.area ?? area));
   let weight = $state(untrack(() => activity?.weight ?? 2));
   let days = $state(untrack(() => activity?.days ?? [0, 1, 2, 3, 4, 5, 6]));
@@ -34,9 +35,9 @@
     error = '';
     try {
       if (activity) {
-        await api.updateActivity(activity.id, { name: name.trim(), area: chosenArea, weight, days });
+        await api.updateActivity(activity.id, { name: name.trim(), description: description.trim(), area: chosenArea, weight, days });
       } else {
-        await api.createActivity({ name: name.trim(), area: chosenArea, weight, days });
+        await api.createActivity({ name: name.trim(), description: description.trim(), area: chosenArea, weight, days });
       }
       onsaved();
     } catch (failure) {
@@ -65,6 +66,18 @@
     <div>
       <label class="label" for="activity-name">{t('activity.name')}</label>
       <input id="activity-name" class="field" type="text" maxlength="100" required bind:value={name} />
+    </div>
+
+    <div>
+      <label class="label" for="activity-description">{t('activity.description')}</label>
+      <textarea
+        id="activity-description"
+        class="field"
+        rows="2"
+        maxlength="300"
+        placeholder={t('activity.descriptionPlaceholder')}
+        bind:value={description}
+      ></textarea>
     </div>
 
     <div>

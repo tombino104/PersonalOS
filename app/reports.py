@@ -10,10 +10,6 @@ class ReportClosed(Exception):
     pass
 
 
-class ReportCompleted(Exception):
-    pass
-
-
 class FutureDay(ValueError):
     pass
 
@@ -208,8 +204,9 @@ def report_detail(conn: sqlite3.Connection, report_id: int, now: datetime) -> di
     if row is None:
         raise ReportNotFound(f"report {report_id} not found")
     completions = conn.execute(
-        "SELECT c.activity_id, c.name_at_time, c.weight_at_time, c.done, a.slug "
+        "SELECT c.activity_id, c.name_at_time, c.weight_at_time, c.done, a.slug, act.description "
         "FROM completions c JOIN areas a ON a.id = c.area_id "
+        "JOIN activities act ON act.id = c.activity_id "
         "WHERE c.report_id = ? ORDER BY a.position, c.id",
         (report_id,),
     ).fetchall()
@@ -236,6 +233,7 @@ def report_detail(conn: sqlite3.Connection, report_id: int, now: datetime) -> di
             {
                 "activity_id": c["activity_id"],
                 "name": c["name_at_time"],
+                "description": c["description"],
                 "weight": c["weight_at_time"],
                 "area": c["slug"],
                 "done": bool(c["done"]),
@@ -299,8 +297,6 @@ def sync_draft(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
     completed = conn.execute(
         "SELECT completed_at FROM reports WHERE id = ?", (report_id,)
     ).fetchone()["completed_at"]
-    if completed is not None:
-        raise ReportCompleted(f"report {report_id} is already completed")
     day = date.fromisoformat(
         conn.execute("SELECT day FROM reports WHERE id = ?", (report_id,)).fetchone()["day"]
     )
@@ -327,6 +323,8 @@ def sync_draft(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
             "(SELECT activity_id FROM completions WHERE report_id = ?)",
             (report_id, bit, report_id),
         )
+        if completed is not None:
+            _write_scores(conn, report_id)
 
 
 def area_averages(conn: sqlite3.Connection, user_id: int, start: date, end: date) -> dict:

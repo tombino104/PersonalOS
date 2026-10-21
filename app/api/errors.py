@@ -24,7 +24,6 @@ def _response(status_code: int, code: str, message: str, details=None) -> JSONRe
 
 _DOMAIN_ERRORS = [
     (reports.ReportClosed, 409, "report_closed"),
-    (reports.ReportCompleted, 409, "report_completed"),
     (reports.ReportNotOpen, 409, "report_not_open"),
     (activities.InvalidDays, 422, "invalid_days"),
     (reports.FutureDay, 422, "future_day"),

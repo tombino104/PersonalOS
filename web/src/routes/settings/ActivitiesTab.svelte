@@ -66,7 +66,7 @@
       <div class="grow">
         <div class="chips">
           {#each group.items as activity (activity.id)}
-            <button class="chip" class:faded={activity.archived_at} onclick={() => open(activity, group.area)}>
+            <button class="chip" class:faded={activity.archived_at} title={activity.description ?? undefined} onclick={() => open(activity, group.area)}>
               {activity.name}<b>{activity.archived_at ? t('settings.archivedTag') : t('settings.weightTag', { weight: activity.weight })}</b>{#if daysLabel(activity.days, locale())}<b>{daysLabel(activity.days, locale())}</b>{/if}
             </button>
           {/each}

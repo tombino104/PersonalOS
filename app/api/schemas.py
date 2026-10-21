@@ -4,6 +4,7 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 ActivityName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=100)]
+Description = Annotated[str, StringConstraints(strip_whitespace=True, max_length=300)]
 Weight = Annotated[int, Field(ge=1, le=3)]
 Days = Annotated[list[Annotated[int, Field(ge=0, le=6)]], Field(min_length=1, max_length=7)]
 
@@ -13,6 +14,7 @@ class ActivityCreate(BaseModel):
 
     area: str
     name: ActivityName
+    description: Description | None = None
     weight: Weight
     days: Days | None = None
 
@@ -22,6 +24,7 @@ class ActivityUpdate(BaseModel):
 
     area: str | None = None
     name: ActivityName | None = None
+    description: Description | None = None
     weight: Weight | None = None
     days: Days | None = None
     archived: bool | None = None

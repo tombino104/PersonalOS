@@ -138,7 +138,7 @@ def create_activity(
     conn: sqlite3.Connection = Depends(get_conn),
     now: datetime = Depends(get_now),
 ) -> dict:
-    activity = activities.create(conn, body.area, body.name, body.weight, now, body.days)
+    activity = activities.create(conn, body.area, body.name, body.weight, now, body.days, body.description)
     _emit(request, background, "activity.created", {"activity": activity}, now)
     return {"activity": activity, "warnings": activities.warnings(conn)}
 

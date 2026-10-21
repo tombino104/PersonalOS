@@ -74,6 +74,18 @@ describe('demo server', () => {
     expect(call('PATCH', '/settings', { report_time: '8pm' }).data.error.code).toBe('invalid_report_time');
   });
 
+  it('keeps a completed report in step with the activities while it can be edited', () => {
+    const { call } = demo();
+    call('POST', '/reports', { day: TODAY });
+    call('POST', `/reports/${TODAY}/complete`);
+    call('POST', '/activities', { area: 'career', name: 'Inbox zero', weight: 3, description: ' Empty it ' });
+    const synced = call('POST', `/reports/${TODAY}/sync`).data;
+    const added = synced.completions.find((item) => item.name === 'Inbox zero');
+    expect(added.description).toBe('Empty it');
+    expect(synced.completed).toBe(true);
+    expect(synced.scores.find((entry) => entry.area === 'career').maximum).toBeGreaterThanOrEqual(3);
+  });
+
   it('syncs a draft with the current activities', () => {
     const { call } = demo();
     call('POST', '/reports', { day: TODAY });

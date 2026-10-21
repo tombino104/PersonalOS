@@ -14,23 +14,23 @@ const WEEKDAYS = [0, 1, 2, 3, 4];
 
 export const SAMPLE_ACTIVITIES = {
   physical: [
-    ['Workout', 3, [0, 2, 4, 5]],
+    ['Workout', 3, [0, 2, 4, 5], 'At least 30 minutes, anything that makes you sweat'],
     ['Walk or run', 2, EVERY_DAY],
-    ['Regular sleep', 2, EVERY_DAY],
+    ['Regular sleep', 2, EVERY_DAY, 'In bed before midnight, screens off'],
     ['Balanced meals', 1, EVERY_DAY],
   ],
   discipline: [
     ['Wake up on time', 2, EVERY_DAY],
-    ['Morning routine', 2, EVERY_DAY],
+    ['Morning routine', 2, EVERY_DAY, 'Water, stretching, plan the day'],
     ['Follow the daily plan', 2, WEEKDAYS],
   ],
   social: [
     ['Small kind gesture', 1, EVERY_DAY],
     ['Start a conversation', 2, EVERY_DAY],
-    ['Take the initiative', 3, [1, 3, 5]],
+    ['Take the initiative', 3, [1, 3, 5], 'Propose something instead of waiting to be asked'],
   ],
   intellect: [
-    ['Reading', 2, EVERY_DAY],
+    ['Reading', 2, EVERY_DAY, 'Twenty pages of a book, not the news'],
     ['Follow a course', 3, WEEKDAYS],
     ['Personal project', 2, [5, 6]],
   ],
@@ -85,11 +85,12 @@ function random(seed) {
 
 export function sampleActivities(state, at) {
   for (const area of AREAS) {
-    for (const [name, weight, days] of SAMPLE_ACTIVITIES[area.slug]) {
+    for (const [name, weight, days, description] of SAMPLE_ACTIVITIES[area.slug]) {
       state.activities.push({
         id: state.nextActivityId++,
         area: area.slug,
         name,
+        description: description ?? null,
         weight,
         cadence: 'daily',
         days,

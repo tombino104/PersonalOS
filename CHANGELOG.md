@@ -5,6 +5,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-21
+
+### Added
+- Activities can have a short description (up to 300 characters, optional). It shows under the name in the evening questionnaire, as a reminder of what counts. Activities and the completions of a report now carry `description` in the API. Closes #3.
+
+### Changed
+- Reports that can still be edited now follow your changes to the activities, also after they are completed: when you open today's or yesterday's report, new activities appear, archived ones disappear, renames and weight changes apply, ticks are kept and the scores are recalculated. Older reports stay as they were. `POST /api/v1/reports/{day}/sync` no longer refuses a completed report. Closes #4.
+
 ## [0.13.1] - 2026-10-21
 
 ### Added
@@ -218,7 +226,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/tombino104/PersonalOS/compare/v0.13.1...v0.14.0
 [0.13.1]: https://github.com/tombino104/PersonalOS/compare/v0.13.0...v0.13.1
 [0.13.0]: https://github.com/tombino104/PersonalOS/compare/v0.12.1...v0.13.0
 [0.12.1]: https://github.com/tombino104/PersonalOS/compare/v0.12.0...v0.12.1

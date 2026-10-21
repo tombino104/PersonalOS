@@ -176,6 +176,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       completions: report.completions.map(({ activity_id, name, weight, area, done }) => ({
         activity_id,
         name,
+        description: state.activities.find((activity) => activity.id === activity_id)?.description ?? null,
         weight,
         area,
         done,
@@ -231,6 +232,12 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const clean = name.trim();
     if (clean.length < 1 || clean.length > 100) invalid();
     return clean;
+  }
+
+  function checkDescription(description) {
+    if (description === undefined || description === null) return null;
+    if (typeof description !== 'string' || description.trim().length > 300) invalid();
+    return description.trim() || null;
   }
 
   function checkWeight(weight) {
@@ -367,6 +374,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       id: state.nextActivityId++,
       area: checkArea(body?.area),
       name: checkName(body?.name),
+      description: checkDescription(body?.description),
       weight: checkWeight(body?.weight),
       cadence: 'daily',
       days: body?.days == null ? [0, 1, 2, 3, 4, 5, 6] : checkDays(body.days),
@@ -384,6 +392,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     }
     const activity = activityOf(params.id);
     if ('name' in changes) activity.name = checkName(changes.name);
+    if ('description' in changes) activity.description = checkDescription(changes.description);
     if ('area' in changes) activity.area = checkArea(changes.area);
     if ('weight' in changes) activity.weight = checkWeight(changes.weight);
     if ('days' in changes) activity.days = checkDays(changes.days);
@@ -444,7 +453,6 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
   protectedRoute('POST', '/reports/:day/sync', ({ params }) => {
     const report = reportOf(params.day);
     requireEditable(report);
-    if (report.completedAt) refuse(409, 'report_completed', `report ${report.day} is already completed`);
     const weekday = weekdayOf(report.day);
     const known = new Map(state.activities.map((activity) => [activity.id, activity]));
     report.completions = report.completions.filter((item) => {

@@ -41,7 +41,7 @@
         return;
       }
       let opened = await api.openReport(day);
-      if (!opened.completed && opened.editable) opened = await api.syncReport(day);
+      if (opened.editable) opened = await api.syncReport(day);
       report = opened;
       reflection = opened.reflection ?? '';
       saved = Boolean(opened.reflection) || opened.completions.some((c) => c.done);
@@ -164,7 +164,12 @@
               onclick={() => toggle(task)}
             >
               <span class="box"><Icon name="check" small /></span>
-              <span class="name">{task.name}</span>
+              <span class="text">
+                <span class="name">{task.name}</span>
+                {#if task.description}
+                  <span class="note">{task.description}</span>
+                {/if}
+              </span>
             </button>
           {/each}
         </section>
@@ -274,6 +279,18 @@
   .task.on .box :global(.icon) {
     opacity: 1;
     transform: scale(1);
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .note {
+    color: var(--ink-3);
+    font: 400 13px/1.4 var(--sans);
   }
 
   .task.on .name {
