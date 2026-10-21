@@ -14,5 +14,7 @@ Dockerfile
 .dockerignore
 pytest.ini
 requirements-dev.txt
+umbrel-store
+.github
 web/node_modules
 web/dist
