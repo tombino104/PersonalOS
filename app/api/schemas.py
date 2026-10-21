@@ -37,6 +37,12 @@ class PluginActivation(BaseModel):
     accept_permissions: bool
 
 
+class PluginDataRemoval(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    confirm: Annotated[str, StringConstraints(max_length=64)]
+
+
 class Setup(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

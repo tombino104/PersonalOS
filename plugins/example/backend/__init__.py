@@ -10,10 +10,10 @@ class Note(BaseModel):
 
 def setup(api):
     def report_id_for(ctx, day: date) -> int:
-        row = ctx.db.execute("SELECT id FROM reports WHERE day = ?", (day.isoformat(),)).fetchone()
-        if row is None:
+        report_id = ctx.report_id(day.isoformat())
+        if report_id is None:
             raise HTTPException(status_code=404, detail="no report for that day")
-        return row["id"]
+        return report_id
 
     @api.router.get("/notes/{day}")
     def get_note(day: date, ctx=api.ctx):

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A small example plugin: one optional line about something good in your day.",
   "core_api": "1.x",
-  "permissions": ["read_reports", "questionnaire_block", "api_routes"],
+  "permissions": ["questionnaire_block", "api_routes"],
   "adds": {
     "questionnaire_blocks": ["gratitude"]
   },

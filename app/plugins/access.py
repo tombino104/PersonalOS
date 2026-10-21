@@ -20,12 +20,8 @@ _ALWAYS_ALLOWED = {
 }
 _WRITES = {sqlite3.SQLITE_INSERT, sqlite3.SQLITE_UPDATE, sqlite3.SQLITE_DELETE}
 _READS_AND_WRITES = _WRITES | {sqlite3.SQLITE_READ}
-_CREATES_WITH_TABLE = {
-    sqlite3.SQLITE_CREATE_INDEX,
-    sqlite3.SQLITE_CREATE_TRIGGER,
-    sqlite3.SQLITE_DROP_INDEX,
-    sqlite3.SQLITE_DROP_TRIGGER,
-}
+_INDEXES = {sqlite3.SQLITE_CREATE_INDEX, sqlite3.SQLITE_DROP_INDEX}
+_CREATES_WITH_TABLE = {sqlite3.SQLITE_CREATE_TRIGGER, sqlite3.SQLITE_DROP_TRIGGER}
 _OBJECTS = {sqlite3.SQLITE_CREATE_TABLE, sqlite3.SQLITE_DROP_TABLE}
 _MASTER = {"sqlite_master", "sqlite_temp_master", "sqlite_schema", "sqlite_temp_schema"}
 _FOREIGN_KEY_TARGETS = {"reports", "activities", "areas"}
@@ -87,6 +83,9 @@ def migration_authorizer(plugin_id: str):
             return DENY
         if action in _OBJECTS:
             return OK if arg1.startswith(prefix) else DENY
+        if action in _INDEXES:
+            owned = arg1.startswith(prefix) or arg1.startswith(f"sqlite_autoindex_{prefix}")
+            return OK if owned and (arg2 or "").startswith(prefix) else DENY
         if action in _CREATES_WITH_TABLE:
             return OK if arg1.startswith(prefix) and (arg2 or "").startswith(prefix) else DENY
         if action == sqlite3.SQLITE_ALTER_TABLE:
@@ -136,6 +135,14 @@ class PluginContext:
     db: sqlite3.Connection
     now: datetime
     today: str
+
+    def report_id(self, day: str) -> int | None:
+        core = db.connect(config.db_path())
+        try:
+            row = core.execute("SELECT id FROM reports WHERE day = ?", (day,)).fetchone()
+        finally:
+            core.close()
+        return None if row is None else row["id"]
 
     def commit(self) -> None:
         if self.db.in_transaction:

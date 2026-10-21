@@ -32,7 +32,7 @@ CORE_EVENTS = frozenset(
 )
 
 PLACEMENTS = frozenset({"dock", "more"})
-RESERVED_PATHS = frozenset({"activate", "deactivate"})
+RESERVED_PATHS = frozenset({"activate", "deactivate", "remove-data"})
 
 _ID = re.compile(r"^[a-z][a-z0-9_]{1,31}$")
 _NAME = re.compile(r"^[a-z][a-z0-9_]{0,31}$")
@@ -63,6 +63,7 @@ class Manifest:
     core_api: str
     permissions: frozenset
     questionnaire_blocks: tuple
+    report_sections: tuple
     widgets: tuple
     pages: tuple
     entries: tuple
@@ -80,6 +81,7 @@ class Manifest:
             "core_api": self.core_api,
             "permissions": sorted(self.permissions),
             "questionnaire_blocks": list(self.questionnaire_blocks),
+            "report_sections": list(self.report_sections),
             "widgets": list(self.widgets),
             "pages": list(self.pages),
             "entries": [
@@ -140,10 +142,18 @@ def parse_manifest(data, folder_name: str) -> Manifest:
     adds = data.get("adds", {})
     if not isinstance(adds, dict):
         raise ManifestError("'adds' must be an object")
-    unknown_adds = set(adds) - {"questionnaire_blocks", "widgets", "pages", "entries", "settings"}
+    unknown_adds = set(adds) - {
+        "questionnaire_blocks",
+        "report_sections",
+        "widgets",
+        "pages",
+        "entries",
+        "settings",
+    }
     if unknown_adds:
         raise ManifestError(f"unknown 'adds' keys: {', '.join(sorted(unknown_adds))}")
     blocks = _names(adds.get("questionnaire_blocks", []), "adds.questionnaire_blocks")
+    report_sections = _names(adds.get("report_sections", []), "adds.report_sections")
     widgets = _names(adds.get("widgets", []), "adds.widgets")
     pages = _names(adds.get("pages", []), "adds.pages")
     has_settings = adds.get("settings", False)
@@ -151,8 +161,8 @@ def parse_manifest(data, folder_name: str) -> Manifest:
         raise ManifestError("'adds.settings' must be true or false")
     if blocks and "questionnaire_block" not in granted:
         raise ManifestError("questionnaire blocks need the 'questionnaire_block' permission")
-    if (widgets or pages or has_settings or adds.get("entries")) and "ui_panel" not in granted:
-        raise ManifestError("widgets, pages, entries and settings need the 'ui_panel' permission")
+    if (report_sections or widgets or pages or has_settings or adds.get("entries")) and "ui_panel" not in granted:
+        raise ManifestError("report sections, widgets, pages, entries and settings need the 'ui_panel' permission")
 
     entries = []
     raw_entries = adds.get("entries", [])
@@ -202,6 +212,7 @@ def parse_manifest(data, folder_name: str) -> Manifest:
         core_api=core_api,
         permissions=granted,
         questionnaire_blocks=blocks,
+        report_sections=report_sections,
         widgets=widgets,
         pages=pages,
         entries=tuple(entries),

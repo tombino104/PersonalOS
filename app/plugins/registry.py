@@ -16,7 +16,9 @@ from fastapi.routing import APIRoute
 from starlette.concurrency import run_in_threadpool
 
 from .. import audit, config, db
-from .access import open_context
+import re
+
+from .access import open_context, table_prefix
 from .manifest import (
     CORE_API_VERSION,
     Manifest,
@@ -29,6 +31,7 @@ from .migrate import MigrationError, apply_migrations
 logger = logging.getLogger("uvicorn.error")
 
 MAX_CONSECUTIVE_ERRORS = 5
+SAFE_TABLE_NAME = re.compile(r"^[A-Za-z0-9_]+$")
 RESTRICTED_KEYS = {
     "completions": "read_reports",
     "reflection": "read_reports",
@@ -47,6 +50,14 @@ class PluginUnavailable(Exception):
 
 
 class PermissionsNotAccepted(Exception):
+    pass
+
+
+class PluginActive(Exception):
+    pass
+
+
+class ConfirmationMismatch(Exception):
     pass
 
 
@@ -269,10 +280,12 @@ class Registry:
                 "core_api": None,
                 "permissions": [],
                 "questionnaire_blocks": [],
+                "report_sections": [],
                 "widgets": [],
                 "pages": [],
                 "entries": [],
                 "settings": False,
+                "installed": row is not None,
                 "active": bool(row and row["active"]),
                 "consecutive_errors": row["consecutive_errors"] if row else 0,
                 "message": row["last_error"] if row else None,
@@ -329,6 +342,32 @@ class Registry:
         with conn:
             conn.execute("UPDATE plugins SET active = 0 WHERE id = ?", (plugin_id,))
             audit.log(conn, "user", "plugin.deactivated", {"plugin": plugin_id}, now)
+
+    def remove_data(self, conn: sqlite3.Connection, plugin_id: str, confirm: str, now: datetime) -> None:
+        row = conn.execute("SELECT active FROM plugins WHERE id = ?", (plugin_id,)).fetchone()
+        if row is None:
+            raise PluginNotFound(f"plugin {plugin_id} has no data to remove")
+        if row["active"]:
+            raise PluginActive("turn the plugin off before removing its data")
+        if confirm != plugin_id:
+            raise ConfirmationMismatch("type the plugin id to confirm")
+        core = db.connect(config.db_path())
+        try:
+            core.execute("PRAGMA foreign_keys = OFF")
+            prefix = table_prefix(plugin_id)
+            names = [
+                item[0]
+                for item in core.execute("SELECT name FROM sqlite_master WHERE type = 'table'")
+                if item[0].startswith(prefix) and SAFE_TABLE_NAME.match(item[0])
+            ]
+            for name in names:
+                core.execute(f'DROP TABLE IF EXISTS "{name}"')
+            with core:
+                core.execute("DELETE FROM plugin_migrations WHERE plugin = ?", (plugin_id,))
+                core.execute("DELETE FROM plugins WHERE id = ?", (plugin_id,))
+                audit.log(core, "user", "plugin.data_removed", {"plugin": plugin_id, "tables": names}, now)
+        finally:
+            core.close()
 
     def record_success(self, plugin_id: str) -> None:
         conn = db.connect(config.db_path())

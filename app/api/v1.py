@@ -17,6 +17,7 @@ from .schemas import (
     ActivityUpdate,
     DoneUpdate,
     PluginActivation,
+    PluginDataRemoval,
     ReflectionUpdate,
     ReportOpen,
     SettingsUpdate,
@@ -332,6 +333,19 @@ def deactivate_plugin(
     registry = _registry(request)
     registry.deactivate(conn, plugin_id, now)
     _emit(request, background, "plugin.deactivated", {"plugin": plugin_id}, now)
+    return {"plugins": registry.describe(conn)}
+
+
+@router.post("/plugins/{plugin_id}/remove-data")
+def remove_plugin_data(
+    plugin_id: str,
+    body: PluginDataRemoval,
+    request: Request,
+    conn: sqlite3.Connection = Depends(get_conn),
+    now: datetime = Depends(get_now),
+) -> dict:
+    registry = _registry(request)
+    registry.remove_data(conn, plugin_id, body.confirm, now)
     return {"plugins": registry.describe(conn)}
 
 

@@ -38,6 +38,8 @@ _DOMAIN_ERRORS = [
     (plugin_registry.PluginNotFound, 404, "not_found"),
     (plugin_registry.PluginUnavailable, 409, "plugin_unavailable"),
     (plugin_registry.PermissionsNotAccepted, 422, "permissions_not_accepted"),
+    (plugin_registry.PluginActive, 409, "plugin_active"),
+    (plugin_registry.ConfirmationMismatch, 422, "confirmation_mismatch"),
 ]
 
 
