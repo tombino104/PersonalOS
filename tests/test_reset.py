@@ -94,7 +94,7 @@ def test_a_foreign_origin_cannot_reset(client, tmp_path):
         RESET, json=payload(read_code(tmp_path)), headers={"Origin": "https://evil.example"}
     )
     assert response.status_code == 403
-    assert client.get(STATUS).json() == {"setup_required": False}
+    assert client.get(STATUS).json() == {"setup_required": False, "setup_code_required": True}
 
 
 def test_the_reset_is_recorded_in_the_audit_log(client, tmp_path):
@@ -105,4 +105,4 @@ def test_the_reset_is_recorded_in_the_audit_log(client, tmp_path):
 
 def test_it_works_without_any_account_too(anon_client, tmp_path):
     assert anon_client.post(RESET, json=payload(read_code(tmp_path))).status_code == 200
-    assert anon_client.get(STATUS).json() == {"setup_required": False}
+    assert anon_client.get(STATUS).json() == {"setup_required": False, "setup_code_required": True}

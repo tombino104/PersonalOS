@@ -1,11 +1,12 @@
 import { api, setUnauthorizedHandler } from './api.js';
 
-export const session = $state({ status: 'loading', name: '' });
+export const session = $state({ status: 'loading', name: '', codeRequired: true });
 
 async function signedOut() {
   session.name = '';
   try {
     const result = await api.authStatus();
+    session.codeRequired = result.setup_code_required !== false;
     session.status = result.setup_required ? 'setup' : 'anonymous';
   } catch {
     session.status = 'anonymous';

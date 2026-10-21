@@ -1,6 +1,7 @@
 import hmac
 import logging
 import math
+import os
 import secrets
 import sqlite3
 import threading
@@ -27,6 +28,10 @@ class SetupDone(Exception):
 
 class InvalidSetupCode(Exception):
     pass
+
+
+def code_required() -> bool:
+    return os.environ.get("SETUP_CODE_REQUIRED", "1").strip().lower() not in ("0", "false", "no")
 
 
 def code_path() -> Path:

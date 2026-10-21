@@ -86,6 +86,10 @@
       <p class="muted plugin-note">{t('more.pluginsNote')}</p>
     </section>
   {/if}
+
+  <p class="muted source">
+    <a href="https://github.com/tombino104/PersonalOS" target="_blank" rel="noopener noreferrer">{t('more.source')}</a>
+  </p>
 </div>
 
 <style>
@@ -164,6 +168,11 @@
     margin-top: 4px;
     font: 400 14px/1.4 var(--sans);
     color: var(--ink-2);
+  }
+
+  .source {
+    margin: 0;
+    font: 400 13px/1.5 var(--sans);
   }
 
   .go {

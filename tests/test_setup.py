@@ -26,12 +26,12 @@ def payload(code, name="Alice", password=PASSPHRASE):
 
 
 def test_a_fresh_install_asks_for_setup_and_writes_a_code(anon_client, tmp_path):
-    assert anon_client.get(STATUS).json() == {"setup_required": True}
+    assert anon_client.get(STATUS).json() == {"setup_required": True, "setup_code_required": True}
     assert re.fullmatch(r"[A-Z2-9]{4}-[A-Z2-9]{4}", read_code(tmp_path))
 
 
 def test_status_is_public_and_changes_once_a_user_exists(client):
-    assert client.get(STATUS).json() == {"setup_required": False}
+    assert client.get(STATUS).json() == {"setup_required": False, "setup_code_required": True}
 
 
 def test_setup_creates_the_account_and_signs_in(anon_client, tmp_path):
@@ -40,7 +40,7 @@ def test_setup_creates_the_account_and_signs_in(anon_client, tmp_path):
     assert response.json() == {"name": "Alice"}
     assert COOKIE_NAME in response.headers["set-cookie"]
     assert anon_client.get("/api/v1/auth/me").json() == {"name": "Alice"}
-    assert anon_client.get(STATUS).json() == {"setup_required": False}
+    assert anon_client.get(STATUS).json() == {"setup_required": False, "setup_code_required": True}
 
 
 def test_the_used_code_is_replaced_and_setup_cannot_run_twice(anon_client, tmp_path):
@@ -59,7 +59,7 @@ def test_the_code_is_accepted_in_any_case_and_without_the_dash(anon_client, tmp_
 def test_a_wrong_code_is_refused(anon_client):
     response = anon_client.post(SETUP, json=payload("WRONG-CODE"))
     assert (response.status_code, response.json()["error"]["code"]) == (401, "invalid_setup_code")
-    assert anon_client.get(STATUS).json() == {"setup_required": True}
+    assert anon_client.get(STATUS).json() == {"setup_required": True, "setup_code_required": True}
 
 
 def test_too_many_wrong_codes_lock_setup_for_fifteen_minutes(anon_client, tmp_path, clock):
@@ -93,7 +93,7 @@ def test_setup_works_after_the_placeholder_user_of_an_old_version(anon_client, t
     conn.execute("INSERT INTO users (name, password_hash) VALUES ('owner', '!')")
     conn.commit()
     conn.close()
-    assert anon_client.get(STATUS).json() == {"setup_required": True}
+    assert anon_client.get(STATUS).json() == {"setup_required": True, "setup_code_required": True}
     assert anon_client.post(SETUP, json=payload(read_code(tmp_path))).status_code == 200
     conn = db.connect(tmp_path / "personal_os.db")
     assert conn.execute("SELECT COUNT(*) FROM users").fetchone()[0] == 1
@@ -119,3 +119,15 @@ def test_a_code_is_written_at_start_even_when_an_account_exists(tmp_path, monkey
     before = read_code(tmp_path)
     with TestClient(app):
         assert read_code(tmp_path) != before
+
+
+def test_the_code_can_be_switched_off_for_setup_only(anon_client, tmp_path, monkeypatch):
+    monkeypatch.setenv("SETUP_CODE_REQUIRED", "0")
+    assert anon_client.get(STATUS).json() == {"setup_required": True, "setup_code_required": False}
+    response = anon_client.post(SETUP, json={"name": "Alice", "password": PASSPHRASE})
+    assert response.status_code == 200
+    assert anon_client.get("/api/v1/auth/me").json() == {"name": "Alice"}
+    assert anon_client.post(SETUP, json={"name": "Mallory", "password": PASSPHRASE}).status_code == 409
+    reset = anon_client.post("/api/v1/auth/reset", json={"name": "Alice", "password": PASSPHRASE})
+    assert (reset.status_code, reset.json()["error"]["code"]) == (401, "invalid_setup_code")
+    assert anon_client.post("/api/v1/auth/reset", json=payload(read_code(tmp_path))).status_code == 200

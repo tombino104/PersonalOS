@@ -29,4 +29,4 @@ For questions and ideas that are not a bug yet, use Discussions.
 6. Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`), in English.
 7. Never include personal data: databases, backups, keys, tokens, `.env` files. Example data must be fake and generic.
 
-By contributing you agree that your contribution is licensed under the project's license, [PolyForm Noncommercial 1.0.0](LICENSE).
+By contributing you agree that your contribution is licensed under the project's license, the [GNU Affero General Public License v3.0](LICENSE).

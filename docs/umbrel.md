@@ -13,8 +13,8 @@ Personal OS ships as a Docker image (`ghcr.io/tombino104/personalos`) and as a c
 1. Create an empty repository for the store and publish `umbrel-store/` as its root (see `umbrel-store/README.md`).
 2. In umbrelOS: App Store, menu at the top right, **Community App Stores**, add the repository address.
 3. Install **Personal OS** from that store.
-4. Open it (`http://umbrel.local:8473`). The first time, it asks for a one-time setup code. Find it in `setup-code.txt` inside the app's data folder (in the Files app: `Apps/tombino104-personal-os/data`). Backups are in the `backups` folder next to it (Settings > Backups in the app). The same file holds the code for the "start over" link on the login page, which erases all data.
-5. Create your account. The code file disappears.
+4. Open it from the umbrelOS home screen. umbrelOS asks for your umbrelOS password first, then the app asks you to create your account (a name and a password, typed twice). No code is needed on umbrelOS, because the umbrelOS login already protects that page.
+5. Backups are in the `backups` folder of the app's data folder (in the Files app: `Apps/tombino104-personal-os/data`), and in Settings > Backups. The file `setup-code.txt` next to them holds the code needed to erase all data (Settings > Account, or the "start over" link on the login page).
 
 ## Where the data lives
 
@@ -22,7 +22,7 @@ Everything the app saves is in one folder, `Apps/tombino104-personal-os/data` (i
 
 ## Login
 
-Personal OS has its own login, so the umbrelOS app proxy does not ask for the umbrelOS password (`PROXY_AUTH_ADD: "false"`). Write requests are accepted only from the same origin (the browser's `Sec-Fetch-Site` header), which keeps the app working behind any proxy.
+umbrelOS keeps its own login in front of the app (the default for umbrelOS apps), and Personal OS has its own login behind it. Write requests are accepted only from the same origin (the browser's `Sec-Fetch-Site` header), which keeps the app working behind any proxy. In the compose file, `SETUP_CODE_REQUIRED: "false"` lets the first account be created without the setup code, which is safe because the umbrelOS login protects that page.
 
 ## Updating
 
@@ -30,12 +30,14 @@ Bump the version in `umbrel-store/tombino104-personal-os/umbrel-app.yml` and the
 
 ## Before submitting to the official App Store
 
-The community store above is the way to try the app on your own Umbrel. The official App Store takes apps through a pull request to [getumbrel/umbrel-apps](https://github.com/getumbrel/umbrel-apps); the same two files (`umbrel-app.yml` and `docker-compose.yml`) are reused, with these differences to settle first:
+The community store above is the way to try the app on your own Umbrel. The official App Store takes apps through a pull request to [getumbrel/umbrel-apps](https://github.com/getumbrel/umbrel-apps). The files for that pull request are in `umbrel-official/` (not published anywhere): see `umbrel-official/README.md` for the steps and the text of the pull request.
 
-- **App id and folder:** the official store uses a plain lowercase id with no store prefix (for example `personal-os`).
-- **Port:** it must be unique across the whole store; the linter checks it.
-- **Gallery and icon:** leave `gallery: []` and no `icon`; the Umbrel team adds the images. Screenshots go in the pull request description.
-- **Umbrel login:** the official packaging keeps the umbrelOS login in front of apps by default. Personal OS has its own login, so decide whether to keep both or to rely on the umbrelOS one.
-- **First-run setup:** the app store standard asks that an app opens to a clear next step without reading files or logs. Today the first run asks for a code stored in `setup-code.txt`; this should be replaced (for example by relying on the umbrelOS login) before submitting.
-- **License:** the documents read do not state a license rule. The license is currently PolyForm Noncommercial, which is not open source; ask the Umbrel team whether it is accepted before investing in the submission.
-- **Checks:** install, restart and update the app on a real umbrelOS device, and run the repository's linter.
+What is already settled:
+
+- **App id:** `personal-os`, with no store prefix, in a folder of the same name.
+- **Login and first run:** the umbrelOS login stays on; the first account is created in the browser without any code or file.
+- **Images:** multi-arch (amd64 and arm64) and pinned with the digest of the index.
+- **Icon and gallery:** left out; the pull request carries the screenshots and the logo.
+- **License:** AGPL-3.0, an open source license.
+
+What is still to do by hand: install, restart and update the app on a real umbrelOS device from the official packaging, run the repository's linter (`npm run lint:apps -- personal-os --check-images`), and confirm that port `8473` is free in the whole store.

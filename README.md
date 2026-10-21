@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.10.2.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Backups, reminders and agents come next.
+> **Status: v0.11.0.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Backups, reminders and agents come next.
 
 ## Screenshots
 
@@ -54,7 +54,7 @@ If you forget the password, or the account is locked after too many failed attem
 docker compose exec personal-os python -m app.cli reset-password
 ```
 
-Other settings (see `.env.example`): `COOKIE_SECURE` (`auto`, `1` or `0`), `ALLOWED_ORIGINS` (extra hosts allowed for write requests, comma separated), `ENABLE_DOCS=1` to serve the interactive API docs at `/docs`, `PLUGINS_DIR` (where plugins are loaded from), `PLUGIN_HANDLER_TIMEOUT` (seconds a plugin may take to react to an event, 5 by default).
+Other settings (see `.env.example`): `COOKIE_SECURE` (`auto`, `1` or `0`), `ALLOWED_ORIGINS` (extra hosts allowed for write requests, comma separated), `SETUP_CODE_REQUIRED=0` to create the first account without the setup code (only safe when something else already protects the app, like the umbrelOS login), `ENABLE_DOCS=1` to serve the interactive API docs at `/docs`, `PLUGINS_DIR` (where plugins are loaded from), `PLUGIN_HANDLER_TIMEOUT` (seconds a plugin may take to react to an event, 5 by default).
 
 ## Develop
 
@@ -98,4 +98,6 @@ Issues and pull requests are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md). To
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE): you may read, use, modify and share the code for **noncommercial** purposes. Commercial use is not allowed without the author's permission.
+Copyright (C) 2026 Lorenzo (tombino104). Released under the [GNU Affero General Public License v3.0](LICENSE): you can use, study, modify and share it, including commercially, as long as you share your changes under the same license, also when you offer the app as a service over a network.
+
+Versions up to v0.10.2 were published under PolyForm Noncommercial 1.0.0; from v0.11.0 on the license is the AGPL-3.0.

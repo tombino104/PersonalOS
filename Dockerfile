@@ -13,7 +13,7 @@ FROM python:3.13-slim
 
 LABEL org.opencontainers.image.source="https://github.com/tombino104/PersonalOS" \
       org.opencontainers.image.title="Personal OS" \
-      org.opencontainers.image.licenses="PolyForm-Noncommercial-1.0.0"
+      org.opencontainers.image.licenses="AGPL-3.0-only"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \

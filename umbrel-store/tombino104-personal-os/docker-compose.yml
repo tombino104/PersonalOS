@@ -5,7 +5,6 @@ services:
     environment:
       APP_HOST: tombino104-personal-os_web_1
       APP_PORT: 3000
-      PROXY_AUTH_ADD: "false"
 
   web:
     image: ghcr.io/tombino104/personalos:0.10.2@sha256:35880f95f8cb15ba2486a2ee93bda12dbfbd84144d32a7675cb7b5cedd30f2af
@@ -15,6 +14,7 @@ services:
       PORT: 3000
       DATA_DIR: /data
       COOKIE_SECURE: auto
+      SETUP_CODE_REQUIRED: "false"
       ENABLE_DOCS: "0"
     volumes:
       - ${APP_DATA_DIR}/data:/data

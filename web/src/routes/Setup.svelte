@@ -1,5 +1,5 @@
 <script>
-  import { setup } from '../lib/session.svelte.js';
+  import { session, setup } from '../lib/session.svelte.js';
   import { ApiError } from '../lib/api.js';
   import { t } from '../lib/i18n.svelte.js';
 
@@ -40,21 +40,23 @@
     </header>
 
     <form class="card form" onsubmit={submit}>
-      <div>
-        <label class="label" for="setup-code">{t('setup.code')}</label>
-        <input
-          id="setup-code"
-          class="field code"
-          type="text"
-          autocomplete="off"
-          autocapitalize="characters"
-          autocorrect="off"
-          spellcheck="false"
-          required
-          bind:value={code}
-        />
-        <p class="muted help">{t('setup.codeHelp')}</p>
-      </div>
+      {#if session.codeRequired}
+        <div>
+          <label class="label" for="setup-code">{t('setup.code')}</label>
+          <input
+            id="setup-code"
+            class="field code"
+            type="text"
+            autocomplete="off"
+            autocapitalize="characters"
+            autocorrect="off"
+            spellcheck="false"
+            required
+            bind:value={code}
+          />
+          <p class="muted help">{t('setup.codeHelp')}</p>
+        </div>
+      {/if}
       <div>
         <label class="label" for="setup-name">{t('setup.name')}</label>
         <input

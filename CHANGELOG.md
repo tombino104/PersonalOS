@@ -5,6 +5,17 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-22
+
+### Changed
+- **License:** from this version the project is released under the GNU Affero General Public License v3.0. Versions up to 0.10.2 were published under PolyForm Noncommercial 1.0.0.
+- New setting `SETUP_CODE_REQUIRED` (on by default): when off, the first account is created without the setup code. The code still protects "Erase all data". The setup page and `GET /api/v1/auth/status` follow it (`setup_code_required`).
+- The Umbrel packaging keeps the umbrelOS login in front of the app and turns the setup code off, so the first run needs no file or log.
+
+### Added
+- A link to the source code on the More page, as the AGPL asks for network services.
+- `umbrel-official/`: the packaging and the pull request text for the official umbrelOS App Store.
+
 ## [0.10.2] - 2026-10-22
 
 ### Added
@@ -174,7 +185,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.10.2...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/tombino104/PersonalOS/compare/v0.10.2...v0.11.0
 [0.10.2]: https://github.com/tombino104/PersonalOS/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/tombino104/PersonalOS/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/tombino104/PersonalOS/compare/v0.9.1...v0.10.0

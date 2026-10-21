@@ -43,7 +43,7 @@ def _set_session_cookie(request: Request, response: Response, token: str) -> Non
 
 @public_router.get("/status")
 def status(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
-    return {"setup_required": auth.setup_required(conn)}
+    return {"setup_required": auth.setup_required(conn), "setup_code_required": setup.code_required()}
 
 
 @public_router.post("/setup")
@@ -56,7 +56,8 @@ def first_run_setup(
 ) -> dict:
     if not auth.setup_required(conn):
         raise setup.SetupDone("an account already exists")
-    setup.verify(body.code, now)
+    if setup.code_required():
+        setup.verify(body.code, now)
     auth.create_user(conn, body.name, body.password)
     setup.finish()
     token = auth.login(conn, body.name, body.password, now)
