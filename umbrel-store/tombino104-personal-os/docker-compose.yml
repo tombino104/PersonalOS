@@ -8,7 +8,7 @@ services:
       PROXY_AUTH_ADD: "false"
 
   web:
-    image: ghcr.io/tombino104/personalos:0.8.0@sha256:4e7ead1ccae6af5eca670a53e2b8fa542664ceecd2a73daadfcf5c79621b8734
+    image: ghcr.io/tombino104/personalos:0.9.0@sha256:302740bbcb66154f39af29e27fd92e1c985701f35db3f181e60f73cbd2a5e9d3
     restart: on-failure
     stop_grace_period: 1m
     environment:
