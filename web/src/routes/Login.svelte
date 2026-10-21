@@ -1,4 +1,5 @@
 <script>
+  import Link from '../components/Link.svelte';
   import { login } from '../lib/session.svelte.js';
   import { ApiError } from '../lib/api.js';
   import { t } from '../lib/i18n.svelte.js';
@@ -68,12 +69,22 @@
       {/if}
       <button class="btn solid" type="submit" disabled={busy}>{t('login.submit')}</button>
     </form>
+
+    <Link class="forgot" href="/reset">{t('login.forgot')}</Link>
   </div>
 </main>
 
 <style>
   .login {
     justify-content: center;
+  }
+
+  .login :global(.forgot) {
+    align-self: center;
+    text-align: center;
+    padding: 12px;
+    font: 400 14px/1.4 var(--sans);
+    color: var(--ink-2);
   }
 
   .form {

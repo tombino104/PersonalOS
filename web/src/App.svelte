@@ -4,6 +4,7 @@
   import Dock from './components/Dock.svelte';
   import Login from './routes/Login.svelte';
   import Setup from './routes/Setup.svelte';
+  import Reset from './routes/Reset.svelte';
   import Home from './routes/Home.svelte';
   import Stella from './routes/Stella.svelte';
   import Questionnaire from './routes/Questionnaire.svelte';
@@ -62,7 +63,11 @@
     <Dock />
   </div>
 {:else if session.status === 'anonymous'}
-  <Login />
+  {#if router.path === '/reset'}
+    <Reset />
+  {:else}
+    <Login />
+  {/if}
 {:else if session.status === 'setup'}
   <Setup />
 {/if}

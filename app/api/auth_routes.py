@@ -4,7 +4,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, Request, Response
 
-from .. import auth, setup
+from .. import auth, reset, security, setup
 from .deps import (
     COOKIE_NAME,
     get_conn,
@@ -59,6 +59,25 @@ def first_run_setup(
     setup.verify(body.code, now)
     auth.create_user(conn, body.name, body.password)
     setup.finish()
+    token = auth.login(conn, body.name, body.password, now)
+    _set_session_cookie(request, response, token)
+    return {"name": body.name}
+
+
+@public_router.post("/reset")
+def reset_everything(
+    body: Setup,
+    request: Request,
+    response: Response,
+    conn: sqlite3.Connection = Depends(get_conn),
+    now: datetime = Depends(get_now),
+) -> dict:
+    setup.verify(body.code, now)
+    security.validate_new_password(body.password)
+    reset.wipe(conn, now)
+    auth.create_user(conn, body.name, body.password)
+    setup.finish()
+    request.app.state.plugins.apply_defaults(now)
     token = auth.login(conn, body.name, body.password, now)
     _set_session_cookie(request, response, token)
     return {"name": body.name}

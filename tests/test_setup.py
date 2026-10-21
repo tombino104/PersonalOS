@@ -43,10 +43,10 @@ def test_setup_creates_the_account_and_signs_in(anon_client, tmp_path):
     assert anon_client.get(STATUS).json() == {"setup_required": False}
 
 
-def test_the_code_is_deleted_and_setup_cannot_run_twice(anon_client, tmp_path):
+def test_the_used_code_is_replaced_and_setup_cannot_run_twice(anon_client, tmp_path):
     code = read_code(tmp_path)
     anon_client.post(SETUP, json=payload(code))
-    assert not code_file(tmp_path).exists()
+    assert read_code(tmp_path) != code
     again = anon_client.post(SETUP, json=payload(code, name="Mallory"))
     assert (again.status_code, again.json()["error"]["code"]) == (409, "setup_done")
 
@@ -109,13 +109,13 @@ def test_a_new_code_is_written_at_every_start_until_an_account_exists(tmp_path, 
     assert first != second
 
 
-def test_a_stale_code_is_removed_at_start_when_an_account_exists(tmp_path, monkeypatch):
+def test_a_code_is_written_at_start_even_when_an_account_exists(tmp_path, monkeypatch):
     monkeypatch.setenv("DATA_DIR", str(tmp_path))
     with TestClient(app):
         pass
     conn = db.connect(tmp_path / "personal_os.db")
     auth.create_user(conn, USER, PASSWORD)
     conn.close()
-    assert code_file(tmp_path).exists()
+    before = read_code(tmp_path)
     with TestClient(app):
-        assert not code_file(tmp_path).exists()
+        assert read_code(tmp_path) != before

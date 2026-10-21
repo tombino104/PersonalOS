@@ -46,16 +46,20 @@ def _reset_failures() -> None:
     _failures["locked_until"] = None
 
 
+def _write_new_code() -> str:
+    code = "".join(secrets.choice(ALPHABET) for _ in range(CODE_LENGTH))
+    code_path().write_text(f"{_display(code)}\n", encoding="utf-8")
+    return code
+
+
 def ensure_code(conn: sqlite3.Connection) -> None:
-    path = code_path()
     with _lock:
         _reset_failures()
-        if not auth.setup_required(conn):
-            path.unlink(missing_ok=True)
-            return
-        code = "".join(secrets.choice(ALPHABET) for _ in range(CODE_LENGTH))
-        path.write_text(f"{_display(code)}\n", encoding="utf-8")
-    logger.warning("No account yet. Setup code: %s (also saved in %s)", _display(code), path)
+        code = _write_new_code()
+    if auth.setup_required(conn):
+        logger.warning("No account yet. Setup code: %s (also saved in %s)", _display(code), code_path())
+    else:
+        logger.info("A setup code for resetting the app is saved in %s", code_path())
 
 
 def verify(candidate: str, now: datetime) -> None:
@@ -79,4 +83,5 @@ def verify(candidate: str, now: datetime) -> None:
 
 
 def finish() -> None:
-    code_path().unlink(missing_ok=True)
+    with _lock:
+        _write_new_code()

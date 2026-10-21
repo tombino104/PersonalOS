@@ -79,6 +79,7 @@
   "home.trends": "Andamento per ambito",
   "home.week": "Settimana",
 
+  "login.forgot": "Password dimenticata? Cancella tutto e ricomincia",
   "login.invalid": "Nome o password sbagliati.",
   "login.lede": "Un posto tranquillo per le tue giornate.",
   "login.locked": "Troppi tentativi. Riprova tra circa {minutes} minuti.",
@@ -157,6 +158,13 @@
   "questionnaire.reflection": "Riflessione",
   "questionnaire.reflectionPlaceholder": "Com'è andata, davvero?",
   "questionnaire.save": "Salva le modifiche",
+
+  "reset.back": "Torna all'accesso",
+  "reset.codeHelp": "Apri il file setup-code.txt nella cartella dei dati dell'app. Un nuovo codice viene creato a ogni avvio dell'app e dopo ogni reset.",
+  "reset.confirm": "Ho capito che tutto verrà cancellato per sempre: report, attività, impostazioni e dati di ogni plugin.",
+  "reset.lede": "Questo cancella tutti i tuoi dati e non si può annullare. Poi crei un nuovo account.",
+  "reset.submit": "Cancella tutto e ricomincia",
+  "reset.title": "Ricomincia da capo",
 
   "settings.account": "Account",
   "settings.accountLede": "Una sola persona, una sola password.",

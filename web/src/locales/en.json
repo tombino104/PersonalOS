@@ -79,6 +79,7 @@
   "home.trends": "Trend by area",
   "home.week": "Week",
 
+  "login.forgot": "Forgot your password? Erase everything and start over",
   "login.invalid": "Wrong name or password.",
   "login.lede": "A quiet place for your days.",
   "login.locked": "Too many attempts. Try again in about {minutes} minutes.",
@@ -157,6 +158,13 @@
   "questionnaire.reflection": "Reflection",
   "questionnaire.reflectionPlaceholder": "How did it really go?",
   "questionnaire.save": "Save changes",
+
+  "reset.back": "Back to log in",
+  "reset.codeHelp": "Open the file setup-code.txt in the app's data folder. A new code is made every time the app starts and after every reset.",
+  "reset.confirm": "I understand that everything will be erased for good: reports, activities, settings and the data of every plugin.",
+  "reset.lede": "This erases all your data and cannot be undone. Then you create a new account.",
+  "reset.submit": "Erase everything and start over",
+  "reset.title": "Start over",
 
   "settings.account": "Account",
   "settings.accountLede": "One person, one password.",
