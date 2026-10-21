@@ -1,6 +1,6 @@
 # Writing a plugin
 
-A plugin is a folder in `plugins/` with a manifest, an optional Python backend and an optional Svelte interface. `plugins/example` is a complete, working example. Plugins are bundled into the Docker image: add a folder, rebuild the image, then turn the plugin on in **Settings > Plugins**.
+A plugin is a folder in `plugins/` with a manifest, an optional Python backend and an optional Svelte interface. `plugins/example` is a small working example and `plugins/mood` is a complete, real plugin (a mood tracker with a questionnaire block, a page and a section in past reports). Plugins are bundled into the Docker image: add a folder, rebuild the image, then turn the plugin on in **Settings > Plugins**.
 
 ```
 plugins/<id>/
@@ -27,6 +27,7 @@ Plugins trust the core and the core trusts plugins: they run in the same process
   "permissions": ["read_reports", "questionnaire_block", "api_routes"],
   "adds": {
     "questionnaire_blocks": ["gratitude"],
+    "report_sections": [],
     "widgets": [],
     "pages": [],
     "entries": [],
@@ -40,6 +41,7 @@ Plugins trust the core and the core trusts plugins: they run in the same process
 
 - `id` is lowercase letters, digits and underscores, and must equal the folder name. Your tables must start with `plg_<id>_`.
 - `core_api` is the core API major version you need (`1.x`). If it does not match, the plugin shows as incompatible and cannot be turned on.
+- `report_sections` add a section to the detail of a past report (in Past reports).
 - `entries` are links to your pages: `{ "id", "label", "icon", "placement": "dock" | "more", "page" }`. The dock holds at most five entries in total, so extra ones go to the More page.
 - `emits` must start with `<id>.`; `listens` can name any core event or another plugin's event.
 
@@ -79,7 +81,7 @@ def setup(api):
 ```
 
 - `api.router` is a FastAPI router. Routes are served only while the plugin is on, and only to a logged-in user. An error inside a route returns a clean `500` for that request and counts against the plugin; it never affects the rest of the app.
-- `api.ctx` gives each route a `PluginContext` with `db` (a SQLite connection), `now`, `today` and `plugin_id`. Statements commit one by one; use `with ctx.transaction():` to group several.
+- `api.ctx` gives each route a `PluginContext` with `db` (a SQLite connection), `now`, `today` and `plugin_id`. `ctx.report_id("2026-10-20")` returns the id of a day's report (or `None`) without needing to read the reports table. Statements commit one by one; use `with ctx.transaction():` to group several.
 - `api.on(event)` registers an event handler `handler(ctx, payload)`. Declare the event in `listens`.
 - `api.emit(event, payload)` sends one of your own events.
 
@@ -88,7 +90,7 @@ def setup(api):
 - Your connection can read and write only your own `plg_<id>_` tables. It can read the core tables its permissions allow, nothing else (no users, sessions, settings).
 - Migrations may only create or change `plg_<id>_` objects. A migration that touches anything else fails and is rolled back.
 - A table with a `report_id` column is guarded: inserts, updates and deletes are refused when the report is closed (the day after the edit window) or does not exist. Tables without `report_id` are not restricted.
-- Turning a plugin off never deletes its data.
+- Turning a plugin off never deletes its data. Its data is removed only by the explicit **Remove its data** action in Settings > Plugins (the plugin must be off and you type its id to confirm); that drops its `plg_<id>_` tables and nothing else.
 
 ## Events
 
@@ -117,13 +119,14 @@ import GratitudeBlock from './GratitudeBlock.svelte';
 
 export default {
   questionnaireBlocks: { gratitude: GratitudeBlock },
+  reportSections: {},
   widgets: {},
   pages: {},
   settingsPanel: null,
 };
 ```
 
-- A questionnaire block receives `day` and `editable`.
+- A questionnaire block receives `day` and `editable`; a report section receives `day`; pages and widgets receive nothing.
 - Import core helpers with the `$core` alias: `import { pluginRequest } from '$core/lib/api.js'`, `import { t } from '$core/lib/i18n.svelte.js'`.
 - `pluginRequest(id, method, path, body)` calls your backend routes.
 - Texts: put `ui/locales/en.json` (and other languages) next to `index.js`; they become `t('plugin.<id>.<key>')`. English is the source language. `name` and `description` keys translate the plugin's own name and description.

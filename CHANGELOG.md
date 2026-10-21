@@ -5,6 +5,20 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-21
+
+### Added
+- Mood tracker plugin (`plugins/mood`): a 1 to 5 scale and an optional note in the evening questionnaire, a page with the trend (the line breaks on days without an entry), how many times each level was chosen and recent notes, and the mood shown in past reports. It never enters scores and cannot read them.
+- Plugin extension point `report_sections`: plugins can add a section to the detail of a past report.
+- Plugin data removal: Settings > Plugins can remove a switched-off plugin's data after typing its id (`POST /api/v1/plugins/{id}/remove-data`); core data is never touched.
+- `ctx.report_id(day)` for plugins, so they no longer need permission to read reports just to find a day's report.
+
+### Changed
+- The example plugin no longer asks to read reports.
+
+### Fixed
+- Plugin tables with a `UNIQUE` constraint can now be created by migrations.
+
 ## [0.6.0] - 2026-10-21
 
 ### Added
@@ -93,7 +107,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/tombino104/PersonalOS/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/tombino104/PersonalOS/compare/v0.5.1...v0.6.0
 [0.5.1]: https://github.com/tombino104/PersonalOS/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/tombino104/PersonalOS/compare/v0.4.0...v0.5.0
