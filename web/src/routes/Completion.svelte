@@ -5,7 +5,7 @@
   import { formatDate, parseDay } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { router } from '../lib/router.svelte.js';
-  import { session } from '../lib/session.svelte.js';
+  import { displayName } from '../lib/profile.svelte.js';
 
   let today = $state('');
   const day = $derived(router.query.get('day') ?? today);
@@ -55,7 +55,7 @@
 
   <div class="message">
     <h1>{t('completion.titleStart')} <em>{t('completion.titleEmphasis')}</em>{t('completion.titleEnd')}</h1>
-    <p>{t('completion.body', { name: session.name, until })}</p>
+    <p>{t('completion.body', { name: displayName(), until })}</p>
   </div>
 
   <Link class="home-link message" href="/">{t('completion.home')}</Link>

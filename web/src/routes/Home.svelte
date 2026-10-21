@@ -1,6 +1,8 @@
 <script>
   import { onMount } from 'svelte';
+  import Avatar from '../components/Avatar.svelte';
   import Icon from '../components/Icon.svelte';
+  import Link from '../components/Link.svelte';
   import { api } from '../lib/api.js';
   import { AREAS, buildHeatGrid, trendGeometry } from '../lib/charts.js';
   import { addDays, formatDate, lastDays } from '../lib/dates.js';
@@ -82,7 +84,8 @@
   );
   const weekdayLabels = ['2024-01-01', '', '2024-01-03', '', '2024-01-05', '', ''];
 
-  const pluginWidgets = $derived(widgets());
+  const pluginWidgets = $derived(widgets().filter((widget) => widget.placement === 'bottom'));
+  const topWidgets = $derived(widgets().filter((widget) => widget.placement === 'top'));
   const round = (value) => Math.round(value);
   const weekday = $derived(today ? formatDate(today, locale(), { weekday: 'long' }) : '');
   const dateText = $derived(today ? formatDate(today, locale(), { day: 'numeric', month: 'long' }) : '');
@@ -110,7 +113,10 @@
 <div class="content stagger">
   <header class="header-row">
     <div>
-      <div class="eyebrow">{t('nav.home')}</div>
+      <div class="greeting">
+        <Link href="/settings/mascot" aria-label={t('settings.mascot')}><Avatar size={40} /></Link>
+        <div class="eyebrow">{t('nav.home')}</div>
+      </div>
       <h1 class="title">
         {weekday.charAt(0).toUpperCase() + weekday.slice(1)}, <em>{dateText}</em>
       </h1>
@@ -126,6 +132,12 @@
       {/if}
     </div>
   </header>
+
+  {#each topWidgets as widget (widget.pluginId + widget.widgetId)}
+    <section class="card widget rise">
+      <widget.component />
+    </section>
+  {/each}
 
   {#if status === 'loading'}
     <p class="lede" aria-live="polite">{t('common.loading')}</p>
@@ -229,6 +241,13 @@
 
   .defs {
     position: absolute;
+  }
+
+  .greeting {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
   }
 
   .controls {

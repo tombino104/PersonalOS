@@ -20,8 +20,8 @@ async function request(method, path, body) {
   });
 }
 
-function upload(path, file) {
-  return send('POST', path, { headers: { 'Content-Type': 'application/zip' }, body: file });
+function upload(method, path, file, type) {
+  return send(method, path, { headers: { 'Content-Type': type }, body: file });
 }
 
 async function send(method, path, { headers, body }) {
@@ -64,7 +64,12 @@ export const api = {
   createBackup: () => request('POST', '/backups'),
   backupUrl: (name) => `/api/v1/backups/${name}`,
   restoreStored: (name) => request('POST', `/backups/${name}/restore?confirm=restore`),
-  restoreUpload: (file) => upload('/backups/restore?confirm=restore', file),
+  restoreUpload: (file) => upload('POST', '/backups/restore?confirm=restore', file, 'application/zip'),
+  profile: () => request('GET', '/profile'),
+  updateProfile: (body) => request('PUT', '/profile', body),
+  uploadPhoto: (blob) => upload('PUT', '/profile/photo', blob, blob.type || 'image/jpeg'),
+  removePhoto: () => request('DELETE', '/profile/photo'),
+  photoUrl: (version) => `/api/v1/profile/photo?v=${encodeURIComponent(version ?? '')}`,
   today: () => request('GET', '/today'),
   areas: () => request('GET', '/areas'),
 

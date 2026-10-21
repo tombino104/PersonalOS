@@ -6,11 +6,13 @@
   import ActivitiesTab from './settings/ActivitiesTab.svelte';
   import AppearanceTab from './settings/AppearanceTab.svelte';
   import BackupsTab from './settings/BackupsTab.svelte';
+  import MascotTab from './settings/MascotTab.svelte';
   import PluginsTab from './settings/PluginsTab.svelte';
 
   const TABS = [
     { id: 'activities', label: 'settings.activities', component: ActivitiesTab },
     { id: 'account', label: 'settings.account', component: AccountTab },
+    { id: 'mascot', label: 'settings.mascot', component: MascotTab },
     { id: 'appearance', label: 'settings.appearance', component: AppearanceTab },
     { id: 'backups', label: 'settings.backups', component: BackupsTab },
     { id: 'plugins', label: 'settings.plugins', component: PluginsTab },

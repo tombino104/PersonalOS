@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.9.1.** Core API, password login, the web interface, the plugin system, a built-in calendar, a mood tracker plugin and backups are in place. Backups, reminders and agents come next.
+> **Status: v0.10.0.** Core API, password login, the web interface, a profile with a photo, the plugin system, a built-in calendar, a daily quote and a mood tracker plugin, and backups are in place. Backups, reminders and agents come next.
 
 ## Screenshots
 
@@ -82,7 +82,7 @@ Texts live in `web/src/locales/` (English is the source and the default, Italian
 
 ## Plugins
 
-Features beyond the core are plugins: a folder in `plugins/` with a manifest, a Python backend and a Svelte interface. Turn them on and off in Settings > Plugins; each one lists the permissions it asks for. `plugins/calendar` (a calendar with repeating events) is on from the start and shows in the dock, `plugins/mood` (a mood tracker) is another real plugin, `plugins/example` is a small working example, and [docs/plugins.md](docs/plugins.md) explains how to write your own.
+Features beyond the core are plugins: a folder in `plugins/` with a manifest, a Python backend and a Svelte interface. Turn them on and off in Settings > Plugins; each one lists the permissions it asks for. `plugins/calendar` (a calendar with repeating events) is on from the start and shows in the dock, `plugins/quotes` (a famous quote under the date on Home, off until you turn it on) and `plugins/mood` (a mood tracker) are other real plugins, `plugins/example` is a small working example, and [docs/plugins.md](docs/plugins.md) explains how to write your own.
 
 ## Umbrel
 

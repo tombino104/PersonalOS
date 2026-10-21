@@ -1,0 +1,13 @@
+{
+  "id": "quotes",
+  "name": "Daily quote",
+  "version": "0.1.0",
+  "description": "A famous quote under the date on Home, one a day. It never creates points.",
+  "core_api": "1.x",
+  "permissions": ["ui_panel"],
+  "adds": {
+    "widgets": ["daily"]
+  },
+  "listens": [],
+  "emits": []
+}

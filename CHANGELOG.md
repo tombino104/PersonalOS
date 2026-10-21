@@ -5,6 +5,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-22
+
+### Added
+- Mascot profile (Settings > Mascot): a photo, a name shown in the app, a short note about you and an optional birth year. The photo is resized in the browser and stored in the database, so it is part of the data folder and of the backups. It shows in the Home header and on the More page.
+- Daily quote plugin (`plugins/quotes`): a famous quote, one a day, in English or Italian, in a card under the date on Home. Off until you turn it on in Settings > Plugins. It never creates points.
+- Home widgets can ask for the top position (`widgetPlacement` in the plugin UI module).
+- API: `GET/PUT /api/v1/profile`, `PUT/DELETE/GET /api/v1/profile/photo`.
+
 ## [0.9.1] - 2026-10-22
 
 ### Changed
@@ -151,7 +159,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/tombino104/PersonalOS/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/tombino104/PersonalOS/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/tombino104/PersonalOS/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/tombino104/PersonalOS/compare/v0.7.2...v0.8.0

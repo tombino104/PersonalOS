@@ -67,7 +67,12 @@ export function reportSections() {
 export function widgets() {
   return activePlugins().flatMap((plugin) =>
     plugin.widgets
-      .map((widget) => ({ pluginId: plugin.id, widgetId: widget, component: ui[plugin.id]?.widgets?.[widget] }))
+      .map((widget) => ({
+        pluginId: plugin.id,
+        widgetId: widget,
+        component: ui[plugin.id]?.widgets?.[widget],
+        placement: ui[plugin.id]?.widgetPlacement?.[widget] === 'top' ? 'top' : 'bottom',
+      }))
       .filter((widget) => widget.component),
   );
 }

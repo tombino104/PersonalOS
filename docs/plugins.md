@@ -43,6 +43,7 @@ Optional: `"default_active": true` turns the plugin on once, the first time the 
 
 - `id` is lowercase letters, digits and underscores, and must equal the folder name. Your tables must start with `plg_<id>_`.
 - `core_api` is the core API major version you need (`1.x`). If it does not match, the plugin shows as incompatible and cannot be turned on.
+- `widgets` show a card on Home. By default it goes below the charts; a UI module can export `widgetPlacement: { <widget>: 'top' }` to put it right under the date.
 - `report_sections` add a section to the detail of a past report (in Past reports).
 - `entries` are links to your pages: `{ "id", "label", "icon", "placement": "dock" | "more", "page" }`. The dock holds at most five entries in total, so extra ones go to the More page.
 - `emits` must start with `<id>.`; `listens` can name any core event or another plugin's event.

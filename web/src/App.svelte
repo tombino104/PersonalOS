@@ -19,6 +19,7 @@
   import { applyTheme } from './lib/theme.svelte.js';
   import { applyLanguage } from './lib/i18n.svelte.js';
   import { syncAppearance } from './lib/appearance.js';
+  import { loadProfile } from './lib/profile.svelte.js';
 
   const pages = {
     '/': Home,
@@ -45,6 +46,7 @@
     if (session.status === 'authenticated') {
       loadPlugins();
       syncAppearance();
+      loadProfile();
     }
   });
 

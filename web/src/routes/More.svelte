@@ -1,11 +1,12 @@
 <script>
   import { onMount } from 'svelte';
+  import Avatar from '../components/Avatar.svelte';
   import Icon from '../components/Icon.svelte';
   import Link from '../components/Link.svelte';
   import { api } from '../lib/api.js';
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
-  import { session } from '../lib/session.svelte.js';
+  import { displayName } from '../lib/profile.svelte.js';
   import { moreEntries } from '../lib/plugins.svelte.js';
 
   const pluginEntries = $derived(moreEntries());
@@ -33,9 +34,9 @@
   </header>
 
   <section class="card profile" aria-label={t('more.profile')}>
-    <span class="avatar" aria-hidden="true">{session.name.charAt(0).toUpperCase()}</span>
+    <Avatar />
     <div>
-      <div class="name">{session.name}</div>
+      <div class="name">{displayName()}</div>
       <div class="since">
         {#if recorded > 0}
           {t('more.since', { date: formatDate(since, locale(), { day: 'numeric', month: 'long' }), count: recorded })}
@@ -98,19 +99,6 @@
     align-items: center;
     gap: 20px;
     padding: 20px 24px;
-  }
-
-  .avatar {
-    display: inline-flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--ink);
-    color: var(--paper);
-    font: 500 28px/1 var(--serif);
   }
 
   .name {

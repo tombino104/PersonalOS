@@ -7,7 +7,7 @@
   import { formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { navigate, router } from '../lib/router.svelte.js';
-  import { session } from '../lib/session.svelte.js';
+  import { displayName } from '../lib/profile.svelte.js';
   import { questionnaireBlocks } from '../lib/plugins.svelte.js';
 
   let status = $state('loading');
@@ -113,7 +113,7 @@
         <em>{day === today ? t('questionnaire.evening') : fullDate}</em>
       </h1>
       <p class="lede">
-        {t('questionnaire.greeting', { name: session.name })}
+        {t('questionnaire.greeting', { name: displayName() })}
         {#if saved}· {t('questionnaire.draftSaved')}{/if}
       </p>
       {#if report.completed}

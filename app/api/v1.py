@@ -8,7 +8,7 @@ from starlette.concurrency import run_in_threadpool
 from .. import __version__, activities, backup, reports, settings
 from ..logical_day import logical_day
 from ..plugins.manifest import RESERVED_PATHS
-from . import backup_routes
+from . import backup_routes, profile_routes
 from .auth_routes import protected_router
 from .deps import get_conn, get_now, get_user_id, verify_origin
 from .errors import ApiError
@@ -29,6 +29,7 @@ router = APIRouter(
 )
 router.include_router(protected_router)
 router.include_router(backup_routes.router)
+router.include_router(profile_routes.router)
 
 MAX_RANGE_DAYS = 366
 DEFAULT_RANGE_DAYS = 90

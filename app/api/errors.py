@@ -4,7 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from .. import activities, auth, backup, reports, security, setup
+from .. import activities, auth, backup, profile, reports, security, setup
 from ..plugins import registry as plugin_registry
 
 
@@ -41,6 +41,7 @@ _DOMAIN_ERRORS = [
     (plugin_registry.PluginActive, 409, "plugin_active"),
     (plugin_registry.ConfirmationMismatch, 422, "confirmation_mismatch"),
     (backup.InvalidBackup, 422, "invalid_backup"),
+    (profile.InvalidPhoto, 422, "invalid_photo"),
     (backup.BackupNotFound, 404, "not_found"),
 ]
 
