@@ -5,6 +5,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+### Added
+- A live demo on GitHub Pages: the real interface running in the browser against a built-in fake server with made-up data, nothing stored anywhere. Built with `DEMO=1 npm run build` (`web/src/demo/`) and deployed by the new Demo workflow.
+
+### Changed
+- The README now starts with the screenshots and is much shorter; running details moved to `docs/running.md`, and umbrelOS is presented as one supported option rather than the target.
+- Home no longer shows a "Home" label next to the avatar.
+
 ## [0.13.0] - 2026-10-22
 
 ### Added

@@ -3,6 +3,7 @@
   import RestoreDialog from '../../components/RestoreDialog.svelte';
   import { ApiError, api } from '../../lib/api.js';
   import { locale, t } from '../../lib/i18n.svelte.js';
+  import { withBase } from '../../lib/router.svelte.js';
   import { formatBytes } from '../../lib/backups.js';
 
   let backups = $state([]);
@@ -83,7 +84,7 @@
     try {
       if (restoring.file) await api.restoreUpload(restoring.file);
       else await api.restoreStored(restoring.name);
-      location.assign('/');
+      location.assign(withBase('/'));
     } catch (error) {
       if (error instanceof ApiError && error.code === 'invalid_backup') restoreError = t('backups.invalid');
       else if (error instanceof ApiError && error.code === 'too_large') restoreError = t('backups.tooLarge');

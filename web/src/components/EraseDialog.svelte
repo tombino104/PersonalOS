@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import ResetForm from './ResetForm.svelte';
   import { t } from '../lib/i18n.svelte.js';
+  import { withBase } from '../lib/router.svelte.js';
 
   let { onclose } = $props();
 
@@ -15,7 +16,7 @@
 <dialog bind:this={dialog} class="card" aria-labelledby="erase-title" {onclose}>
   <h2 id="erase-title">{t('account.eraseTitle')}</h2>
   <p class="intro">{t('reset.lede')}</p>
-  <ResetForm plain onreset={() => location.assign('/')} />
+  <ResetForm plain onreset={() => location.assign(withBase('/'))} />
   <button class="btn cancel" type="button" onclick={() => dialog.close()}>{t('common.cancel')}</button>
 </dialog>
 

@@ -2,6 +2,7 @@
   import Link from '../components/Link.svelte';
   import ResetForm from '../components/ResetForm.svelte';
   import { t } from '../lib/i18n.svelte.js';
+  import { withBase } from '../lib/router.svelte.js';
 </script>
 
 <main class="page bare">
@@ -12,7 +13,7 @@
       <p class="lede">{t('reset.lede')}</p>
     </header>
 
-    <ResetForm onreset={() => location.assign('/')} />
+    <ResetForm onreset={() => location.assign(withBase('/'))} />
 
     <Link class="back" href="/">
       <svg class="icon small" viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6" /></svg>{t('reset.back')}

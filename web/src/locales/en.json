@@ -282,6 +282,7 @@
   "reset.back": "Back to log in",
   "reset.codeHelp": "Open the file setup-code.txt in the app's data folder. A new code is made every time the app starts and every time it is used.",
   "reset.confirm": "I understand that everything will be erased for good: reports, activities, settings and the data of every plugin.",
+  "reset.demoHelp": "This is the demo, so the code is filled in for you. Erasing takes you through the welcome screens, like a first run.",
   "reset.lede": "This erases all your data and cannot be undone. Then the app starts again from the beginning.",
   "reset.submit": "Erase everything",
   "reset.title": "Start over",

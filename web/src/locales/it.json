@@ -282,6 +282,7 @@
   "reset.back": "Torna all'accesso",
   "reset.codeHelp": "Apri il file setup-code.txt nella cartella dei dati dell'app. Un nuovo codice viene creato a ogni avvio dell'app e ogni volta che viene usato.",
   "reset.confirm": "Ho capito che tutto verrà cancellato per sempre: report, attività, impostazioni e dati di ogni plugin.",
+  "reset.demoHelp": "Questa è la demo, quindi il codice è già inserito. Cancellare ti porta alle schermate di benvenuto, come al primo avvio.",
   "reset.lede": "Questo cancella tutti i tuoi dati e non si può annullare. Poi l'app riparte da zero.",
   "reset.submit": "Cancella tutto",
   "reset.title": "Ricomincia da capo",

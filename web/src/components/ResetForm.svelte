@@ -5,7 +5,7 @@
 
   let { onreset, plain = false } = $props();
 
-  let code = $state('');
+  let code = $state(__DEMO__ ? 'DEMO' : '');
   let understood = $state(false);
   let error = $state('');
   let busy = $state(false);
@@ -41,7 +41,7 @@
       required
       bind:value={code}
     />
-    <p class="muted help">{t('reset.codeHelp')}</p>
+    <p class="muted help">{__DEMO__ ? t('reset.demoHelp') : t('reset.codeHelp')}</p>
   </div>
   <label class="confirm">
     <input type="checkbox" required bind:checked={understood} />

@@ -1,5 +1,5 @@
 <script>
-  import { navigate } from '../lib/router.svelte.js';
+  import { navigate, withBase } from '../lib/router.svelte.js';
 
   let { href, children, ...rest } = $props();
 
@@ -11,4 +11,4 @@
   }
 </script>
 
-<a {href} onclick={go} {...rest}>{@render children?.()}</a>
+<a href={withBase(href)} onclick={go} {...rest}>{@render children?.()}</a>

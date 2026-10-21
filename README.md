@@ -4,6 +4,8 @@
 
 A free, self-hosted daily check-in for six areas of your life. No streaks, no points, no subscription, no cloud.
 
+**[Try the live demo](https://tombino104.github.io/PersonalOS/)** (made-up data, nothing leaves your browser)
+
 | | |
 | --- | --- |
 | ![Home: trends per area and a six-month heatmap](docs/screenshots/home.png) | ![The evening questionnaire](docs/screenshots/questionnaire.png) |
