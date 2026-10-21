@@ -4,6 +4,16 @@ A personal growth system for one person: six life areas, a relative score and an
 
 > **Status: v0.8.0.** Core API, password login, the web interface, the plugin system, a built-in calendar and a mood tracker plugin are in place. Backups, reminders and agents come next.
 
+## Screenshots
+
+Taken with generated demo data.
+
+| | |
+| --- | --- |
+| ![Home: trends per area and a six-month heatmap](docs/screenshots/home.png) | ![The evening questionnaire](docs/screenshots/questionnaire.png) |
+| ![The star: the six areas together](docs/screenshots/star.png) | ![Past reports](docs/screenshots/past-reports.png) |
+| ![The calendar plugin](docs/screenshots/calendar.png) | ![Home in the dark theme](docs/screenshots/home-dark.png) |
+
 ## Guiding ideas
 
 - A mirror, not a judge. It is not a game.
