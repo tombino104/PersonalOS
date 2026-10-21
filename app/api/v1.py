@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response
 from starlette.concurrency import run_in_threadpool
 
-from .. import __version__, activities, reports, settings
+from .. import __version__, activities, backup, reports, settings
 from ..logical_day import logical_day
 from ..plugins.manifest import RESERVED_PATHS
 from . import backup_routes
@@ -277,6 +277,8 @@ def get_settings(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
     return {
         "timezone": rules.timezone,
         "day_cutoff": rules.cutoff.strftime("%H:%M"),
+        "backup_auto": backup.schedule(conn)["auto"],
+        "backup_time": backup.schedule(conn)["time"],
         "theme": settings.get(conn, "theme"),
         "language": settings.get(conn, "language"),
     }
@@ -299,6 +301,14 @@ def update_settings(body: SettingsUpdate, conn: sqlite3.Connection = Depends(get
         except ValueError:
             raise ApiError(422, "invalid_day_cutoff", "expected a time like 04:00") from None
         settings.put(conn, "day_cutoff", changes["day_cutoff"])
+    if "backup_time" in changes:
+        try:
+            time.fromisoformat(changes["backup_time"])
+        except ValueError:
+            raise ApiError(422, "invalid_backup_time", "expected a time like 03:00") from None
+        settings.put(conn, "backup_time", changes["backup_time"])
+    if "backup_auto" in changes:
+        settings.put(conn, "backup_auto", changes["backup_auto"])
     for key in ("theme", "language"):
         if key in changes:
             settings.put(conn, key, changes[key])

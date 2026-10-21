@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-10-22
+
+### Changed
+- Automatic backups can be turned off and their time chosen in Settings > Backups. If the device was off at that time, the backup is made as soon as it is on again.
+- New settings `backup_auto` and `backup_time`.
+
 ## [0.9.0] - 2026-10-22
 
 ### Added
@@ -145,7 +151,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.9.1...HEAD
+[0.9.1]: https://github.com/tombino104/PersonalOS/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/tombino104/PersonalOS/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/tombino104/PersonalOS/compare/v0.7.2...v0.8.0
 [0.7.2]: https://github.com/tombino104/PersonalOS/compare/v0.7.1...v0.7.2

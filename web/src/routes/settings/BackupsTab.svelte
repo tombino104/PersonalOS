@@ -13,6 +13,8 @@
   let restoring = $state(null);
   let restoreError = $state('');
   let fileInput;
+  let auto = $state(true);
+  let at = $state('03:00');
 
   const when = (iso) =>
     new Intl.DateTimeFormat(locale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso));
@@ -30,7 +32,22 @@
     }
   }
 
-  onMount(load);
+  onMount(() => {
+    load();
+    api.settings().then((result) => {
+      auto = result.backup_auto;
+      at = result.backup_time;
+    }).catch(() => {});
+  });
+
+  async function saveSchedule() {
+    failure = '';
+    try {
+      await api.updateSettings({ backup_auto: auto, backup_time: at || '03:00' });
+    } catch {
+      failure = t('error.generic');
+    }
+  }
 
   async function backUpNow() {
     busy = true;
@@ -92,6 +109,17 @@
     />
   </div>
   <p class="muted note">{t('backups.nowNote')}</p>
+  <div class="schedule">
+    <label class="check">
+      <input type="checkbox" bind:checked={auto} onchange={saveSchedule} />
+      <span>{t('backups.auto')}</span>
+    </label>
+    <div class="when-field">
+      <label class="label" for="backup-time">{t('backups.time')}</label>
+      <input id="backup-time" class="field" type="time" disabled={!auto} bind:value={at} onchange={saveSchedule} />
+    </div>
+    <p class="muted note">{t('backups.autoNote')}</p>
+  </div>
   {#if failure}
     <p class="error" role="alert">{failure}</p>
   {/if}
@@ -160,6 +188,45 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  .schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+  }
+
+  .schedule .note {
+    margin: 0;
+  }
+
+  .check {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font: 400 15px/1.5 var(--sans);
+  }
+
+  .check input {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--ink);
+  }
+
+  .when-field {
+    width: 160px;
+  }
+
+  .when-field .label {
+    margin-bottom: 8px;
+  }
+
+  .field:disabled {
+    opacity: 0.5;
   }
 
   .hidden {

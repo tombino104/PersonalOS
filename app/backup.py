@@ -5,7 +5,7 @@ import shutil
 import sqlite3
 import tempfile
 import zipfile
-from datetime import datetime, timezone
+from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
 
 from . import __version__, config, db, settings
@@ -14,7 +14,7 @@ DB_NAME = "personal_os.db"
 MANIFEST_NAME = "manifest.json"
 DIRECTORY = "backups"
 KINDS = {"auto": 7, "manual": 20, "before-restore": 5}
-NIGHTLY_HOUR = 3
+DEFAULT_TIME = "03:00"
 MAX_UPLOAD_BYTES = 256 * 1024 * 1024
 MAX_DATABASE_BYTES = 1024 * 1024 * 1024
 NAME = re.compile(r"^personal-os-(auto|manual|before-restore)-(\d{8}-\d{6})\.zip$")
@@ -108,20 +108,34 @@ def create(kind: str, now: datetime) -> dict:
     return _describe(final)
 
 
-def nightly_due(conn: sqlite3.Connection, now: datetime) -> bool:
-    rules = settings.day_rules(conn)
-    local = now.astimezone(rules.zone)
-    if local.hour < NIGHTLY_HOUR:
+def schedule(conn: sqlite3.Connection) -> dict:
+    return {
+        "auto": bool(settings.get(conn, "backup_auto", True)),
+        "time": settings.get(conn, "backup_time", DEFAULT_TIME),
+    }
+
+
+def _latest_scheduled_moment(conn: sqlite3.Connection, now: datetime) -> datetime:
+    zone = settings.day_rules(conn).zone
+    local = now.astimezone(zone)
+    moment = datetime.combine(local.date(), time.fromisoformat(schedule(conn)["time"]), tzinfo=zone)
+    if moment > local:
+        moment -= timedelta(days=1)
+    return moment
+
+
+def scheduled_due(conn: sqlite3.Connection, now: datetime) -> bool:
+    if not schedule(conn)["auto"]:
         return False
-    return settings.get(conn, "last_auto_backup_day") != local.date().isoformat()
+    last = settings.get(conn, "last_auto_backup_at")
+    return last is None or datetime.fromisoformat(last) < _latest_scheduled_moment(conn, now)
 
 
-def run_nightly(conn: sqlite3.Connection, now: datetime) -> dict | None:
-    if not nightly_due(conn, now):
+def run_scheduled(conn: sqlite3.Connection, now: datetime) -> dict | None:
+    if not scheduled_due(conn, now):
         return None
     item = create("auto", now)
-    local_day = now.astimezone(settings.day_rules(conn).zone).date().isoformat()
-    settings.put(conn, "last_auto_backup_day", local_day)
+    settings.put(conn, "last_auto_backup_at", now.astimezone(timezone.utc).isoformat(timespec="seconds"))
     return item
 
 

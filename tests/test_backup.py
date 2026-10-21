@@ -100,21 +100,44 @@ def test_pruning_one_kind_does_not_touch_the_others(client):
     assert len([item for item in backup.list_backups() if item["kind"] == "manual"]) == 1
 
 
-def test_the_nightly_backup_runs_once_a_day_after_three(client, tmp_path):
+def local_moment(conn, day, hour, minute=0):
+    zone = settings.day_rules(conn).zone
+    return datetime(2026, 10, day, hour, minute, tzinfo=zone).astimezone(timezone.utc)
+
+
+def test_the_scheduled_backup_runs_once_per_scheduled_moment(client, tmp_path):
     conn = db.connect(tmp_path / "personal_os.db")
-    rules = settings.day_rules(conn)
-    day = datetime(2026, 10, 21, tzinfo=rules.zone)
-
-    def at(moment):
-        return moment.astimezone(timezone.utc)
-
-    assert backup.run_nightly(conn, at(day.replace(hour=2, minute=30))) is None
-    first = backup.run_nightly(conn, at(day.replace(hour=3, minute=5)))
+    first = backup.run_scheduled(conn, local_moment(conn, 21, 3, 5))
     assert first is not None and first["kind"] == "auto"
-    assert backup.run_nightly(conn, at(day.replace(hour=15))) is None
-    next_day = day + timedelta(days=1)
-    assert backup.run_nightly(conn, at(next_day.replace(hour=3, minute=1))) is not None
+    assert backup.run_scheduled(conn, local_moment(conn, 21, 15)) is None
+    assert backup.run_scheduled(conn, local_moment(conn, 22, 2, 30)) is None
+    assert backup.run_scheduled(conn, local_moment(conn, 22, 3, 1)) is not None
     conn.close()
+
+
+def test_a_backup_missed_while_the_device_was_off_is_made_when_it_is_back(client, tmp_path):
+    conn = db.connect(tmp_path / "personal_os.db")
+    assert backup.run_scheduled(conn, local_moment(conn, 21, 3, 5)) is not None
+    assert backup.run_scheduled(conn, local_moment(conn, 23, 10)) is not None
+    assert backup.run_scheduled(conn, local_moment(conn, 23, 11)) is None
+    conn.close()
+
+
+def test_the_user_chooses_the_time_and_can_turn_it_off(client, tmp_path):
+    assert client.patch("/api/v1/settings", json={"backup_time": "22:30"}).json()["backup_time"] == "22:30"
+    conn = db.connect(tmp_path / "personal_os.db")
+    assert backup.run_scheduled(conn, local_moment(conn, 21, 22, 40)) is not None
+    assert backup.run_scheduled(conn, local_moment(conn, 22, 21, 0)) is None
+    assert backup.run_scheduled(conn, local_moment(conn, 22, 22, 31)) is not None
+    client.patch("/api/v1/settings", json={"backup_auto": False})
+    assert backup.run_scheduled(conn, local_moment(conn, 25, 23, 0)) is None
+    conn.close()
+
+
+def test_a_bad_backup_time_is_refused(client):
+    assert client.patch("/api/v1/settings", json={"backup_time": "25:99"}).status_code == 422
+    assert client.patch("/api/v1/settings", json={"backup_time": "3am"}).status_code == 422
+    assert client.patch("/api/v1/settings", json={"backup_auto": None}).status_code == 422
 
 
 def test_restoring_a_stored_backup_brings_the_data_back(client, tmp_path, clock):

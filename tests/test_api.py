@@ -244,6 +244,8 @@ def test_settings_roundtrip_and_validation(client):
     assert client.get("/api/v1/settings").json() == {
         "timezone": "Europe/Rome",
         "day_cutoff": "04:00",
+        "backup_auto": True,
+        "backup_time": "03:00",
         "theme": None,
         "language": None,
     }

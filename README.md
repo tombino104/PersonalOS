@@ -2,7 +2,7 @@
 
 A personal growth system for one person: six life areas, a relative score and an evening questionnaire. Lightweight, plugin-based, designed to run in a docker container (especially on UmbrelOS), behind Tailscale.
 
-> **Status: v0.9.0.** Core API, password login, the web interface, the plugin system, a built-in calendar, a mood tracker plugin and backups are in place. Backups, reminders and agents come next.
+> **Status: v0.9.1.** Core API, password login, the web interface, the plugin system, a built-in calendar, a mood tracker plugin and backups are in place. Backups, reminders and agents come next.
 
 ## Screenshots
 
@@ -16,7 +16,7 @@ Taken with generated demo data.
 
 ## Backups
 
-Everything lives in the data folder, so a backup is a copy of it. The app also does it for you: a backup is made every night at 03:00 (the last 7 are kept) in `data/backups`, and **Settings > Backups** lets you make one now and download it, or restore from a saved backup or an uploaded `.zip`. Before a restore the app backs up the current state first. Backups never contain the setup code.
+Everything lives in the data folder, so a backup is a copy of it. The app also does it for you: a backup is made every day (at a time you choose, 03:00 by default; if the device was off, as soon as it is on again; the last 7 are kept) in `data/backups`, and **Settings > Backups** lets you make one now and download it, or restore from a saved backup or an uploaded `.zip`. Before a restore the app backs up the current state first. Backups never contain the setup code.
 
 ## Guiding ideas
 

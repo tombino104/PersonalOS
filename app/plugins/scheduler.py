@@ -14,9 +14,9 @@ def tick(registry: Registry, now: datetime) -> list[dict]:
     try:
         expired = reports.expire_reports(conn, now)
         try:
-            backup.run_nightly(conn, now)
+            backup.run_scheduled(conn, now)
         except Exception:
-            logger.exception("the nightly backup failed")
+            logger.exception("the scheduled backup failed")
     finally:
         conn.close()
     for item in expired:
