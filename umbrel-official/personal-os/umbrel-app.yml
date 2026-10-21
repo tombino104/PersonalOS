@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.14.0"
+version: "0.15.0"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,7 +24,7 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  Activities can have a short description, shown in the evening questionnaire. Reports that can still be edited now follow
-  your changes to the activities, also after they are completed.
+  New Journal plugin: a private place for longer writing, with search and writing prompts. Turn it on in
+  Settings > Plugins.
 submitter: tombino104
 submission: ""
