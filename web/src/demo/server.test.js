@@ -110,6 +110,20 @@ describe('demo server', () => {
     expect(call('PATCH', '/settings', { dock: [] }).data.dock).toBeNull();
   });
 
+  it('counts a weekly goal only once it can no longer be met', () => {
+    const { call } = demo();
+    for (const item of call('GET', '/activities').data.activities) {
+      call('PATCH', `/activities/${item.id}`, { archived: true });
+    }
+    call('POST', '/activities', { area: 'physical', name: 'Gym', weight: 2, times_per_week: 7 });
+    const opened = call('POST', '/reports', { day: TODAY }).data;
+    expect(opened.completions[0].weekly).toMatchObject({ target: 7, forced: true });
+    const complete = call('POST', `/reports/${TODAY}/complete`).data;
+    expect(complete.scores.find((entry) => entry.area === 'physical').maximum).toBe(2);
+    const free = call('POST', '/activities', { area: 'career', name: 'Study', weight: 1, times_per_week: 1 }).data.activity;
+    expect(call('PATCH', `/activities/${free.id}`, { times_per_week: 9 }).status).toBe(422);
+  });
+
   it('syncs a draft with the current activities', () => {
     const { call } = demo();
     call('POST', '/reports', { day: TODAY });

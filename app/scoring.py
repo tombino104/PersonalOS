@@ -6,16 +6,23 @@ from dataclasses import dataclass
 class Item:
     weight: int
     done: bool
+    optional: bool = False
 
 
 def tally(items: Iterable[Item]) -> tuple[int, int]:
     maximum = 0
     obtained = 0
     for item in items:
+        if item.optional and not item.done:
+            continue
         maximum += item.weight
         if item.done:
             obtained += item.weight
     return maximum, obtained
+
+
+def weekly_forced(target: int, done_before: int, days_left: int) -> bool:
+    return target - done_before >= days_left
 
 
 def score(maximum: int, obtained: int) -> float | None:

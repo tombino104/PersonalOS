@@ -94,6 +94,7 @@ export function sampleActivities(state, at) {
         weight,
         cadence: 'daily',
         days,
+        times_per_week: null,
         created_at: at.toISOString(),
         archived_at: null,
       });
@@ -113,6 +114,7 @@ export function completionsFor(state, day) {
       name: activity.name,
       weight: activity.weight,
       area: activity.area,
+      target: activity.times_per_week ?? null,
       done: false,
     }));
 }

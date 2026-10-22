@@ -13,6 +13,7 @@
   let chosenArea = $state(untrack(() => activity?.area ?? area));
   let weight = $state(untrack(() => activity?.weight ?? 2));
   let days = $state(untrack(() => activity?.days ?? [0, 1, 2, 3, 4, 5, 6]));
+  let times = $state(untrack(() => activity?.times_per_week ?? 0));
   const initials = $derived(weekdayInitials(locale()));
 
   function toggleDay(index) {
@@ -36,9 +37,9 @@
     error = '';
     try {
       if (activity) {
-        await api.updateActivity(activity.id, { name: name.trim(), description: description.trim(), area: chosenArea, weight, days });
+        await api.updateActivity(activity.id, { name: name.trim(), description: description.trim(), area: chosenArea, weight, days, times_per_week: times });
       } else {
-        await api.createActivity({ name: name.trim(), description: description.trim(), area: chosenArea, weight, days });
+        await api.createActivity({ name: name.trim(), description: description.trim(), area: chosenArea, weight, days, times_per_week: times });
       }
       onsaved();
     } catch (failure) {
@@ -127,6 +128,17 @@
         {/each}
       </div>
       <p class="muted help">{t('activity.daysHelp')}</p>
+    </div>
+
+    <div>
+      <label class="label" for="activity-times">{t('activity.times')}</label>
+      <select id="activity-times" class="field" bind:value={times}>
+        <option value={0}>{t('activity.timesNone')}</option>
+        {#each [1, 2, 3, 4, 5, 6, 7] as count}
+          <option value={count}>{t(count === 1 ? 'activity.timesOne' : 'activity.timesMany', { count })}</option>
+        {/each}
+      </select>
+      <p class="muted help">{t('activity.timesHelp')}</p>
     </div>
 
     {#if error}

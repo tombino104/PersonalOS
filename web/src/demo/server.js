@@ -159,9 +159,24 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
 
   const reportOf = (day) => state.reports.get(day) ?? notFound(`no report for ${day}`);
 
+  function weeklyProgress(report, item) {
+    const start = addDays(report.day, -weekdayOf(report.day));
+    let doneBefore = 0;
+    for (const other of state.reports.values()) {
+      if (!other.completedAt || other.day < start || other.day >= report.day) continue;
+      if (other.completions.some((entry) => entry.activity_id === item.activity_id && entry.done)) doneBefore += 1;
+    }
+    const activity = state.activities.find((candidate) => candidate.id === item.activity_id);
+    const daysLeft = (activity?.days ?? []).filter((weekday) => weekday >= weekdayOf(report.day)).length;
+    return { target: item.target, done_before: doneBefore, forced: item.target - doneBefore >= daysLeft };
+  }
+
+  const isOptional = (report, item) => item.target != null && !weeklyProgress(report, item).forced;
+
   function scoresOf(report) {
+    const counted = report.completions.filter((item) => item.done || !isOptional(report, item));
     return AREAS.map((area) => {
-      const items = report.completions.filter((item) => item.area === area.slug);
+      const items = counted.filter((item) => item.area === area.slug);
       const maximum = items.reduce((sum, item) => sum + item.weight, 0);
       const obtained = items.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0);
       return { area: area.slug, maximum, obtained, score: score(maximum, obtained) };
@@ -179,13 +194,14 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       completed_at: report.completedAt ? report.completedAt.toISOString() : null,
       editable_until: deadlineOf(report.day).toISOString(),
       reflection: report.reflection,
-      completions: report.completions.map(({ activity_id, name, weight, area, done }) => ({
-        activity_id,
-        name,
-        description: state.activities.find((activity) => activity.id === activity_id)?.description ?? null,
-        weight,
-        area,
-        done,
+      completions: report.completions.map((item) => ({
+        activity_id: item.activity_id,
+        name: item.name,
+        description: state.activities.find((activity) => activity.id === item.activity_id)?.description ?? null,
+        weight: item.weight,
+        area: item.area,
+        done: item.done,
+        weekly: item.target == null ? null : weeklyProgress(report, item),
       })),
       scores,
       overall: scores ? mean(scores.map((entry) => entry.score)) : null,
@@ -246,6 +262,12 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     if (description === undefined || description === null) return null;
     if (typeof description !== 'string' || description.trim().length > 300) invalid();
     return description.trim() || null;
+  }
+
+  function checkTimes(times) {
+    if (times === undefined || times === null || times === 0) return null;
+    if (!Number.isInteger(times) || times < 1 || times > 7) invalid();
+    return times;
   }
 
   function checkWeight(weight) {
@@ -394,6 +416,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       area: checkArea(body?.area),
       name: checkName(body?.name),
       description: checkDescription(body?.description),
+      times_per_week: checkTimes(body?.times_per_week),
       weight: checkWeight(body?.weight),
       cadence: 'daily',
       days: body?.days == null ? [0, 1, 2, 3, 4, 5, 6] : checkDays(body.days),
@@ -412,6 +435,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const activity = activityOf(params.id);
     if ('name' in changes) activity.name = checkName(changes.name);
     if ('description' in changes) activity.description = checkDescription(changes.description);
+    if ('times_per_week' in changes) activity.times_per_week = checkTimes(changes.times_per_week);
     if ('area' in changes) activity.area = checkArea(changes.area);
     if ('weight' in changes) activity.weight = checkWeight(changes.weight);
     if ('days' in changes) activity.days = checkDays(changes.days);
@@ -491,7 +515,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     });
     for (const item of report.completions) {
       const activity = known.get(item.activity_id);
-      Object.assign(item, { name: activity.name, weight: activity.weight, area: activity.area });
+      Object.assign(item, { name: activity.name, weight: activity.weight, area: activity.area, target: activity.times_per_week ?? null });
     }
     const present = new Set(report.completions.map((item) => item.activity_id));
     report.completions.push(...completionsFor(state, report.day).filter((item) => !present.has(item.activity_id)));

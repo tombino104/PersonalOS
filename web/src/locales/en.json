@@ -27,6 +27,11 @@
   "activity.invalid": "Please check the name and the weight.",
   "activity.name": "Name",
   "activity.restore": "Restore",
+  "activity.times": "Goal per week",
+  "activity.timesHelp": "Instead of counting every selected day, aim for a number of times in the week. Skipping early in the week is free: the habit only counts against a day once the goal can no longer be reached.",
+  "activity.timesMany": "{count} times a week",
+  "activity.timesNone": "No goal: every selected day",
+  "activity.timesOne": "Once a week",
   "activity.weight": "Weight",
   "activity.weightHelp": "1 is a small step, 3 is a big one. Today's and yesterday's reports follow the change while they can still be edited.",
 
@@ -288,6 +293,8 @@
   "questionnaire.reflectionPlaceholder": "How did it really go?",
   "questionnaire.save": "Save changes",
 
+  "questionnaire.weekly": "{count} of {target} this week",
+  "questionnaire.weeklyToday": "{count} of {target} this week · today counts",
   "reportTime.lede": "If you like, the report of the day can only be filled in from a chosen time, so you tick things at the end of the day and not before.",
   "reportTime.lock": "Do not allow the report before this time",
   "reportTime.note": "Yesterday can still be corrected as usual. To fill the report in earlier, change the time or turn this off.",
@@ -327,6 +334,7 @@
   "settings.themeAuto": "Automatic",
   "settings.themeDark": "Dark",
   "settings.themeLight": "Light",
+  "settings.timesTag": "{count}×/week",
   "settings.title": "How it works",
   "settings.titleEmphasis": "for you",
   "settings.tooMany": "More than 5 activities in one area: the picture gets diluted. Maybe archive a few?",

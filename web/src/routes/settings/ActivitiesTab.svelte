@@ -67,7 +67,7 @@
         <div class="chips">
           {#each group.items as activity (activity.id)}
             <button class="chip" class:faded={activity.archived_at} title={activity.description ?? undefined} onclick={() => open(activity, group.area)}>
-              {activity.name}<b>{activity.archived_at ? t('settings.archivedTag') : t('settings.weightTag', { weight: activity.weight })}</b>{#if daysLabel(activity.days, locale())}<b>{daysLabel(activity.days, locale())}</b>{/if}
+              {activity.name}<b>{activity.archived_at ? t('settings.archivedTag') : t('settings.weightTag', { weight: activity.weight })}</b>{#if daysLabel(activity.days, locale())}<b>{daysLabel(activity.days, locale())}</b>{/if}{#if activity.times_per_week}<b>{t('settings.timesTag', { count: activity.times_per_week })}</b>{/if}
             </button>
           {/each}
           <button class="chip dashed" onclick={() => open(null, group.area)}>{t('settings.add')}</button>

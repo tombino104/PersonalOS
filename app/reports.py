@@ -1,9 +1,9 @@
 import sqlite3
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, time, timedelta, timezone
 
 from . import settings
 from .logical_day import DayRules, edit_deadline, logical_day
-from .scoring import Item, mean_score, score, tally
+from .scoring import Item, mean_score, score, tally, weekly_forced
 
 
 class ReportClosed(Exception):
@@ -57,15 +57,43 @@ def _require_editable(conn: sqlite3.Connection, report_id: int, now: datetime) -
     require_open_time(conn, date.fromisoformat(row["day"]), now)
 
 
-def _write_scores(conn: sqlite3.Connection, report_id: int) -> None:
+def _week_start(day: date) -> date:
+    return day - timedelta(days=day.weekday())
+
+
+def weekly_progress(conn: sqlite3.Connection, activity_id: int, target: int, day: date) -> dict:
+    done_before = conn.execute(
+        "SELECT COUNT(*) FROM completions c JOIN reports r ON r.id = c.report_id "
+        "WHERE c.activity_id = ? AND c.done = 1 AND r.completed_at IS NOT NULL "
+        "AND r.day >= ? AND r.day < ?",
+        (activity_id, _week_start(day).isoformat(), day.isoformat()),
+    ).fetchone()[0]
+    mask = conn.execute("SELECT days FROM activities WHERE id = ?", (activity_id,)).fetchone()["days"]
+    days_left = sum(1 for weekday in range(day.weekday(), 7) if mask & (1 << weekday))
+    return {
+        "target": target,
+        "done_before": done_before,
+        "forced": weekly_forced(target, done_before, days_left),
+    }
+
+
+def _write_scores(conn: sqlite3.Connection, report_id: int, cascade: bool = True) -> None:
+    day = date.fromisoformat(
+        conn.execute("SELECT day FROM reports WHERE id = ?", (report_id,)).fetchone()["day"]
+    )
     per_area: dict[int, list[Item]] = {
         row["id"]: [] for row in conn.execute("SELECT id FROM areas")
     }
     for row in conn.execute(
-        "SELECT area_id, weight_at_time, done FROM completions WHERE report_id = ?",
+        "SELECT area_id, activity_id, weight_at_time, done, target_at_time "
+        "FROM completions WHERE report_id = ?",
         (report_id,),
-    ):
-        per_area[row["area_id"]].append(Item(row["weight_at_time"], bool(row["done"])))
+    ).fetchall():
+        optional = False
+        if row["target_at_time"] is not None:
+            progress = weekly_progress(conn, row["activity_id"], row["target_at_time"], day)
+            optional = not progress["forced"]
+        per_area[row["area_id"]].append(Item(row["weight_at_time"], bool(row["done"]), optional))
     conn.execute("DELETE FROM daily_scores WHERE report_id = ?", (report_id,))
     for area_id, items in per_area.items():
         maximum, obtained = tally(items)
@@ -74,6 +102,14 @@ def _write_scores(conn: sqlite3.Connection, report_id: int) -> None:
             "VALUES (?, ?, ?, ?)",
             (report_id, area_id, maximum, obtained),
         )
+    if cascade:
+        later = conn.execute(
+            "SELECT id FROM reports WHERE user_id = (SELECT user_id FROM reports WHERE id = ?) "
+            "AND completed_at IS NOT NULL AND day > ? AND day <= ?",
+            (report_id, day.isoformat(), (_week_start(day) + timedelta(days=6)).isoformat()),
+        ).fetchall()
+        for item in later:
+            _write_scores(conn, item["id"], cascade=False)
 
 
 def open_report(
@@ -99,8 +135,8 @@ def open_report(
         report_id = cursor.lastrowid
         conn.execute(
             "INSERT INTO completions "
-            "(report_id, activity_id, name_at_time, weight_at_time, area_id) "
-            "SELECT ?, id, name, weight, area_id FROM activities "
+            "(report_id, activity_id, name_at_time, weight_at_time, area_id, target_at_time) "
+            "SELECT ?, id, name, weight, area_id, times_per_week FROM activities "
             "WHERE archived_at IS NULL AND (days & ?) != 0",
             (report_id, 1 << day.weekday()),
         )
@@ -204,7 +240,8 @@ def report_detail(conn: sqlite3.Connection, report_id: int, now: datetime) -> di
     if row is None:
         raise ReportNotFound(f"report {report_id} not found")
     completions = conn.execute(
-        "SELECT c.activity_id, c.name_at_time, c.weight_at_time, c.done, a.slug, act.description "
+        "SELECT c.activity_id, c.name_at_time, c.weight_at_time, c.done, c.target_at_time, a.slug, "
+        "act.description "
         "FROM completions c JOIN areas a ON a.id = c.area_id "
         "JOIN activities act ON act.id = c.activity_id "
         "WHERE c.report_id = ? ORDER BY a.position, c.id",
@@ -237,6 +274,11 @@ def report_detail(conn: sqlite3.Connection, report_id: int, now: datetime) -> di
                 "weight": c["weight_at_time"],
                 "area": c["slug"],
                 "done": bool(c["done"]),
+                "weekly": None
+                if c["target_at_time"] is None
+                else weekly_progress(
+                    conn, c["activity_id"], c["target_at_time"], date.fromisoformat(row["day"])
+                ),
             }
             for c in completions
         ],
@@ -311,14 +353,15 @@ def sync_draft(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
             "UPDATE completions SET "
             "name_at_time = (SELECT name FROM activities WHERE id = completions.activity_id), "
             "weight_at_time = (SELECT weight FROM activities WHERE id = completions.activity_id), "
+            "target_at_time = (SELECT times_per_week FROM activities WHERE id = completions.activity_id), "
             "area_id = (SELECT area_id FROM activities WHERE id = completions.activity_id) "
             "WHERE report_id = ?",
             (report_id,),
         )
         conn.execute(
             "INSERT INTO completions "
-            "(report_id, activity_id, name_at_time, weight_at_time, area_id) "
-            "SELECT ?, id, name, weight, area_id FROM activities "
+            "(report_id, activity_id, name_at_time, weight_at_time, area_id, target_at_time) "
+            "SELECT ?, id, name, weight, area_id, times_per_week FROM activities "
             "WHERE archived_at IS NULL AND (days & ?) != 0 AND id NOT IN "
             "(SELECT activity_id FROM completions WHERE report_id = ?)",
             (report_id, bit, report_id),

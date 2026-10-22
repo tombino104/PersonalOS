@@ -27,6 +27,11 @@
   "activity.invalid": "Controlla il nome e il peso.",
   "activity.name": "Nome",
   "activity.restore": "Ripristina",
+  "activity.times": "Obiettivo settimanale",
+  "activity.timesHelp": "Invece di contare ogni giorno scelto, punti a un numero di volte nella settimana. Saltare a inizio settimana non costa nulla: l'abitudine pesa su un giorno solo quando l'obiettivo non si può più raggiungere.",
+  "activity.timesMany": "{count} volte a settimana",
+  "activity.timesNone": "Nessun obiettivo: ogni giorno scelto",
+  "activity.timesOne": "Una volta a settimana",
   "activity.weight": "Peso",
   "activity.weightHelp": "1 è un passo piccolo, 3 è un passo grande. I report di oggi e di ieri seguono la modifica finché si possono ancora correggere.",
 
@@ -288,6 +293,8 @@
   "questionnaire.reflectionPlaceholder": "Com'è andata, davvero?",
   "questionnaire.save": "Salva le modifiche",
 
+  "questionnaire.weekly": "{count} su {target} questa settimana",
+  "questionnaire.weeklyToday": "{count} su {target} questa settimana · oggi conta",
   "reportTime.lede": "Se vuoi, il report del giorno si può compilare solo da un'ora scelta, così spunti le cose a fine giornata e non prima.",
   "reportTime.lock": "Non permettere il report prima di quest'ora",
   "reportTime.note": "Ieri si può ancora correggere come sempre. Per compilare il report prima, cambia l'ora o spegni questa opzione.",
@@ -327,6 +334,7 @@
   "settings.themeAuto": "Automatico",
   "settings.themeDark": "Scuro",
   "settings.themeLight": "Chiaro",
+  "settings.timesTag": "{count}×/sett.",
   "settings.title": "Come funziona",
   "settings.titleEmphasis": "per te",
   "settings.tooMany": "Più di 5 attività in un ambito: il quadro si diluisce. Vale la pena archiviarne qualcuna?",

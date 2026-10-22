@@ -166,6 +166,14 @@
                 {#if task.description}
                   <span class="note">{task.description}</span>
                 {/if}
+                {#if task.weekly}
+                  <span class="note">
+                    {t(task.weekly.forced && !task.done ? 'questionnaire.weeklyToday' : 'questionnaire.weekly', {
+                      count: task.weekly.done_before + (task.done ? 1 : 0),
+                      target: task.weekly.target,
+                    })}
+                  </span>
+                {/if}
               </span>
             </button>
           {/each}

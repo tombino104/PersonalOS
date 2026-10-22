@@ -4,7 +4,8 @@ from datetime import datetime, timezone
 SOFT_LIMIT_PER_AREA = 5
 
 _SELECT = (
-    "SELECT act.id, act.name, act.description, act.weight, act.cadence, act.days, act.created_at, act.archived_at, "
+    "SELECT act.id, act.name, act.description, act.weight, act.cadence, act.days, act.times_per_week, "
+    "act.created_at, act.archived_at, "
     "a.slug AS area FROM activities act JOIN areas a ON a.id = act.area_id"
 )
 
@@ -58,6 +59,7 @@ def _as_dict(row) -> dict:
         "weight": row["weight"],
         "cadence": row["cadence"],
         "days": mask_to_days(row["days"]),
+        "times_per_week": row["times_per_week"],
         "created_at": row["created_at"],
         "archived_at": row["archived_at"],
     }
@@ -88,14 +90,15 @@ def create(
     now: datetime,
     days: list[int] | None = None,
     description: str | None = None,
+    times_per_week: int | None = None,
 ) -> dict:
     area_id = _area_id(conn, area_slug)
     mask = ALL_DAYS if days is None else days_to_mask(days)
     with conn:
         cursor = conn.execute(
-            "INSERT INTO activities (area_id, name, description, weight, days, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?)",
-            (area_id, name, description or None, weight, mask, _iso(now)),
+            "INSERT INTO activities (area_id, name, description, weight, days, times_per_week, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (area_id, name, description or None, weight, mask, times_per_week or None, _iso(now)),
         )
     return get(conn, cursor.lastrowid)
 
@@ -116,6 +119,9 @@ def update(conn: sqlite3.Connection, activity_id: int, changes: dict, now: datet
     if "description" in changes:
         assignments.append("description = ?")
         params.append(changes["description"] or None)
+    if "times_per_week" in changes:
+        assignments.append("times_per_week = ?")
+        params.append(changes["times_per_week"] or None)
     if "days" in changes:
         assignments.append("days = ?")
         params.append(days_to_mask(changes["days"]))
