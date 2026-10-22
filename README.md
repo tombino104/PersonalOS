@@ -20,11 +20,9 @@ No streaks, no points, no subscription, no cloud. A mirror, not a judge.
 
 <br />
 
-<video src="https://github.com/tombino104/PersonalOS/raw/main/docs/media/personal-os.mp4" poster="docs/media/personal-os-poster.png" controls muted playsinline width="860">
-  <a href="docs/media/personal-os.mp4"><img src="docs/media/personal-os-preview.gif" alt="Personal OS in 8 seconds: ticking the evening questionnaire. Click to watch the 49-second film." width="860" /></a>
-</video>
+<a href="docs/media/personal-os.mp4"><img src="docs/media/personal-os-preview.gif" alt="Personal OS: ticking the evening questionnaire. Click to watch the 49-second film." width="780" /></a>
 
-<sub>▶ <a href="docs/media/personal-os.mp4">Watch the 49-second film</a></sub>
+<sub>▶ <a href="docs/media/personal-os.mp4"><b>Watch the 49-second film</b></a></sub>
 
 </div>
 
