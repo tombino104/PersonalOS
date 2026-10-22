@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.16.0"
+version: "0.16.1"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,7 +24,6 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  You can now arrange the dock yourself (Settings > Dock, up to seven items) and delete archived activities for good.
-  Past reports keep their history.
+  The locked questionnaire screen no longer shows a button to change the report time.
 submitter: tombino104
 submission: ""
