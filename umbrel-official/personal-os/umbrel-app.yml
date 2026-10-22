@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.16.1"
+version: "0.17.0"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,6 +24,7 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  The locked questionnaire screen no longer shows a button to change the report time.
+  New: weekly goals for habits (N times a week), a weekly review, data export (CSV and JSON), and the app can be added
+  to your phone's home screen.
 submitter: tombino104
 submission: ""
