@@ -14,4 +14,10 @@ if (__DEMO__) {
   installDemo({ version: __APP_VERSION__ });
 }
 
+if (!__DEMO__ && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch(() => {});
+  });
+}
+
 mount(App, { target: document.getElementById('app') });

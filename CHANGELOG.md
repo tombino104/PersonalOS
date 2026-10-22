@@ -5,6 +5,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-10-22
+
+### Added
+- Weekly goals: an activity can aim for a number of times per week (1 to 7) instead of every selected day. Skipping early in the week is free: the habit counts against a day only once the goal can no longer be reached, and a day where you did it always counts. The questionnaire shows the progress ("2 of 3 this week"); the scores of later days of the week follow edits to earlier days. Activities carry `times_per_week` (0 clears it) and a report's completions carry `weekly`.
+- Weekly review: a page (in More, or in the dock if you add it) with the days of a week, the six areas compared with the week before, how many days each habit was kept, the lines you wrote, and a free note per week. `GET /api/v1/reviews/{monday}` and `PUT /api/v1/reviews/{monday}/note`.
+- Export: Settings > Backups downloads a zip with activities, reports, completions, scores and weekly notes as CSV, one `data.json`, the data of every plugin, and the journal as Markdown (`GET /api/v1/export`). No password, setup code or session is included, and text that looks like a spreadsheet formula is defused.
+- Installable app: a web manifest, icons and a small service worker (it caches only the app files, never your data), so the app can be added to the home screen of a phone. A new section of the guide explains how.
+
 ## [0.16.1] - 2026-10-22
 
 ### Changed
@@ -242,7 +250,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.16.1...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/tombino104/PersonalOS/compare/v0.16.1...v0.17.0
 [0.16.1]: https://github.com/tombino104/PersonalOS/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/tombino104/PersonalOS/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/tombino104/PersonalOS/compare/v0.14.0...v0.15.0

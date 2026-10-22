@@ -115,5 +115,7 @@ def web(path: str) -> FileResponse:
             headers = {}
             if path.startswith("assets/"):
                 headers["Cache-Control"] = "public, max-age=31536000, immutable"
+            elif path in ("sw.js", "manifest.webmanifest"):
+                headers["Cache-Control"] = "no-cache"
             return FileResponse(candidate, headers=headers)
     return FileResponse(index, headers={"Cache-Control": "no-cache"})

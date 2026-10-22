@@ -10,6 +10,9 @@ def site(tmp_path, monkeypatch):
     (web / "assets").mkdir(parents=True)
     (web / "index.html").write_text("<html>personal-os</html>", encoding="utf-8")
     (web / "assets" / "app.js").write_text("console.log(1)", encoding="utf-8")
+    (web / "sw.js").write_text("self.skipWaiting()", encoding="utf-8")
+    (web / "manifest.webmanifest").write_text('{"name": "Personal OS"}', encoding="utf-8")
+    (web / "icon-192.png").write_bytes(b"png")
     (tmp_path / "secret.txt").write_text("top secret", encoding="utf-8")
     monkeypatch.setenv("WEB_DIR", str(web))
     monkeypatch.setenv("DATA_DIR", str(tmp_path / "data"))
@@ -71,3 +74,14 @@ def test_security_headers_are_on_every_response(site):
         assert headers["x-frame-options"] == "DENY"
         assert headers["referrer-policy"] == "no-referrer"
         assert "default-src 'self'" in headers["content-security-policy"]
+
+
+def test_the_manifest_and_the_service_worker_are_public_and_never_stale(site):
+    worker = site.get("/sw.js")
+    assert worker.status_code == 200 and worker.text == "self.skipWaiting()"
+    assert worker.headers["cache-control"] == "no-cache"
+    manifest = site.get("/manifest.webmanifest")
+    assert manifest.status_code == 200
+    assert manifest.headers["content-type"].startswith("application/manifest+json")
+    assert manifest.headers["cache-control"] == "no-cache"
+    assert site.get("/icon-192.png").status_code == 200
