@@ -1,10 +1,34 @@
+<div align="center">
+
+<img src="docs/media/logo.svg" width="88" alt="Personal OS: six coloured dots, one per life area, around a small dark centre" />
+
 # Personal OS
 
 **Discipline, without the dopamine tricks.**
 
-A free, self-hosted daily check-in for six areas of your life. No streaks, no points, no subscription, no cloud.
+A free, self-hosted daily check-in for six areas of your life.<br />
+No streaks, no points, no subscription, no cloud. A mirror, not a judge.
 
-**[Try the live demo](https://tombino104.github.io/PersonalOS/)** (made-up data, nothing leaves your browser)
+[![Release](https://img.shields.io/github/v/release/tombino104/PersonalOS?style=flat-square&color=2e2c29&label=release)](https://github.com/tombino104/PersonalOS/releases)
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-2e2c29?style=flat-square)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/tombino104/PersonalOS/ci.yml?branch=main&style=flat-square&label=tests)](https://github.com/tombino104/PersonalOS/actions/workflows/ci.yml)
+[![Live demo](https://img.shields.io/badge/live%20demo-try%20it%20now-b25a3f?style=flat-square)](https://tombino104.github.io/PersonalOS/)
+
+**[Live demo](https://tombino104.github.io/PersonalOS/)** · **[Run it](#run)** · **[Features](#features)** · **[Plugins](docs/plugins.md)** · **[Changelog](CHANGELOG.md)**
+
+<sub>The demo runs entirely in your browser with made-up data: nothing is sent anywhere.</sub>
+
+<br />
+
+<video src="https://github.com/tombino104/PersonalOS/raw/main/docs/media/personal-os.mp4" poster="docs/media/personal-os-poster.png" controls muted playsinline width="860">
+  <a href="docs/media/personal-os.mp4"><img src="docs/media/personal-os-preview.gif" alt="Personal OS in 8 seconds: ticking the evening questionnaire. Click to watch the 49-second film." width="860" /></a>
+</video>
+
+<sub>▶ <a href="docs/media/personal-os.mp4">Watch the 49-second film</a></sub>
+
+</div>
+
+## A closer look
 
 | | |
 | --- | --- |

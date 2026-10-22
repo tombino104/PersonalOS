@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <polygon id="ring" points="80.0,30.0 123.3,55.0 123.3,105.0 80.0,130.0 36.7,105.0 36.7,55.0" fill="none" stroke="#e3dccd" stroke-width="2"/>
+  <circle id="dot-physical" cx="80.0" cy="30.0" r="12" fill="#b25a3f"/>
+  <circle id="dot-discipline" cx="123.3" cy="55.0" r="12" fill="#946d1f"/>
+  <circle id="dot-social" cx="123.3" cy="105.0" r="12" fill="#a8586c"/>
+  <circle id="dot-intellect" cx="80.0" cy="130.0" r="12" fill="#4f7390"/>
+  <circle id="dot-career" cx="36.7" cy="105.0" r="12" fill="#587c57"/>
+  <circle id="dot-mindset" cx="36.7" cy="55.0" r="12" fill="#7662a0"/>
+  <circle id="core" cx="80" cy="80" r="7" fill="#2e2c29"/>
+</svg>
