@@ -123,6 +123,11 @@
   "dock.show": "Show {name} in the dock",
   "error.generic": "Something went wrong. Please try again.",
 
+  "export.button": "Download an export",
+  "export.failed": "The export could not be made. Please try again.",
+  "export.lede": "A zip with your activities, reports, scores and weekly notes as CSV files you can open in any spreadsheet, one JSON file with everything, the data of your plugins, and your journal as plain text.",
+  "export.note": "It is a copy for reading and moving your data, not a backup: to restore the app, use a backup. No password or setup code is inside.",
+  "export.title": "Export your data",
   "guide.account.body": "Settings > Account lets you change your password or log out. If you forget the password, the login page has a link to start over.\nStarting over erases all data for good and needs the setup code from the file setup-code.txt in the app's data folder. Afterwards the app begins again from the welcome screens. Make a backup first if you may want your data back.",
   "guide.account.title": "Account, password and erasing everything",
   "guide.activities.body": "In Settings > Activities you add, rename and archive your habits. Each belongs to one area, has a weight from 1 (a small step) to 3 (a big one) and the days of the week it applies to: a habit set only for Monday and Thursday shows up in the questionnaire only on those days.\nKeep the list short: a few habits per area that you can really keep. Add a short description if a habit needs a reminder of what counts: it shows under the name in the questionnaire. Archiving never deletes history. An archived habit can also be deleted: it then leaves your lists, while past reports keep it. Reports that can still be edited (today and yesterday) follow your changes when you open them; older days stay as they were.",

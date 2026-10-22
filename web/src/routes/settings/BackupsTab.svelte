@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import ExportCard from '../../components/ExportCard.svelte';
   import RestoreDialog from '../../components/RestoreDialog.svelte';
   import { ApiError, api } from '../../lib/api.js';
   import { locale, t } from '../../lib/i18n.svelte.js';
@@ -125,6 +126,8 @@
     <p class="error" role="alert">{failure}</p>
   {/if}
 </section>
+
+<ExportCard />
 
 <section class="card panel list" aria-label={t('backups.saved')}>
   <h2>{t('backups.saved')}</h2>

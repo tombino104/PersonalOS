@@ -184,6 +184,7 @@ describe('demo server', () => {
   it('turns off what a static demo cannot do', () => {
     const { call } = demo();
     expect(call('POST', '/backups').data.error.code).toBe('demo');
+    expect(call('GET', '/export').data.error.code).toBe('demo');
     expect(call('PUT', '/profile/photo').data.error.code).toBe('invalid_photo');
   });
 

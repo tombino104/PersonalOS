@@ -48,6 +48,21 @@ export function pluginRequest(pluginId, method, path, body) {
 const query = (params) => new URLSearchParams(params).toString();
 const range = (from, to) => `?${query({ from, to })}`;
 
+async function download(path) {
+  const response = await fetch(`/api/v1${path}`, { credentials: 'same-origin' });
+  if (!response.ok) {
+    let error = {};
+    try {
+      error = (await response.json()).error ?? {};
+    } catch {
+    }
+    throw new ApiError(response.status, error.code ?? 'error', error.message ?? response.statusText);
+  }
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const name = disposition.match(/filename="([^"]+)"/)?.[1] ?? 'personal-os-export.zip';
+  return { blob: await response.blob(), name };
+}
+
 export const api = {
   me: () => request('GET', '/auth/me'),
   authStatus: () => request('GET', '/auth/status'),
@@ -60,6 +75,7 @@ export const api = {
 
   settings: () => request('GET', '/settings'),
   updateSettings: (body) => request('PATCH', '/settings', body),
+  exportData: () => download('/export'),
   backups: () => request('GET', '/backups'),
   createBackup: () => request('POST', '/backups'),
   backupUrl: (name) => `/api/v1/backups/${name}`,

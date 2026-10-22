@@ -123,6 +123,11 @@
   "dock.show": "Mostra {name} nel dock",
   "error.generic": "Qualcosa è andato storto. Riprova.",
 
+  "export.button": "Scarica un'esportazione",
+  "export.failed": "Non è stato possibile creare l'esportazione. Riprova.",
+  "export.lede": "Uno zip con attività, report, punteggi e note settimanali in file CSV che apri con qualunque foglio di calcolo, un file JSON con tutto, i dati dei plugin e il tuo diario in testo semplice.",
+  "export.note": "È una copia per leggere e portare via i tuoi dati, non un backup: per ripristinare l'app usa un backup. Dentro non ci sono password né codice di configurazione.",
+  "export.title": "Esporta i tuoi dati",
   "guide.account.body": "Impostazioni > Account ti permette di cambiare la password o uscire. Se dimentichi la password, la pagina di accesso ha un link per ricominciare da capo.\nRicominciare cancella tutti i dati per sempre e richiede il codice di setup dal file setup-code.txt nella cartella dati dell'app. Poi l'app riparte dalle schermate di benvenuto. Fai prima un backup se pensi di volere i tuoi dati indietro.",
   "guide.account.title": "Account, password e cancellare tutto",
   "guide.activities.body": "In Impostazioni > Attività aggiungi, rinomini e archivi le tue abitudini. Ognuna appartiene a un ambito, ha un peso da 1 (un piccolo passo) a 3 (uno grande) e i giorni della settimana in cui vale: un'abitudine impostata solo per lunedì e giovedì compare nel questionario solo in quei giorni.\nTieni l'elenco corto: poche abitudini per ambito che puoi davvero mantenere. Aggiungi una breve descrizione se un'abitudine ha bisogno di un promemoria su cosa conta: compare sotto il nome nel questionario. Archiviare non cancella mai la storia. Un'abitudine archiviata si può anche eliminare: esce dai tuoi elenchi, mentre i report passati la tengono. I report ancora modificabili (oggi e ieri) seguono le tue modifiche quando li apri; i giorni più vecchi restano com'erano.",

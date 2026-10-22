@@ -24,6 +24,7 @@ PROTECTED = [
     ("POST", "/api/v1/reports/2026-10-20/sync"),
     ("POST", "/api/v1/reports/2026-10-20/complete"),
     ("GET", "/api/v1/scores"),
+    ("GET", "/api/v1/export"),
     ("GET", "/api/v1/reviews/2026-10-19"),
     ("PUT", "/api/v1/reviews/2026-10-19/note"),
     ("DELETE", "/api/v1/activities/1"),

@@ -397,6 +397,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
   protectedRoute('DELETE', '/profile/photo', () => ({ ...state.profile }));
 
   protectedRoute('GET', '/backups', () => ({ backups: [], keep: KEEP }));
+  protectedRoute('GET', '/export', unavailable);
   protectedRoute('POST', '/backups', unavailable);
   protectedRoute('POST', '/backups/restore', unavailable);
   protectedRoute('POST', '/backups/:name/restore', unavailable);
