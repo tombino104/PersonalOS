@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.16.1] - 2026-10-22
+
+### Changed
+- The locked questionnaire screen no longer offers a button to change the report time, and its text just says when the report opens. The time can still be changed in Settings > Activities. Closes #9.
+
 ## [0.16.0] - 2026-10-22
 
 ### Added
@@ -237,7 +242,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 ### Added
 - Initial project skeleton: README, PolyForm Noncommercial license, `.gitignore`, `.env.example`.
 
-[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/tombino104/PersonalOS/compare/v0.16.1...HEAD
+[0.16.1]: https://github.com/tombino104/PersonalOS/compare/v0.16.0...v0.16.1
 [0.16.0]: https://github.com/tombino104/PersonalOS/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/tombino104/PersonalOS/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/tombino104/PersonalOS/compare/v0.13.1...v0.14.0

@@ -115,9 +115,6 @@
       <h1 class="title">{t('questionnaire.lockedTitle')}</h1>
       <p class="lede">{t('questionnaire.locked', { time: opensAt })}</p>
     </header>
-    <div class="locked-actions">
-      <Link class="btn" href="/settings/activities">{t('questionnaire.lockedChange')}</Link>
-    </div>
   {:else if status === 'closed'}
     <header>
       <div class="eyebrow">{t('questionnaire.eyebrow')}</div>
@@ -207,11 +204,6 @@
 </div>
 
 <style>
-  .locked-actions {
-    display: flex;
-    gap: 12px;
-  }
-
   .groups {
     display: flex;
     flex-direction: column;
