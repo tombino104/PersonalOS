@@ -71,6 +71,8 @@ export const api = {
   removePhoto: () => request('DELETE', '/profile/photo'),
   photoUrl: (version) => `/api/v1/profile/photo?v=${encodeURIComponent(version ?? '')}`,
   today: () => request('GET', '/today'),
+  review: (weekStart) => request('GET', `/reviews/${weekStart}`),
+  saveReviewNote: (weekStart, text) => request('PUT', `/reviews/${weekStart}/note`, { text }),
   areas: () => request('GET', '/areas'),
 
   activities: (includeArchived = false) =>

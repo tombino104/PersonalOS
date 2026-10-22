@@ -8,6 +8,13 @@ const CORE_ITEMS = [
   { key: 'home', href: '/', icon: 'home', labelKey: 'nav.home', match: (path) => path === '/' },
   { key: 'stella', href: '/stella', icon: 'star', labelKey: 'nav.stella', match: (path) => path === '/stella' },
   {
+    key: 'review',
+    href: '/review',
+    icon: 'chart',
+    labelKey: 'nav.review',
+    match: (path) => path === '/review',
+  },
+  {
     key: 'questionnaire',
     href: '/questionnaire',
     icon: 'pencil',

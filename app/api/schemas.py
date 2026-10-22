@@ -73,6 +73,12 @@ class PasswordChange(BaseModel):
     new_password: Annotated[str, StringConstraints(max_length=2048)]
 
 
+class ReviewNote(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    text: Annotated[str, StringConstraints(max_length=5000)] | None
+
+
 class ReportOpen(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

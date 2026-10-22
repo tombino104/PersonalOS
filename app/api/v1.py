@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response
 from starlette.concurrency import run_in_threadpool
 
-from .. import __version__, activities, backup, reports, settings
+from .. import __version__, activities, backup, reports, review, settings
 from ..logical_day import logical_day
 from ..plugins.manifest import RESERVED_PATHS
 from . import backup_routes, profile_routes
@@ -19,6 +19,7 @@ from .schemas import (
     DoneUpdate,
     PluginActivation,
     PluginDataRemoval,
+    ReviewNote,
     ReflectionUpdate,
     ReportOpen,
     SettingsUpdate,
@@ -288,6 +289,28 @@ def get_scores(
 ) -> dict:
     start, end = _resolve_range(conn, now, start, end)
     return {"days": reports.scores_range(conn, user_id, start, end)}
+
+
+@router.get("/reviews/{week_start}")
+def get_review(
+    week_start: date,
+    conn: sqlite3.Connection = Depends(get_conn),
+    user_id: int = Depends(get_user_id),
+    now: datetime = Depends(get_now),
+) -> dict:
+    today = logical_day(now, settings.day_rules(conn))
+    return review.summary(conn, user_id, week_start, today)
+
+
+@router.put("/reviews/{week_start}/note")
+def put_review_note(
+    week_start: date,
+    body: ReviewNote,
+    conn: sqlite3.Connection = Depends(get_conn),
+    now: datetime = Depends(get_now),
+) -> dict:
+    today = logical_day(now, settings.day_rules(conn))
+    return {"note": review.save_note(conn, week_start, today, body.text, now)}
 
 
 @router.get("/settings")

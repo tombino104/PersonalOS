@@ -83,6 +83,7 @@ function freshState() {
     mood: new Map(),
     journal: [],
     nextEntryId: 1,
+    reviews: new Map(),
   };
 }
 
@@ -575,6 +576,74 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       (a, b) => order.get(a.area) - order.get(b.area) || a.activity_id - b.activity_id,
     );
     return { activities };
+  });
+
+  function checkWeek(weekStart) {
+    if (!isDay(weekStart) || weekdayOf(weekStart) !== 0) refuse(422, 'invalid_week', 'a week starts on a Monday');
+    if (weekStart > today()) refuse(422, 'future_week', 'that week has not started yet');
+  }
+
+  function averagesOf(start, end) {
+    const reports = completedIn(start, end);
+    return {
+      filled: reports.length,
+      areas: AREAS.map((area) => ({
+        area: area.slug,
+        average: mean(reports.map((report) => scoresOf(report).find((entry) => entry.area === area.slug).score)),
+      })),
+    };
+  }
+
+  protectedRoute('GET', '/reviews/:week', ({ params }) => {
+    const start = params.week;
+    checkWeek(start);
+    const end = addDays(start, 6);
+    const current = averagesOf(start, end);
+    const before = averagesOf(addDays(start, -7), addDays(start, -1));
+    const previous = Object.fromEntries(before.areas.map((item) => [item.area, item.average]));
+    const days = Array.from({ length: 7 }, (_, offset) => {
+      const day = addDays(start, offset);
+      const report = state.reports.get(day);
+      const completed = Boolean(report?.completedAt);
+      return {
+        day,
+        completed,
+        overall: completed ? mean(scoresOf(report).map((entry) => entry.score)) : null,
+        reflection: completed ? report.reflection : null,
+      };
+    });
+    const stats = new Map();
+    for (const report of completedIn(start, end)) {
+      for (const item of report.completions) {
+        const entry = stats.get(item.activity_id) ?? { activity_id: item.activity_id, done: 0, total: 0 };
+        const activity = state.activities.find((candidate) => candidate.id === item.activity_id);
+        Object.assign(entry, { name: item.name, weight: item.weight, area: item.area, archived: Boolean(activity?.archived_at) });
+        entry.done += item.done ? 1 : 0;
+        entry.total += 1;
+        stats.set(item.activity_id, entry);
+      }
+    }
+    const order = new Map(AREAS.map((area) => [area.slug, area.position]));
+    return {
+      week_start: start,
+      week_end: end,
+      is_current: start <= today() && today() <= end,
+      filled_days: current.filled,
+      previous_filled_days: before.filled,
+      days,
+      areas: current.areas.map((item) => ({ ...item, previous: previous[item.area] })),
+      activities: [...stats.values()].sort((a, b) => order.get(a.area) - order.get(b.area) || a.activity_id - b.activity_id),
+      note: state.reviews.get(start) ?? null,
+    };
+  });
+
+  protectedRoute('PUT', '/reviews/:week/note', ({ params, body }) => {
+    checkWeek(params.week);
+    if (!body || !('text' in body) || (body.text !== null && typeof body.text !== 'string') || (body.text ?? '').length > 5000) invalid();
+    const text = (body.text ?? '').trim() || null;
+    if (text === null) state.reviews.delete(params.week);
+    else state.reviews.set(params.week, text);
+    return { note: text };
   });
 
   protectedRoute('GET', '/plugins', () => ({ plugins: pluginList() }));

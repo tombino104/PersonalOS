@@ -124,6 +124,21 @@ describe('demo server', () => {
     expect(call('PATCH', `/activities/${free.id}`, { times_per_week: 9 }).status).toBe(422);
   });
 
+  it('summarizes a week and keeps a note for it', () => {
+    const { call } = demo();
+    const monday = addDays(TODAY, -2);
+    const week = call('GET', `/reviews/${monday}`).data;
+    expect(week.days).toHaveLength(7);
+    expect(week.areas).toHaveLength(6);
+    expect(week.is_current).toBe(true);
+    expect(week.filled_days).toBeGreaterThan(0);
+    expect(call('PUT', `/reviews/${monday}/note`, { text: ' Keep the mornings ' }).data).toEqual({ note: 'Keep the mornings' });
+    expect(call('GET', `/reviews/${monday}`).data.note).toBe('Keep the mornings');
+    expect(call('PUT', `/reviews/${monday}/note`, { text: '  ' }).data).toEqual({ note: null });
+    expect(call('GET', `/reviews/${addDays(monday, 1)}`).data.error.code).toBe('invalid_week');
+    expect(call('GET', `/reviews/${addDays(monday, 7)}`).data.error.code).toBe('future_week');
+  });
+
   it('syncs a draft with the current activities', () => {
     const { call } = demo();
     call('POST', '/reports', { day: TODAY });
