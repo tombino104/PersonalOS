@@ -20,9 +20,13 @@ No streaks, no points, no subscription, no cloud. A mirror, not a judge.
 
 <br />
 
-<a href="docs/media/personal-os.mp4"><img src="docs/media/personal-os-preview.gif" alt="Personal OS: ticking the evening questionnaire. Click to watch the 49-second film." width="780" /></a>
+</div>
 
-<sub>▶ <a href="docs/media/personal-os.mp4"><b>Watch the 49-second film</b></a></sub>
+https://github.com/user-attachments/assets/98feb118-1a01-480c-8f54-c3e1624246be
+
+<div align="center">
+
+<sub>The 49-second film. <a href="docs/media/personal-os.mp4">Download it</a>.</sub>
 
 </div>
 
