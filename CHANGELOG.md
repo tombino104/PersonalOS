@@ -5,6 +5,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-10-23
+
 ### Added
 - Evening reminder: Settings > Activities has an optional notification, one a day at a time you choose, sent only when the day's report is not finished. It is a web push with fixed text (never scores), so it works on an iPhone with the app added to the Home Screen (iOS 16.4+) over https. Each device is switched on separately, with a button to send a test. Settings `reminder_enabled` and `reminder_time`; `GET /api/v1/push`, `POST /api/v1/push/subscriptions`, `POST /api/v1/push/subscriptions/remove` and `POST /api/v1/push/test`. Adds the `cryptography` dependency to sign the push requests. Closes #10.
 
