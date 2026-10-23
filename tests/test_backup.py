@@ -246,12 +246,12 @@ def test_restoring_an_older_database_upgrades_its_schema(client, tmp_path):
     conn = sqlite3.connect(work)
     newest = conn.execute("SELECT MAX(version) FROM schema_migrations").fetchone()[0]
     conn.execute("DELETE FROM schema_migrations WHERE version = ?", (newest,))
-    conn.execute("DROP TABLE weekly_reviews")
+    conn.execute("DROP TABLE push_subscriptions")
     conn.commit()
     conn.close()
     response = client.post(
         f"{BACKUPS}/restore", params=CONFIRMED, content=make_zip({"personal_os.db": work.read_bytes()})
     )
     assert response.status_code == 200
-    assert query(tmp_path, "SELECT COUNT(*) AS d FROM weekly_reviews")[0]["d"] == 0
+    assert query(tmp_path, "SELECT COUNT(*) AS d FROM push_subscriptions")[0]["d"] == 0
     assert client.get("/api/v1/plugins").status_code == 200

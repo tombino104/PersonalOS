@@ -3,7 +3,7 @@ import logging
 import os
 from datetime import datetime, timezone
 
-from .. import backup, config, db, reports
+from .. import backup, config, db, push, reports
 from .registry import Registry
 
 logger = logging.getLogger("uvicorn.error")
@@ -17,6 +17,10 @@ def tick(registry: Registry, now: datetime) -> list[dict]:
             backup.run_scheduled(conn, now)
         except Exception:
             logger.exception("the scheduled backup failed")
+        try:
+            push.run_reminder(conn, now)
+        except Exception:
+            logger.exception("the evening reminder failed")
     finally:
         conn.close()
     for item in expired:

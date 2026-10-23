@@ -105,6 +105,8 @@ class SettingsUpdate(BaseModel):
     report_lock: bool | None = None
     report_time: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
     dock: Annotated[list[Annotated[str, StringConstraints(pattern=r"^[a-z0-9_]+(:[a-z0-9_]+)?$", max_length=80)]], Field(max_length=7)] | None = None
+    reminder_enabled: bool | None = None
+    reminder_time: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
     backup_auto: bool | None = None
     backup_time: Annotated[str, StringConstraints(pattern=r"^\d{2}:\d{2}$")] | None = None
     home_period: Literal["week", "month"] | None = None

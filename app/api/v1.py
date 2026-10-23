@@ -5,10 +5,10 @@ from zoneinfo import ZoneInfo
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response
 from starlette.concurrency import run_in_threadpool
 
-from .. import __version__, activities, backup, reports, review, settings
+from .. import __version__, activities, backup, push, reports, review, settings
 from ..logical_day import logical_day
 from ..plugins.manifest import RESERVED_PATHS
-from . import backup_routes, export_routes, profile_routes
+from . import backup_routes, export_routes, profile_routes, push_routes
 from .auth_routes import protected_router
 from .deps import get_conn, get_now, get_user_id, verify_origin
 from .errors import ApiError
@@ -32,6 +32,7 @@ router.include_router(protected_router)
 router.include_router(backup_routes.router)
 router.include_router(export_routes.router)
 router.include_router(profile_routes.router)
+router.include_router(push_routes.router)
 
 MAX_RANGE_DAYS = 366
 MAX_DOCK = 7
@@ -324,6 +325,8 @@ def get_settings(conn: sqlite3.Connection = Depends(get_conn)) -> dict:
         "report_time": settings.get(conn, "report_time", "20:00"),
         "backup_auto": backup.schedule(conn)["auto"],
         "backup_time": backup.schedule(conn)["time"],
+        "reminder_enabled": push.reminder(conn)["enabled"],
+        "reminder_time": push.reminder(conn)["time"],
         "home_period": settings.get(conn, "home_period", "week"),
         "home_areas": settings.get(conn, "home_areas", "all"),
         "theme": settings.get(conn, "theme"),
@@ -363,6 +366,14 @@ def update_settings(body: SettingsUpdate, conn: sqlite3.Connection = Depends(get
         except ValueError:
             raise ApiError(422, "invalid_backup_time", "expected a time like 03:00") from None
         settings.put(conn, "backup_time", changes["backup_time"])
+    if "reminder_time" in changes:
+        try:
+            time.fromisoformat(changes["reminder_time"])
+        except ValueError:
+            raise ApiError(422, "invalid_reminder_time", "expected a time like 21:00") from None
+        settings.put(conn, "reminder_time", changes["reminder_time"])
+    if "reminder_enabled" in changes:
+        settings.put(conn, "reminder_enabled", changes["reminder_enabled"])
     if "backup_auto" in changes:
         settings.put(conn, "backup_auto", changes["backup_auto"])
     if "dock" in changes:

@@ -258,6 +258,8 @@ def test_settings_roundtrip_and_validation(client):
         "backup_time": "03:00",
         "report_lock": False,
         "report_time": "20:00",
+        "reminder_enabled": False,
+        "reminder_time": "21:00",
         "home_period": "week",
         "home_areas": "all",
         "theme": None,

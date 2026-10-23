@@ -29,6 +29,12 @@ docker compose exec personal-os python -m app.cli reset-password
 
 To start from scratch, the login page has a "start over" link (also in Settings > Account): with the code from `data/setup-code.txt` it **erases all data**, and the app starts again from the welcome screens.
 
+## Evening reminder
+
+Settings > Activities has an optional reminder: one notification a day at the time you choose, only if the day's report is not finished yet. The message is fixed text and never shows a score. Each device switches it on by itself.
+
+It uses web push, so it needs an `https://` address (for example `tailscale serve`) and, on an iPhone, iOS 16.4 or later with Personal OS added to the Home Screen and opened from there. The server sends the notification through the push service of the browser or phone maker, with no message content; the keys are created on first use and stay in your database. If the app was off at the chosen time, a reminder up to three hours late is still sent, later ones are skipped.
+
 ## Backups
 
 Everything lives in the data folder, so a backup is a copy of it. The app also does it for you: a backup is made every day (at a time you choose, 03:00 by default; if the device was off, as soon as it is on again; the last 7 are kept) in `data/backups`. **Settings > Backups** lets you make one now and download it, or restore from a saved backup or an uploaded `.zip`. Before a restore the app backs up the current state first. Backups never contain the setup code.

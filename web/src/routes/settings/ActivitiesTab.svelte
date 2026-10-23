@@ -1,5 +1,6 @@
 <script>
   import ActivityDialog from '../../components/ActivityDialog.svelte';
+  import ReminderCard from '../../components/ReminderCard.svelte';
   import ReportTimeCard from '../../components/ReportTimeCard.svelte';
   import { api } from '../../lib/api.js';
   import { AREAS } from '../../lib/charts.js';
@@ -81,6 +82,10 @@
 </section>
 
 <ReportTimeCard />
+
+{#if !__DEMO__}
+  <ReminderCard />
+{/if}
 
 {#if dialogOpen}
   {#key editing?.id ?? `new-${defaultArea}`}

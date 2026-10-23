@@ -64,6 +64,8 @@ function freshState() {
       day_cutoff: '04:00',
       report_lock: false,
       report_time: '20:00',
+      reminder_enabled: false,
+      reminder_time: '21:00',
       backup_auto: true,
       backup_time: '03:00',
       home_period: 'week',
@@ -352,6 +354,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       ['day_cutoff', 'invalid_day_cutoff'],
       ['report_time', 'invalid_report_time'],
       ['backup_time', 'invalid_backup_time'],
+      ['reminder_time', 'invalid_reminder_time'],
     ]) {
       if (key in changes && !isTime(changes[key])) refuse(422, code, 'expected a time like 20:00');
     }
@@ -360,6 +363,8 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       'day_cutoff',
       'report_lock',
       'report_time',
+      'reminder_enabled',
+      'reminder_time',
       'backup_auto',
       'backup_time',
       'home_period',

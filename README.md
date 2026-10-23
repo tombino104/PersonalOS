@@ -73,7 +73,7 @@ More about running it (settings, password reset, command line): [docs/running.md
 - Light and dark theme, English and Italian
 - A dock you arrange yourself: up to seven pages, in the order you like
 - Backups and restore from Settings, export to CSV and JSON, a built-in guide
-- Installable on your phone like an app (PWA)
+- Installable on your phone like an app (PWA), with an optional evening reminder notification
 
 ## Develop
 

@@ -1,5 +1,6 @@
 import { api } from './api.js';
 import { i18n, setLanguage } from './i18n.svelte.js';
+import { syncText } from './reminder.js';
 import { setTheme, theme } from './theme.svelte.js';
 
 export async function syncAppearance() {
@@ -31,4 +32,5 @@ export function saveTheme(mode) {
 export function saveLanguage(language) {
   setLanguage(language);
   api.updateSettings({ language }).catch(() => {});
+  syncText();
 }

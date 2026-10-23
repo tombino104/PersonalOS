@@ -75,6 +75,10 @@ export const api = {
 
   settings: () => request('GET', '/settings'),
   updateSettings: (body) => request('PATCH', '/settings', body),
+  pushStatus: () => request('GET', '/push'),
+  pushSubscribe: (endpoint) => request('POST', '/push/subscriptions', { endpoint }),
+  pushUnsubscribe: (endpoint) => request('POST', '/push/subscriptions/remove', { endpoint }),
+  pushTest: () => request('POST', '/push/test'),
   exportData: () => download('/export'),
   backups: () => request('GET', '/backups'),
   createBackup: () => request('POST', '/backups'),
