@@ -24,12 +24,12 @@ For a new version: bump `version` and the image in `docker-compose.yml` (tag and
 
 ## Pull request text
 
-**Personal OS 0.17.0**
+**Personal OS 0.18.0**
 
 A personal growth app for one person: six life areas, a relative score and an evening questionnaire. It is a mirror, not a judge (no streaks, ranks or notifications tied to points). Built-in calendar, plugins, nightly backups and restore, English and Italian.
 
 - Upstream: https://github.com/tombino104/PersonalOS (AGPL-3.0)
-- Image: `ghcr.io/tombino104/personalos:0.17.0`, public, `linux/amd64` and `linux/arm64`, pinned by the digest of the multi-arch index, built by GitHub Actions from the tag.
+- Image: `ghcr.io/tombino104/personalos:0.18.0`, public, `linux/amd64` and `linux/arm64`, pinned by the digest of the multi-arch index, built by GitHub Actions from the tag.
 - Authentication: the umbrelOS login stays on. The app has its own account (one user) behind it; the first account is created in the browser with no default credentials and no code (`SETUP_CODE_REQUIRED=false`).
 - Data: everything is in `${APP_DATA_DIR}/data` (SQLite database and backups).
 - Permissions: no host access, no privileged mode, no extra ports.
