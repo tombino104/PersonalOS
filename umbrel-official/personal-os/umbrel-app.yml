@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.20.0"
+version: "0.21.0"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,7 +24,6 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  New: a Board view for the journal (entries as loose paper sheets) and an optional mood on every journal entry, which
-  counts in the mood tracker with less weight than the mood of the day.
+  New: an "On this day" card in the journal, showing what you wrote on the same day in earlier years.
 submitter: tombino104
 submission: ""
