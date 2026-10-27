@@ -557,19 +557,9 @@ textarea.field {
   to { opacity: 1; transform: none; }
 }
 
-@keyframes reveal {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
 @keyframes dock-rise {
   from { opacity: 0; transform: translateY(44px) scale(0.94); }
   to { opacity: 1; transform: none; }
-}
-
-@keyframes grow {
-  from { transform: scale(0.15); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: no-preference) {

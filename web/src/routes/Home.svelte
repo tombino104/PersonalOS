@@ -4,9 +4,10 @@
   import Icon from '../components/Icon.svelte';
   import Link from '../components/Link.svelte';
   import { api } from '../lib/api.js';
-  import { AREAS, buildHeatGrid, trendGeometry } from '../lib/charts.js';
+  import { AREAS, buildHeatGrid, easeInOut, trendFrame, trendGeometry } from '../lib/charts.js';
   import { addDays, formatDate, lastDays } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
+  import { playProgress } from '../lib/motion.js';
   import { widgets } from '../lib/plugins.svelte.js';
 
   let status = $state('loading');
@@ -86,6 +87,16 @@
     }),
   );
   const visible = $derived(threeOnly ? trends.slice(trioPage * 3, trioPage * 3 + 3) : trends);
+
+  let progress = $state(0);
+
+  $effect(() => {
+    if (status !== 'ready') return;
+    period;
+    threeOnly;
+    trioPage;
+    return playProgress((value) => (progress = easeInOut(value)), { delay: 350 });
+  });
   const todayOverall = $derived(scoreByDay[today]?.overall ?? null);
   const heat = $derived(
     today
@@ -183,6 +194,7 @@
 
       <div class="trend-grid">
         {#each visible as trend (trend.area)}
+          {@const frame = trendFrame(trend.geometry, progress)}
           <div class="card trend rise" data-area={trend.area}>
             <div class="trend-head">
               <div class="trend-name">
@@ -203,11 +215,13 @@
               })}
             >
               <line x1="8" y1="57" x2="296" y2="57" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 6" />
-              <path d={trend.geometry.area} fill="url(#hatch-{trend.area})" />
-              <path class="line" d={trend.geometry.line} />
+              <path d={frame.area} fill="url(#hatch-{trend.area})" />
+              <path class="line" d={frame.line} />
               <path d="M8 6 V100 H296" fill="none" stroke="var(--ink-3)" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" />
-              {#each trend.geometry.points as point}
-                <circle cx={point.x} cy={point.y} r={period === 'month' ? 2.5 : 4} fill="var(--area)" stroke="var(--surface)" stroke-width="1.5" />
+              {#each trend.geometry.points as point, index}
+                {#if frame.scales[index] > 0}
+                  <circle cx={point.x} cy={point.y} r={(period === 'month' ? 2.5 : 4) * frame.scales[index]} fill="var(--area)" stroke="var(--surface)" stroke-width="1.5" />
+                {/if}
               {/each}
             </svg>
             <div class="range muted"><span>{rangeStart}</span><span>{rangeEnd}</span></div>
@@ -359,14 +373,6 @@
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .line {
-      transform-box: view-box;
-      transform-origin: 8px 0;
-      animation: reveal 1.1s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
-    }
   }
 
   .range {

@@ -9,7 +9,6 @@
   let note = $state('');
   let saved = $state(false);
   let failed = $state(false);
-  let timer = null;
 
   onMount(async () => {
     try {
@@ -25,7 +24,7 @@
     try {
       await pluginRequest('mood', 'PUT', `/entries/${day}`, {
         value,
-        note: note.trim() === '' ? null : note,
+        note: note === '' ? null : note,
       });
       saved = true;
       failed = false;
@@ -37,14 +36,7 @@
   function choose(level) {
     value = value === level ? null : level;
     saved = false;
-    if (timer) clearTimeout(timer);
     save();
-  }
-
-  function schedule() {
-    saved = false;
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(save, 700);
   }
 </script>
 
@@ -67,18 +59,6 @@
   {/each}
 </div>
 <div class="ends muted"><span>{t('plugin.mood.low')}</span><span>{t('plugin.mood.high')}</span></div>
-
-<label class="label" for="mood-note">{t('plugin.mood.noteLabel')}</label>
-<textarea
-  id="mood-note"
-  class="field"
-  rows="2"
-  maxlength="300"
-  placeholder={t('plugin.mood.notePlaceholder')}
-  disabled={!editable}
-  bind:value={note}
-  oninput={schedule}
-></textarea>
 {#if failed}
   <p class="error" role="alert">{t('error.generic')}</p>
 {/if}
@@ -130,7 +110,7 @@
   .ends {
     display: flex;
     justify-content: space-between;
-    margin: 8px 2px 16px;
+    margin: 8px 2px 0;
     font: 400 12px/1 var(--sans);
   }
 </style>

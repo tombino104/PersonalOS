@@ -6,8 +6,6 @@
   "levelLabel": "Mood {level} out of 5",
   "low": "lower",
   "high": "higher",
-  "noteLabel": "A note, if you like",
-  "notePlaceholder": "A few words",
   "noteTitle": "A note",
   "eyebrow": "Plugin · Mood tracker",
   "heading": "How you",

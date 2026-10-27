@@ -5,6 +5,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-10-27
+
+### Changed
+- Home trends and the star now draw themselves point by point: the line grows from one point to the next with the hatched area following it, and each dot pops in as the line reaches it (the star closes its outline corner by corner). The old sweep from the left is gone. With reduced motion the charts appear at once.
+
+### Removed
+- Mood: the free-text note field under the mood scale in the evening report. Notes already saved stay and are still shown; changing the mood keeps them.
+
 ## [0.22.0] - 2026-10-27
 
 ### Added

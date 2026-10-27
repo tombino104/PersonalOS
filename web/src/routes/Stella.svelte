@@ -1,9 +1,10 @@
 <script>
   import { onMount } from 'svelte';
   import { api } from '../lib/api.js';
-  import { AREAS, radarAxes, radarLabel, radarPoint, radarPolygon, radarRings } from '../lib/charts.js';
+  import { AREAS, easeInOut, radarAxes, radarFrame, radarLabel, radarPoint, radarRings } from '../lib/charts.js';
   import { addDays } from '../lib/dates.js';
   import { has, t } from '../lib/i18n.svelte.js';
+  import { playProgress } from '../lib/motion.js';
 
   let today = $state('');
   let firstDay = $state(null);
@@ -62,8 +63,16 @@
       ? t('stella.reading', { high: t(`area.${highest}`), low: t(`area.${lowest}`) })
       : t('stella.readingEmpty'),
   );
-  const currentPolygon = $derived(radarPolygon(AREAS.map((area) => current[area])));
-  const previousPolygon = $derived(radarPolygon(AREAS.map((area) => previous[area])));
+  let progress = $state(0);
+  const currentFrame = $derived(radarFrame(AREAS.map((area) => current[area]), progress));
+  const previousFrame = $derived(radarFrame(AREAS.map((area) => previous[area]), progress));
+
+  $effect(() => {
+    if (status !== 'ready') return;
+    current;
+    previous;
+    return playProgress((value) => (progress = easeInOut(value)), { delay: 250 });
+  });
   const rings = radarRings();
   const axes = radarAxes();
   const selectedStats = $derived(stats.filter((entry) => entry.area === selected && !entry.archived));
@@ -97,13 +106,16 @@
             <line x1="230" y1="230" x2={axis.x2} y2={axis.y2} stroke="var(--line)" stroke-width="1" />
           {/each}
           {#if period !== 0}
-            <polygon class="shape later" points={previousPolygon} fill="none" stroke="var(--ink-3)" stroke-width="1.25" stroke-dasharray="4 4" stroke-linejoin="round" />
+            <polyline points={previousFrame.outline} fill="none" stroke="var(--ink-3)" stroke-width="1.25" stroke-dasharray="4 4" stroke-linejoin="round" />
           {/if}
-          <polygon class="shape" points={currentPolygon} fill="var(--ink)" fill-opacity="0.09" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" />
+          <polygon points={currentFrame.outline} fill="var(--ink)" fill-opacity="0.09" />
+          <polyline points={currentFrame.outline} fill="none" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" />
           {#each AREAS as area, index}
             {@const point = radarPoint(index, current[area] ?? 0)}
             {@const label = radarLabel(index)}
-            <circle cx={point[0].toFixed(1)} cy={point[1].toFixed(1)} r={selected === area ? 7 : 4.5} fill="var(--area-{area})" stroke="var(--surface)" stroke-width="2" />
+            {#if currentFrame.scales[index] > 0}
+              <circle cx={point[0].toFixed(1)} cy={point[1].toFixed(1)} r={(selected === area ? 7 : 4.5) * currentFrame.scales[index]} fill="var(--area-{area})" stroke="var(--surface)" stroke-width="2" />
+            {/if}
             <text x={label.x} y={label.y} text-anchor={label.anchor} dominant-baseline="middle" class="axis-label">{t(`area.${area}`)}</text>
           {/each}
         </svg>
@@ -214,18 +226,6 @@
 
   .legend i.dashed {
     border-top: 1.5px dashed var(--ink-3);
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .shape {
-      transform-box: fill-box;
-      transform-origin: 50% 50%;
-      animation: grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s 1 both;
-    }
-
-    .shape.later {
-      animation-delay: 0.25s;
-    }
   }
 
   .side {
