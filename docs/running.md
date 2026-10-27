@@ -33,7 +33,15 @@ To start from scratch, the login page has a "start over" link (also in Settings 
 
 Settings > Activities has an optional reminder: one notification a day at the time you choose, only if the day's report is not finished yet. The message is fixed text and never shows a score. Each device switches it on by itself.
 
-It uses web push, so it needs an `https://` address (for example `tailscale serve`) and, on an iPhone, iOS 16.4 or later with Personal OS added to the Home Screen and opened from there. The server sends the notification through the push service of the browser or phone maker, with no message content; the keys are created on first use and stay in your database. If the app was off at the chosen time, a reminder up to three hours late is still sent, later ones are skipped.
+It uses web push, so it needs an `https://` address (for example `tailscale serve`) and, on an iPhone, iOS 16.4 or later with Personal OS added to the Home Screen and opened from there. The server sends the notification through the push service of the browser or phone maker, with no message content; the keys are created on first use and stay in your database. To get an `https://` address on a private network, turn on MagicDNS and HTTPS Certificates in the Tailscale admin console, then on the machine that runs the app:
+
+```bash
+tailscale serve --bg http://127.0.0.1:<port of the app>
+```
+
+Open the `https://<machine>.<tailnet>.ts.net` address it prints. If saving settings fails with "request origin not allowed", add that address to `ALLOWED_ORIGINS`.
+
+If the app was off at the chosen time, a reminder up to three hours late is still sent, later ones are skipped.
 
 ## Backups
 

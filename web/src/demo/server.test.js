@@ -20,7 +20,7 @@ describe('demo server', () => {
   it('starts signed in with a few months of history', () => {
     const { call } = demo();
     expect(call('GET', '/auth/me').data).toEqual({ name: 'Demo' });
-    expect(call('GET', '/today').data).toEqual({ day: TODAY, report_opens_at: null });
+    expect(call('GET', '/today').data).toEqual({ day: TODAY, report_opens_at: null, first_day: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/) });
     const scores = call('GET', '/scores').data.days;
     expect(scores.length).toBeGreaterThan(50);
     expect(scores.every((day) => day.areas.length === 6)).toBe(true);

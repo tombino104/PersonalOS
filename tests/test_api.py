@@ -313,11 +313,11 @@ def test_reports_belong_to_the_logged_in_user(client, tmp_path):
 
 
 def test_today_follows_the_day_cutoff(client, clock):
-    assert client.get("/api/v1/today").json() == {"day": "2026-10-20", "report_opens_at": None}
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-20", "report_opens_at": None, "first_day": None}
     clock.now = datetime(2026, 10, 21, 1, 30, tzinfo=timezone.utc)
-    assert client.get("/api/v1/today").json() == {"day": "2026-10-20", "report_opens_at": None}
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-20", "report_opens_at": None, "first_day": None}
     clock.now = datetime(2026, 10, 21, 2, 0, tzinfo=timezone.utc)
-    assert client.get("/api/v1/today").json() == {"day": "2026-10-21", "report_opens_at": None}
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-21", "report_opens_at": None, "first_day": None}
 
 
 def test_overall_and_stats_over_the_api(client):
@@ -345,3 +345,13 @@ def test_stats_validate_the_range(client):
     for path in ("/api/v1/stats/areas", "/api/v1/stats/activities"):
         response = client.get(path, params={"from": "2026-10-20", "to": "2026-10-01"})
         assert (response.status_code, response.json()["error"]["code"]) == (422, "invalid_range")
+
+
+def test_today_reports_the_first_completed_day_and_stats_cover_years(client, clock):
+    clock.now = datetime(2026, 10, 20, 20, 0, tzinfo=timezone.utc)
+    client.post("/api/v1/reports", json={"day": "2026-10-20"})
+    client.post("/api/v1/reports/2026-10-20/complete")
+    assert client.get("/api/v1/today").json()["first_day"] == "2026-10-20"
+    assert client.get("/api/v1/stats/areas", params={"from": "2022-01-01", "to": "2026-10-20"}).status_code == 200
+    assert client.get("/api/v1/stats/activities", params={"from": "2022-01-01", "to": "2026-10-20"}).status_code == 200
+    assert client.get("/api/v1/scores", params={"from": "2022-01-01", "to": "2026-10-20"}).status_code == 422

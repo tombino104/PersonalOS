@@ -5,6 +5,14 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-10-27
+
+### Added
+- Star: an "All time" view next to the last 7 and 30 days, covering every day since the first completed report (there is no earlier period to compare it with). `GET /api/v1/today` now carries `first_day`, and the statistics endpoints accept ranges of up to ten years. Closes #11.
+
+### Changed
+- The evening reminder card now says why notifications are unavailable: page opened over plain http, iPhone app not added to the Home Screen, or browser without push. The Tailscale Serve steps are in the running guide. Refs #12.
+
 ## [0.18.0] - 2026-10-23
 
 ### Added

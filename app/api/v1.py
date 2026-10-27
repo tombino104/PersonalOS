@@ -35,19 +35,24 @@ router.include_router(profile_routes.router)
 router.include_router(push_routes.router)
 
 MAX_RANGE_DAYS = 366
+MAX_STATS_RANGE_DAYS = 3660
 MAX_DOCK = 7
 DEFAULT_RANGE_DAYS = 90
 
 
 def _resolve_range(
-    conn: sqlite3.Connection, now: datetime, start: date | None, end: date | None
+    conn: sqlite3.Connection,
+    now: datetime,
+    start: date | None,
+    end: date | None,
+    limit: int = MAX_RANGE_DAYS,
 ) -> tuple[date, date]:
     end = end or logical_day(now, settings.day_rules(conn))
     start = start or end - timedelta(days=DEFAULT_RANGE_DAYS - 1)
     if start > end:
         raise ApiError(422, "invalid_range", "'from' must not be after 'to'")
-    if (end - start).days >= MAX_RANGE_DAYS:
-        raise ApiError(422, "invalid_range", f"range cannot exceed {MAX_RANGE_DAYS} days")
+    if (end - start).days >= limit:
+        raise ApiError(422, "invalid_range", f"range cannot exceed {limit} days")
     return start, end
 
 
@@ -81,14 +86,18 @@ def info() -> dict:
 
 @router.get("/today")
 def today(
-    conn: sqlite3.Connection = Depends(get_conn), now: datetime = Depends(get_now)
+    conn: sqlite3.Connection = Depends(get_conn),
+    user_id: int = Depends(get_user_id),
+    now: datetime = Depends(get_now),
 ) -> dict:
     day = logical_day(now, settings.day_rules(conn))
     moment = reports.opens_at(conn, day)
     locked = moment is not None and now < moment
+    first = reports.first_day(conn, user_id)
     return {
         "day": day.isoformat(),
         "report_opens_at": moment.strftime("%H:%M") if locked else None,
+        "first_day": None if first is None else first.isoformat(),
     }
 
 
@@ -100,7 +109,7 @@ def area_stats(
     user_id: int = Depends(get_user_id),
     now: datetime = Depends(get_now),
 ) -> dict:
-    start, end = _resolve_range(conn, now, start, end)
+    start, end = _resolve_range(conn, now, start, end, MAX_STATS_RANGE_DAYS)
     return reports.area_averages(conn, user_id, start, end)
 
 
@@ -112,7 +121,7 @@ def activity_stats(
     user_id: int = Depends(get_user_id),
     now: datetime = Depends(get_now),
 ) -> dict:
-    start, end = _resolve_range(conn, now, start, end)
+    start, end = _resolve_range(conn, now, start, end, MAX_STATS_RANGE_DAYS)
     return {"activities": reports.activity_stats(conn, user_id, start, end)}
 
 

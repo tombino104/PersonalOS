@@ -370,6 +370,14 @@ def sync_draft(conn: sqlite3.Connection, report_id: int, now: datetime) -> None:
             _write_scores(conn, report_id)
 
 
+def first_day(conn: sqlite3.Connection, user_id: int) -> date | None:
+    row = conn.execute(
+        "SELECT MIN(day) AS day FROM reports WHERE user_id = ? AND completed_at IS NOT NULL",
+        (user_id,),
+    ).fetchone()
+    return None if row["day"] is None else date.fromisoformat(row["day"])
+
+
 def area_averages(conn: sqlite3.Connection, user_id: int, start: date, end: date) -> dict:
     per_area: dict[str, list[float | None]] = {
         row["slug"]: [] for row in conn.execute("SELECT slug FROM areas ORDER BY position")

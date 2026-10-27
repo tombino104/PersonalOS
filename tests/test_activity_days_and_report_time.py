@@ -120,7 +120,7 @@ def test_before_the_time_today_s_report_cannot_be_opened_or_changed(client, cloc
     lock(client, "22:30")
     clock.now = utc(2026, 10, 20, 15, 0)
     today = client.get("/api/v1/today").json()
-    assert today == {"day": "2026-10-20", "report_opens_at": "22:30"}
+    assert today == {"day": "2026-10-20", "report_opens_at": "22:30", "first_day": None}
     refused = client.post("/api/v1/reports", json={"day": TUESDAY})
     assert (refused.status_code, refused.json()["error"]["code"]) == (409, "report_not_open")
     assert "22:30" in refused.json()["error"]["message"]
@@ -153,7 +153,7 @@ def test_yesterday_stays_editable_and_early_morning_counts_as_after_the_time(cli
     client.post("/api/v1/reports", json={"day": TUESDAY})
     clock.now = utc(2026, 10, 21, 8, 0)
     first = client.get(ACTIVITIES).json()["activities"][0]
-    assert client.get("/api/v1/today").json() == {"day": "2026-10-21", "report_opens_at": "20:00"}
+    assert client.get("/api/v1/today").json() == {"day": "2026-10-21", "report_opens_at": "20:00", "first_day": None}
     done = client.put(f"/api/v1/reports/{TUESDAY}/completions/{first['id']}", json={"done": True})
     assert done.status_code == 200
     clock.now = utc(2026, 10, 21, 1, 0)

@@ -15,6 +15,7 @@ import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory, seedJ
 const manifests = import.meta.glob('../../../plugins/*/manifest.json', { eager: true, import: 'default' });
 
 const MAX_RANGE_DAYS = 366;
+const MAX_STATS_RANGE_DAYS = 3660;
 const DEFAULT_RANGE_DAYS = 90;
 const SOFT_LIMIT_PER_AREA = 5;
 const CATEGORIES = ['personal', 'work', 'study', 'health', 'social', 'other'];
@@ -211,13 +212,13 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     };
   }
 
-  function range(query) {
+  function range(query, limit = MAX_RANGE_DAYS) {
     const end = query.get('to') ?? today();
     const start = query.get('from') ?? addDays(end, -(DEFAULT_RANGE_DAYS - 1));
     if (!isDay(start) || !isDay(end)) invalid();
     if (start > end) refuse(422, 'invalid_range', "'from' must not be after 'to'");
-    if (daysBetween(start, end) >= MAX_RANGE_DAYS) {
-      refuse(422, 'invalid_range', `range cannot exceed ${MAX_RANGE_DAYS} days`);
+    if (daysBetween(start, end) >= limit) {
+      refuse(422, 'invalid_range', `range cannot exceed ${limit} days`);
     }
     return [start, end];
   }
@@ -338,7 +339,8 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const day = today();
     const moment = opensAt(day);
     const locked = moment !== null && now() < moment;
-    return { day, report_opens_at: locked ? clock(moment) : null };
+    const first = [...state.reports.values()].filter((report) => report.completedAt).map((report) => report.day).sort()[0];
+    return { day, report_opens_at: locked ? clock(moment) : null, first_day: first ?? null };
   });
 
   protectedRoute('GET', '/areas', () => ({ areas: AREAS.map((area) => ({ ...area })) }));
@@ -548,7 +550,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
   });
 
   protectedRoute('GET', '/stats/areas', ({ query }) => {
-    const [start, end] = range(query);
+    const [start, end] = range(query, MAX_STATS_RANGE_DAYS);
     const reports = completedIn(start, end);
     return {
       filled_days: reports.length,
@@ -560,7 +562,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
   });
 
   protectedRoute('GET', '/stats/activities', ({ query }) => {
-    const [start, end] = range(query);
+    const [start, end] = range(query, MAX_STATS_RANGE_DAYS);
     const stats = new Map();
     for (const report of completedIn(start, end)) {
       for (const item of report.completions) {

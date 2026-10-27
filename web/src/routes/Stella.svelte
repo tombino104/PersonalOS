@@ -6,6 +6,7 @@
   import { has, t } from '../lib/i18n.svelte.js';
 
   let today = $state('');
+  let firstDay = $state(null);
   let period = $state(7);
   let selected = $state('physical');
   let current = $state({});
@@ -17,7 +18,9 @@
 
   onMount(async () => {
     try {
-      today = (await api.today()).day;
+      const info = await api.today();
+      today = info.day;
+      firstDay = info.first_day;
     } catch {
       status = 'error';
     }
@@ -26,12 +29,13 @@
   $effect(() => {
     if (!today) return;
     const days = period;
-    const start = addDays(today, -(days - 1));
+    const everything = days === 0;
+    const start = everything ? (firstDay ?? today) : addDays(today, -(days - 1));
     const previousEnd = addDays(start, -1);
     const previousStart = addDays(previousEnd, -(days - 1));
     Promise.all([
       api.areaStats(start, today),
-      api.areaStats(previousStart, previousEnd),
+      everything ? Promise.resolve({ areas: [] }) : api.areaStats(previousStart, previousEnd),
       api.activityStats(start, today),
     ])
       .then(([now, before, activities]) => {
@@ -76,6 +80,7 @@
     <div class="segmented" role="group" aria-label={t('home.period')}>
       <button class="seg" class:on={period === 7} aria-pressed={period === 7} onclick={() => (period = 7)}>{t('stella.days7')}</button>
       <button class="seg" class:on={period === 30} aria-pressed={period === 30} onclick={() => (period = 30)}>{t('stella.days30')}</button>
+      <button class="seg" class:on={period === 0} aria-pressed={period === 0} onclick={() => (period = 0)}>{t('stella.daysAll')}</button>
     </div>
   </header>
 
@@ -91,7 +96,9 @@
           {#each axes as axis}
             <line x1="230" y1="230" x2={axis.x2} y2={axis.y2} stroke="var(--line)" stroke-width="1" />
           {/each}
-          <polygon class="shape later" points={previousPolygon} fill="none" stroke="var(--ink-3)" stroke-width="1.25" stroke-dasharray="4 4" stroke-linejoin="round" />
+          {#if period !== 0}
+            <polygon class="shape later" points={previousPolygon} fill="none" stroke="var(--ink-3)" stroke-width="1.25" stroke-dasharray="4 4" stroke-linejoin="round" />
+          {/if}
           <polygon class="shape" points={currentPolygon} fill="var(--ink)" fill-opacity="0.09" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round" />
           {#each AREAS as area, index}
             {@const point = radarPoint(index, current[area] ?? 0)}
@@ -101,8 +108,10 @@
           {/each}
         </svg>
         <div class="legend muted">
-          <span><i class="solid"></i>{t('stella.current', { days: period })}</span>
-          <span><i class="dashed"></i>{t('stella.previous', { days: period })}</span>
+          <span><i class="solid"></i>{period === 0 ? t('stella.currentAll') : t('stella.current', { days: period })}</span>
+          {#if period !== 0}
+            <span><i class="dashed"></i>{t('stella.previous', { days: period })}</span>
+          {/if}
         </div>
       </section>
 

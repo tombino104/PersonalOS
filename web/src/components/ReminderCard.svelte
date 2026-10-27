@@ -2,9 +2,10 @@
   import { onMount } from 'svelte';
   import { api } from '../lib/api.js';
   import { t } from '../lib/i18n.svelte.js';
-  import { currentSubscription, disableDevice, enableDevice, supported, syncText } from '../lib/reminder.js';
+  import { blocker, currentSubscription, disableDevice, enableDevice, supported, syncText } from '../lib/reminder.js';
 
   const available = supported();
+  const blocked = blocker();
   let on = $state(false);
   let at = $state('21:00');
   let busy = $state(false);
@@ -78,7 +79,7 @@
     {/if}
     <p class="muted note">{t('reminder.note')}</p>
   {:else}
-    <p class="muted note">{t('reminder.unsupported')}</p>
+    <p class="muted note">{t(`reminder.${blocked ?? 'unsupported'}`)}</p>
   {/if}
   {#if message}
     <p class="muted note" role="status">{message}</p>

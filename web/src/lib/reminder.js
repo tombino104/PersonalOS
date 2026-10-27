@@ -14,6 +14,14 @@ export function supported() {
   );
 }
 
+export function blocker() {
+  if (typeof window === 'undefined') return null;
+  if (!window.isSecureContext) return 'insecure';
+  if (supported()) return null;
+  const apple = /iPhone|iPad|iPod/.test(navigator.userAgent);
+  return apple && !navigator.standalone ? 'install' : 'unsupported';
+}
+
 export function keyBytes(value) {
   const padded = value + '='.repeat((4 - (value.length % 4)) % 4);
   const raw = atob(padded.replace(/-/g, '+').replace(/_/g, '/'));
