@@ -2,7 +2,7 @@ manifestVersion: 1
 id: tombino104-personal-os
 category: productivity
 name: Personal OS
-version: "0.18.0"
+version: "0.19.0"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -28,6 +28,5 @@ gallery:
   - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
-  New: an optional evening reminder notification (one a day, at the time you choose, never showing scores). It works on
-  an iPhone with the app added to the Home Screen, over https.
+  New: an "All time" view in the Star page, and clearer help when evening reminder notifications are unavailable.
 submitter: tombino104
