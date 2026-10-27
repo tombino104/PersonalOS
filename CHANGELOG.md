@@ -5,6 +5,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-10-27
+
+### Added
+- Health plugin: one step count per day, sent from your phone and shown as a mirror (More > Health). It never enters your scores and never ticks an activity. A day keeps the highest count received. It accepts `{"steps": N}`, a list of days, or the export format of the Health Auto Export app. See `docs/health.md`.
+- Tokens for devices: `GET/POST /api/v1/tokens` and `DELETE /api/v1/tokens/{id}`. A token belongs to one plugin, can only write, is shown once (only its hash is stored) and can be revoked. Devices post to `POST /api/v1/ingest/{plugin}` with `Authorization: Bearer <token>` or `X-Api-Key`; the body is limited to 1 MB.
+- Plugins: the `ingest` permission and the `api.ingest` handler, for plugins that receive data from outside. See `docs/plugins.md`.
+
 ## [0.21.0] - 2026-10-27
 
 ### Added

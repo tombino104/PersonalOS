@@ -1,0 +1,17 @@
+{
+  "id": "health",
+  "name": "Health",
+  "version": "0.1.0",
+  "description": "Daily steps sent from your phone, shown as a mirror. It never enters your scores and never ticks anything for you.",
+  "core_api": "1.x",
+  "permissions": ["ui_panel", "api_routes", "ingest"],
+  "adds": {
+    "pages": ["steps"],
+    "entries": [
+      { "id": "health", "label": "Health", "icon": "heart", "placement": "more", "page": "steps" }
+    ]
+  },
+  "listens": [],
+  "emits": [],
+  "migrations": "backend/migrations"
+}

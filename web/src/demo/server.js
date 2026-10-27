@@ -10,7 +10,7 @@ import {
   occurrences,
   weekdayOf,
 } from './dates.js';
-import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory, seedJournal } from './seed.js';
+import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory, seedJournal, seedSteps } from './seed.js';
 
 const manifests = import.meta.glob('../../../plugins/*/manifest.json', { eager: true, import: 'default' });
 
@@ -87,6 +87,7 @@ function freshState() {
     nextEventId: 1,
     mood: new Map(),
     journal: [],
+    steps: new Map(),
     nextEntryId: 1,
     reviews: new Map(),
   };
@@ -133,6 +134,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     seedHistory(state, current);
     seedEvents(state, current);
     seedJournal(state, current);
+    seedSteps(state, current);
   }
 
   function blank() {
@@ -683,6 +685,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     if (params.id === 'calendar') state.events = [];
     if (params.id === 'mood') state.mood = new Map();
     if (params.id === 'journal') state.journal = [];
+    if (params.id === 'health') state.steps = new Map();
     return { plugins: pluginList() };
   });
 
@@ -814,6 +817,16 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const entry = entryOf(params.id);
     state.journal = state.journal.filter((candidate) => candidate !== entry);
     return { ok: true };
+  });
+
+  guarded('health', 'GET', '/days', ({ query }) => {
+    const limit = Number(query.get('limit') ?? 60);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 400) invalid();
+    const days = [...state.steps.entries()]
+      .sort(([a], [b]) => (a < b ? 1 : -1))
+      .slice(0, limit)
+      .map(([day, steps]) => ({ day, steps }));
+    return { days };
   });
 
   guarded('mood', 'GET', '/entries/:day', ({ params }) => {

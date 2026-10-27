@@ -35,6 +35,7 @@ export const icons = {
     path('M4 10h16M9 3v4M15 3v4'),
   ],
   book: [path('M5 5.5a2 2 0 0 1 2-2h11v14H7a2 2 0 0 0-2 2z'), path('M5 19.5a2 2 0 0 0 2 2h11v-4')],
+  heart: [path('M12 20s-7.5-4.6-7.5-10.2A4.1 4.1 0 0 1 12 7.6a4.1 4.1 0 0 1 7.5 2.2C19.5 15.4 12 20 12 20z')],
   bell: [path('M6 16v-5a6 6 0 1 1 12 0v5l1.5 2h-15z'), path('M10 20a2 2 0 0 0 4 0')],
   plug: [path('M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0z'), path('M12 16v5')],
 };

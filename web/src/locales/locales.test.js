@@ -61,6 +61,7 @@ describe('dynamic keys', () => {
       'ui_panel',
       'api_routes',
       'listen_events',
+      'ingest',
       'request_reminder',
     ];
     for (const state of states) expect(en[`plugins.state.${state}`], state).toBeTruthy();

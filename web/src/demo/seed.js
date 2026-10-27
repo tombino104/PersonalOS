@@ -223,6 +223,14 @@ export function seedJournal(state, today) {
   }
 }
 
+const STEPS = [8400, 10250, 6120, 9340, 11780, 4980, 7210, 10890, 9020, 12400, 5530, 8760, 9610, 7340];
+
+export function seedSteps(state, today) {
+  STEPS.forEach((steps, index) => {
+    state.steps.set(addDays(today, -(index + 1)), steps);
+  });
+}
+
 export function seedEvents(state, today) {
   for (const event of EVENTS) {
     state.events.push({

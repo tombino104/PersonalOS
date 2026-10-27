@@ -251,6 +251,7 @@
   "onboarding.welcome.title": "A quiet place for your days.",
 
   "permission.api_routes": "Provide its own API routes",
+  "permission.ingest": "Receive data sent from your devices, with a token you can revoke",
   "permission.listen_events": "React to events (a completed report, a new activity)",
   "permission.questionnaire_block": "Add a block to the evening questionnaire",
   "permission.read_activities": "Read your activities",

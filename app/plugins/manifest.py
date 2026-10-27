@@ -14,6 +14,7 @@ PERMISSIONS = frozenset(
         "ui_panel",
         "api_routes",
         "listen_events",
+        "ingest",
         "request_reminder",
     }
 )

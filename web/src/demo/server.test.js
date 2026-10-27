@@ -147,10 +147,10 @@ describe('demo server', () => {
     expect(synced.completions.some((item) => item.name === 'Inbox zero')).toBe(true);
   });
 
-  it('serves the three plugins and their data', () => {
+  it('serves the plugins and their data', () => {
     const { call } = demo();
     const plugins = call('GET', '/plugins').data.plugins;
-    expect(plugins.map((plugin) => plugin.id)).toEqual(['calendar', 'journal', 'mood', 'quotes']);
+    expect(plugins.map((plugin) => plugin.id)).toEqual(['calendar', 'health', 'journal', 'mood', 'quotes']);
     expect(plugins.every((plugin) => plugin.active)).toBe(true);
     const events = call('GET', `/plugins/calendar/events?start=${TODAY}&end=${addDays(TODAY, 30)}`).data;
     expect(events.occurrences.length).toBeGreaterThan(3);
@@ -161,6 +161,9 @@ describe('demo server', () => {
     expect(summary.distribution).toHaveLength(5);
     call('POST', '/plugins/mood/deactivate');
     expect(call('GET', '/plugins/mood/summary').data.error.code).toBe('plugin_inactive');
+    const steps = call('GET', '/plugins/health/days?limit=5').data.days;
+    expect(steps).toHaveLength(5);
+    expect(steps[0].day > steps[1].day).toBe(true);
   });
 
   it('keeps a journal with search, paging and edits', () => {

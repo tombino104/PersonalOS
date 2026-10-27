@@ -251,6 +251,7 @@
   "onboarding.welcome.title": "Un posto tranquillo per le tue giornate.",
 
   "permission.api_routes": "Offrire proprie rotte API",
+  "permission.ingest": "Ricevere dati inviati dai tuoi dispositivi, con un token che puoi revocare",
   "permission.listen_events": "Reagire agli eventi (un report completato, una nuova attività)",
   "permission.questionnaire_block": "Aggiungere un blocco al questionario serale",
   "permission.read_activities": "Leggere le tue attività",

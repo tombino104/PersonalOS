@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from . import __version__, auth, config, db, seed, setup
 from .api import errors
 from .api.auth_routes import public_router
+from .api.ingest_routes import router as ingest_router
 from .api.v1 import router as api_v1
 from .plugins import scheduler
 from .plugins.registry import Registry
@@ -51,6 +52,7 @@ app = FastAPI(
 )
 errors.install(app)
 app.include_router(public_router)
+app.include_router(ingest_router)
 app.include_router(api_v1)
 
 

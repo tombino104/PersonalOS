@@ -8,7 +8,7 @@ from starlette.concurrency import run_in_threadpool
 from .. import __version__, activities, backup, push, reports, review, settings
 from ..logical_day import logical_day
 from ..plugins.manifest import RESERVED_PATHS
-from . import backup_routes, export_routes, profile_routes, push_routes
+from . import backup_routes, export_routes, profile_routes, push_routes, token_routes
 from .auth_routes import protected_router
 from .deps import get_conn, get_now, get_user_id, verify_origin
 from .errors import ApiError
@@ -33,6 +33,7 @@ router.include_router(backup_routes.router)
 router.include_router(export_routes.router)
 router.include_router(profile_routes.router)
 router.include_router(push_routes.router)
+router.include_router(token_routes.router)
 
 MAX_RANGE_DAYS = 366
 MAX_STATS_RANGE_DAYS = 3660

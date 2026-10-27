@@ -61,6 +61,7 @@ The user sees this list and confirms it when turning the plugin on.
 | `ui_panel` | add widgets, pages, entries and a settings panel |
 | `api_routes` | serve routes under `/api/v1/plugins/<id>/` |
 | `listen_events` | react to events |
+| `ingest` | receive data posted from outside with a revocable, write-only token |
 | `request_reminder` | reserved for the notifications plugin |
 
 Scores are only reachable with `read_scores`, so a plugin without it cannot build anything around points.
@@ -94,6 +95,21 @@ def setup(api):
 - Migrations may only create or change `plg_<id>_` objects. A migration that touches anything else fails and is rolled back.
 - A table with a `report_id` column is guarded: inserts, updates and deletes are refused when the report is closed (the day after the edit window) or does not exist. Tables without `report_id` are not restricted.
 - Turning a plugin off never deletes its data. Its data is removed only by the explicit **Remove its data** action in Settings > Plugins (the plugin must be off and you type its id to confirm); that drops its `plg_<id>_` tables and nothing else.
+
+## Receiving data from outside
+
+A plugin with the `ingest` permission can accept data from a device that has no login, such as a phone posting its step count. It registers one handler:
+
+```python
+def setup(api):
+    @api.ingest
+    def receive(ctx, payload):
+        if not isinstance(payload, dict):
+            raise ValueError("the payload must be an object")
+        ...
+```
+
+The core does the rest. The user creates a token for that plugin (`POST /api/v1/tokens` with `name` and `plugin`; the secret is shown once and only its hash is stored), and the device posts JSON to `POST /api/v1/ingest/<id>` with `Authorization: Bearer <token>` (or an `X-Api-Key` header). A token works for one plugin only, can be revoked (`DELETE /api/v1/tokens/<id>`), and can only write: the response is always `{"ok": true}`. The body is limited to 1 MB, the handler runs with the same table rules as the routes, and a `ValueError` becomes a `422` for the sender. A turned-off plugin answers `404`.
 
 ## Events
 

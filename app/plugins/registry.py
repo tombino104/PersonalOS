@@ -57,6 +57,10 @@ class PluginActive(Exception):
     pass
 
 
+class IngestFailed(Exception):
+    pass
+
+
 class ConfirmationMismatch(Exception):
     pass
 
@@ -81,6 +85,7 @@ class Loaded:
     error: str | None = None
     error_kind: str | None = None
     handlers: dict = field(default_factory=dict)
+    ingest: object = None
     app: FastAPI | None = None
 
 
@@ -145,6 +150,14 @@ class PluginApi:
 
         return register(handler) if handler is not None else register
 
+    def ingest(self, handler):
+        if "ingest" not in self._loaded.manifest.permissions:
+            raise ValueError("receiving data needs the 'ingest' permission")
+        if self._loaded.ingest is not None:
+            raise ValueError("a plugin can have only one ingest handler")
+        self._loaded.ingest = handler
+        return handler
+
     def emit(self, event: str, payload: dict | None = None) -> None:
         if event not in self._loaded.manifest.emits:
             raise ValueError(f"event '{event}' is not declared in 'emits'")
@@ -196,6 +209,7 @@ class Registry:
         except Exception as error:
             logger.exception("plugin %s failed to load", loaded.id)
             loaded.handlers = {}
+            loaded.ingest = None
             loaded.app = None
             loaded.error = f"it failed to load: {type(error).__name__}: {error}"[:500]
             loaded.error_kind = "broken"
@@ -443,6 +457,45 @@ class Registry:
             data = filter_payload(payload, loaded.manifest.permissions)
             for handler in handlers:
                 self._run_handler(loaded, event, handler, data, now)
+
+    def ingest(self, plugin_id: str, payload, now: datetime) -> None:
+        loaded = self.plugins.get(plugin_id)
+        conn = db.connect(config.db_path())
+        try:
+            active = self.is_active(conn, plugin_id)
+        finally:
+            conn.close()
+        if loaded is None or loaded.manifest is None or loaded.error or loaded.ingest is None or not active:
+            raise PluginUnavailable("this plugin does not accept data")
+        context = open_context(loaded.id, loaded.manifest.permissions, now)
+        future = self._executor.submit(loaded.ingest, context, payload)
+        try:
+            future.result(timeout=handler_timeout())
+            context.commit()
+        except ValueError:
+            self._rollback(context)
+            raise
+        except FutureTimeout:
+            self._rollback(context)
+            self.record_error(loaded.id, "ingest", TimeoutError("the handler took too long"))
+            raise IngestFailed() from None
+        except Exception as error:
+            self._rollback(context)
+            self.record_error(loaded.id, "ingest", error)
+            raise IngestFailed() from None
+        finally:
+            try:
+                context.close()
+            except sqlite3.Error:
+                pass
+        self.record_success(loaded.id)
+
+    @staticmethod
+    def _rollback(context) -> None:
+        try:
+            context.rollback()
+        except sqlite3.Error:
+            pass
 
     def _run_handler(self, loaded: Loaded, event: str, handler, data: dict, now: datetime) -> None:
         context = open_context(loaded.id, loaded.manifest.permissions, now)
