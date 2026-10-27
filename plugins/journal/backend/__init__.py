@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field, field_validator
 
 MAX_ENTRIES = 20000
 MAX_BODY = 20000
+MAX_MEMORIES = 10
 COLUMNS = "id, day, title, body, mood, created_at, updated_at"
 
 
@@ -105,6 +106,17 @@ def setup(api):
             [*params, limit, offset],
         ).fetchall()
         return {"entries": [_public(row) for row in rows], "total": total}
+
+    @api.router.get("/memories")
+    def memories(ctx=api.ctx):
+        today = ctx.today
+        rows = ctx.db.execute(
+            f"SELECT {COLUMNS} FROM plg_journal_entries "
+            "WHERE substr(day, 6, 5) = ? AND day < ? ORDER BY day DESC, id DESC LIMIT ?",
+            (today[5:], today, MAX_MEMORIES),
+        ).fetchall()
+        year = int(today[:4])
+        return {"entries": [{**_public(row), "years_ago": year - int(row["day"][:4])} for row in rows]}
 
     @api.router.get("/entries/{entry_id}")
     def get_entry(entry_id: int, ctx=api.ctx):

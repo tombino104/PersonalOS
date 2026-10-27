@@ -5,11 +5,12 @@
   import { formatDate } from '$core/lib/dates.js';
   import { locale, t } from '$core/lib/i18n.svelte.js';
   import EntryDialog from './EntryDialog.svelte';
-  import { EXCERPT_LENGTH, PAGE_SIZE, SHEET_LENGTH, excerpt, groupByMonth, mergeEntries, pinFor, tiltFor } from './journal.js';
+  import { EXCERPT_LENGTH, PAGE_SIZE, MEMORY_LENGTH, SHEET_LENGTH, excerpt, groupByMonth, mergeEntries, pinFor, tiltFor } from './journal.js';
 
   let today = $state('');
   let entries = $state([]);
   let total = $state(0);
+  let memories = $state([]);
   let query = $state('');
   let status = $state('loading');
   let loadingMore = $state(false);
@@ -61,6 +62,17 @@
       })
       .catch(() => {
         status = 'error';
+      });
+  });
+
+  $effect(() => {
+    reload;
+    pluginRequest('journal', 'GET', '/memories')
+      .then((result) => {
+        memories = result.entries;
+      })
+      .catch(() => {
+        memories = [];
       });
   });
 
@@ -119,6 +131,21 @@
   </div>
   <button class="btn solid" type="button" disabled={!today} onclick={() => open(null)}>{t('plugin.journal.write')}</button>
 </header>
+
+{#if status === 'ready' && memories.length && !query.trim()}
+  <section class="card memories" aria-label={t('plugin.journal.memories')}>
+    <div class="eyebrow">{t('plugin.journal.memories')}</div>
+    {#each memories as entry (entry.id)}
+      <button class="memory" type="button" onclick={() => open(entry)}>
+        <span class="muted ago">{entry.years_ago === 1 ? t('plugin.journal.yearAgo') : t('plugin.journal.yearsAgo', { count: entry.years_ago })}</span>
+        {#if entry.title}
+          <span class="memory-title">{entry.title}</span>
+        {/if}
+        <span class="memory-body">{excerpt(entry.body, MEMORY_LENGTH).text}</span>
+      </button>
+    {/each}
+  </section>
+{/if}
 
 <div class="tools">
   <div class="search">
@@ -227,6 +254,45 @@
   .search {
     flex: 1 1 260px;
     max-width: 420px;
+  }
+
+  .memories {
+    margin-top: 24px;
+    padding: 18px 24px 8px;
+  }
+
+  .memory {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    border: 0;
+    border-top: 1px solid var(--line);
+    background: none;
+    color: var(--ink);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .memory:first-of-type {
+    margin-top: 10px;
+  }
+
+  .ago {
+    display: block;
+    font: 400 13px/1.4 var(--sans);
+  }
+
+  .memory-title {
+    display: block;
+    margin-top: 4px;
+    font: 500 18px/1.3 var(--serif);
+  }
+
+  .memory-body {
+    display: block;
+    margin-top: 4px;
+    font: 400 16px/1.5 var(--serif);
+    overflow-wrap: anywhere;
   }
 
   .entry-mood {

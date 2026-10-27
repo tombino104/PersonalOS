@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-10-27
+
+### Added
+- Journal: an "On this day" card above the entries, showing what you wrote on the same day in earlier years (up to ten, newest first, with "a year ago" or "N years ago"). It appears only when there is something to show, never sends a notification, and hides while you search. New route `GET /api/v1/plugins/journal/memories`.
+
 ## [0.20.0] - 2026-10-27
 
 ### Added

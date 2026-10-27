@@ -2,6 +2,7 @@ export const PROMPT_COUNT = 8;
 export const PAGE_SIZE = 30;
 export const EXCERPT_LENGTH = 320;
 export const SHEET_LENGTH = 220;
+export const MEMORY_LENGTH = 200;
 export const MAX_TILT = 2.2;
 export const PIN_AREAS = ['physical', 'discipline', 'social', 'intellect', 'career', 'mindset'];
 

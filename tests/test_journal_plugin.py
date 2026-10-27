@@ -131,6 +131,29 @@ def test_the_list_can_be_paged_and_limited_to_a_range(journal):
     assert client.get(f"{JOURNAL}/entries", params={"limit": 101}).status_code == 422
 
 
+def test_memories_are_entries_from_the_same_day_in_earlier_years(journal):
+    client, _ = journal
+    write(client, "A year ago", day="2025-10-20", title="Back then")
+    write(client, "Two years ago, early", day="2024-10-20")
+    write(client, "Two years ago, late", day="2024-10-20")
+    write(client, "Next day", day="2025-10-21")
+    write(client, "Today")
+    entries = client.get(f"{JOURNAL}/memories").json()["entries"]
+    assert [(item["body"], item["years_ago"]) for item in entries] == [
+        ("A year ago", 1),
+        ("Two years ago, late", 2),
+        ("Two years ago, early", 2),
+    ]
+    assert entries[0]["title"] == "Back then"
+
+
+def test_there_are_no_memories_when_nothing_was_written_on_this_day(journal):
+    client, _ = journal
+    write(client, "Other day", day="2025-03-02")
+    write(client, "Today")
+    assert client.get(f"{JOURNAL}/memories").json() == {"entries": []}
+
+
 def test_turning_it_off_keeps_the_entries_and_off_means_no_routes(journal):
     client, _ = journal
     write(client, "Kept")

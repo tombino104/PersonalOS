@@ -784,6 +784,17 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     return { entries: matching.slice(offset, offset + limit).map((entry) => ({ ...entry })), total: matching.length };
   });
 
+  guarded('journal', 'GET', '/memories', () => {
+    const day = today();
+    const year = Number(day.slice(0, 4));
+    const entries = state.journal
+      .filter((entry) => entry.day.slice(5) === day.slice(5) && entry.day < day)
+      .sort((a, b) => (a.day === b.day ? b.id - a.id : a.day < b.day ? 1 : -1))
+      .slice(0, 10)
+      .map((entry) => ({ ...entry, years_ago: year - Number(entry.day.slice(0, 4)) }));
+    return { entries };
+  });
+
   guarded('journal', 'GET', '/entries/:id', ({ params }) => ({ ...entryOf(params.id) }));
 
   guarded('journal', 'POST', '/entries', ({ body }) => {

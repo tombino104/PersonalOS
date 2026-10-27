@@ -180,7 +180,34 @@ const JOURNAL = [
   },
 ];
 
+const MEMORIES = [
+  {
+    yearsAgo: 1,
+    mood: 4,
+    title: 'A year already',
+    body: 'Started writing here a little while ago. The routine is still small, and that is exactly why it has lasted.',
+  },
+];
+
+function sameDayYearsAgo(today, years) {
+  const day = today.endsWith('-02-29') ? `${today.slice(0, 8)}28` : today;
+  return `${Number(day.slice(0, 4)) - years}${day.slice(4)}`;
+}
+
 export function seedJournal(state, today) {
+  for (const entry of MEMORIES) {
+    const day = sameDayYearsAgo(today, entry.yearsAgo);
+    const at = atTime(day, '22:10').toISOString();
+    state.journal.push({
+      id: state.nextEntryId++,
+      day,
+      title: entry.title,
+      body: entry.body,
+      mood: entry.mood,
+      created_at: at,
+      updated_at: at,
+    });
+  }
   for (const entry of JOURNAL) {
     const day = addDays(today, -entry.offset);
     const at = atTime(day, '22:10').toISOString();
