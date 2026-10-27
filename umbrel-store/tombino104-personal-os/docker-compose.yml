@@ -7,7 +7,7 @@ services:
       APP_PORT: 3000
 
   web:
-    image: ghcr.io/tombino104/personalos:0.19.0@sha256:4666d91057a7d80ab5d2450821b824e5ec2bf56fff426a46776f3eb58d590079
+    image: ghcr.io/tombino104/personalos:0.20.0@sha256:874d5e9d366d40026564f774d01d0412c1910dfb79345fca8c4d621968b76c23
     restart: on-failure
     stop_grace_period: 1m
     environment:
