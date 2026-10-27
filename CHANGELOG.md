@@ -5,6 +5,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-10-27
+
+### Added
+- Journal: a "Board" view next to the list, where entries are paper sheets pinned loosely on a board (slightly tilted, ruled, each with a coloured pin). The choice is remembered on the device.
+- Journal: an optional mood (1 to 5) on every entry. It counts in the mood tracker together with the mood of the day, with half its weight: a day with a mood of 4 and a journal mood of 1 shows 3, several journal moods of one day count as one average, and a day with only journal moods shows that average. The mood trend page says so. Nothing changes in the scores.
+
+### Changed
+- The journal and the mood tracker now listen to events (the `listen_events` permission) so the mood tracker can learn the moods of journal entries without reading the journal's tables. The journal announces them with `journal.mood_set` and `journal.mood_snapshot`; turning either plugin on re-sends the full list, so they never drift apart. Mood summary entries now carry a decimal `value` and `journal_entries`.
+
 ## [0.19.0] - 2026-10-27
 
 ### Added

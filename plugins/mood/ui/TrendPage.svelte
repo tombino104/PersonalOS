@@ -63,6 +63,7 @@
       {/each}
     </svg>
     <p class="muted foot">{t('plugin.mood.gapsNote')}</p>
+    <p class="muted foot">{t('plugin.mood.blendNote')}</p>
   </section>
 
   <div class="two">

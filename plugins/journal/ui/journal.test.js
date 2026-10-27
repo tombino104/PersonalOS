@@ -1,5 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { PROMPT_COUNT, excerpt, groupByMonth, mergeEntries, pickPrompt } from './journal.js';
+import { MAX_TILT, PIN_AREAS, PROMPT_COUNT, excerpt, groupByMonth, mergeEntries, pickPrompt, pinFor, tiltFor } from './journal.js';
+
+describe('sheets', () => {
+  it('tilts and pins a sheet the same way every time', () => {
+    expect(tiltFor(42)).toBe(tiltFor(42));
+    expect(pinFor(42)).toBe(pinFor(42));
+  });
+
+  it('keeps the tilt small and the pin on a life area', () => {
+    for (let id = 1; id <= 200; id += 1) {
+      expect(Math.abs(tiltFor(id))).toBeLessThanOrEqual(MAX_TILT);
+      expect(PIN_AREAS).toContain(pinFor(id));
+    }
+  });
+
+  it('does not tilt every sheet alike', () => {
+    const tilts = new Set(Array.from({ length: 30 }, (_, index) => tiltFor(index + 1)));
+    expect(tilts.size).toBeGreaterThan(5);
+  });
+});
 
 describe('groupByMonth', () => {
   it('keeps the order and starts a group when the month changes', () => {

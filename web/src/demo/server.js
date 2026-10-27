@@ -16,6 +16,8 @@ const manifests = import.meta.glob('../../../plugins/*/manifest.json', { eager: 
 
 const MAX_RANGE_DAYS = 366;
 const MAX_STATS_RANGE_DAYS = 3660;
+const MOOD_DAY_WEIGHT = 2;
+const MOOD_JOURNAL_WEIGHT = 1;
 const DEFAULT_RANGE_DAYS = 90;
 const SOFT_LIMIT_PER_AREA = 5;
 const CATEGORIES = ['personal', 'work', 'study', 'health', 'social', 'other'];
@@ -763,7 +765,9 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const day = body?.day ?? current?.day ?? today();
     if (!isDay(day) || day < '1970-01-01' || day > '2100-12-31') invalid();
     if (day > today()) refuse(422, 'error', 'an entry cannot be dated in the future');
-    return { day, title, body: text };
+    const mood = body?.mood ?? null;
+    if (mood !== null && ![1, 2, 3, 4, 5].includes(mood)) invalid();
+    return { day, title, body: text, mood };
   }
 
   const likeAny = (entry, text) =>
@@ -828,12 +832,29 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
       .filter(([day]) => day >= start && day <= end)
       .sort(([a], [b]) => (a < b ? -1 : 1))
       .map(([day, entry]) => ({ day, ...entry }));
-    const distribution = [1, 2, 3, 4, 5].map((level) => rows.filter((row) => row.value === level).length);
+    const journalByDay = new Map();
+    for (const entry of state.journal) {
+      if (entry.mood === null || entry.mood === undefined || entry.day < start || entry.day > end) continue;
+      journalByDay.set(entry.day, [...(journalByDay.get(entry.day) ?? []), entry.mood]);
+    }
+    const ownByDay = new Map(rows.filter((row) => row.value !== null).map((row) => [row.day, row.value]));
+    const blended = [...new Set([...ownByDay.keys(), ...journalByDay.keys()])].sort().map((day) => {
+      const parts = [];
+      if (ownByDay.has(day)) parts.push([MOOD_DAY_WEIGHT, ownByDay.get(day)]);
+      const journal = journalByDay.get(day) ?? [];
+      if (journal.length) parts.push([MOOD_JOURNAL_WEIGHT, mean(journal)]);
+      const total = parts.reduce((sum, [weight]) => sum + weight, 0);
+      const value = parts.reduce((sum, [weight, part]) => sum + weight * part, 0) / total;
+      return { day, value: Math.round(value * 100) / 100, journal_entries: journal.length };
+    });
+    const distribution = [1, 2, 3, 4, 5].map(
+      (level) => blended.filter((entry) => Math.floor(entry.value + 0.5) === level).length,
+    );
     return {
       from: start,
       to: end,
       days,
-      entries: rows.filter((row) => row.value !== null).map(({ day, value }) => ({ day, value })),
+      entries: blended,
       distribution,
       notes: rows
         .filter((row) => row.note)

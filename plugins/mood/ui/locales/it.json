@@ -20,6 +20,7 @@
   "days30": "30 giorni",
   "days14": "14 giorni",
   "chartLabel": "Andamento dell'umore, scala da 1 a 5",
+  "blendNote": "Contano anche gli umori che aggiungi alle voci del diario, con metà del peso dell'umore della giornata. Un giorno con soli umori del diario mostra la loro media.",
   "gapsNote": "I trattini in basso sono i giorni non compilati: la linea si interrompe, non scende a zero.",
   "distribution": "Quante volte",
   "level.1": "1 · pesante",

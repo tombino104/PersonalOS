@@ -18,6 +18,7 @@
   "days30": "30 days",
   "days14": "14 days",
   "chartLabel": "Mood over time, on a scale from 1 to 5",
+  "blendNote": "Moods you add to journal entries count too, with half the weight of the mood of the day. A day with only journal moods shows their average.",
   "gapsNote": "The small ticks at the bottom are days without an entry: the line breaks, it does not drop to zero.",
   "distribution": "How many times",
   "level.1": "1 · heavy",

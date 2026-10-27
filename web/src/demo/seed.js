@@ -151,21 +151,25 @@ export function seedHistory(state, today, span = 120) {
 const JOURNAL = [
   {
     offset: 1,
+    mood: 3,
     title: 'Ordinary, and that is fine',
     body: 'Nothing special happened. I did the routine, skipped the workout and did not beat myself up about it. A day is a day, and the list will still be here tomorrow.',
   },
   {
     offset: 4,
+    mood: 4,
     title: null,
     body: 'Talked to someone I had been putting off for weeks. It took ten minutes and I felt lighter for the rest of the afternoon. Next time, do it on the first day, not the twentieth.',
   },
   {
     offset: 9,
+    mood: 5,
     title: 'What I want more of',
     body: 'More mornings without the phone. More time outside. More reading before bed, instead of scrolling.\n\nNone of this needs a plan. It needs a first small step, and then another one.',
   },
   {
     offset: 17,
+    mood: 2,
     title: null,
     body: 'A hard week at work. I kept the plan small and finished one thing a day. By Friday that was enough to feel in control again.',
   },
@@ -185,6 +189,7 @@ export function seedJournal(state, today) {
       day,
       title: entry.title,
       body: entry.body,
+      mood: entry.mood ?? null,
       created_at: at,
       updated_at: at,
     });

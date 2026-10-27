@@ -34,7 +34,7 @@ def test_the_manifest_is_valid_and_it_is_off_until_turned_on(tmp_path, monkeypat
         assert activate(client, "journal").status_code == 200
         item = plugin_state(client, "journal")
         assert item["state"] == "active"
-        assert item["permissions"] == ["api_routes", "ui_panel"]
+        assert item["permissions"] == ["api_routes", "listen_events", "ui_panel"]
         assert item["entries"][0]["placement"] == "dock"
         assert item["pages"] == ["entries"]
 

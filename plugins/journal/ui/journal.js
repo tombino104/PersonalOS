@@ -1,6 +1,22 @@
 export const PROMPT_COUNT = 8;
 export const PAGE_SIZE = 30;
 export const EXCERPT_LENGTH = 320;
+export const SHEET_LENGTH = 220;
+export const MAX_TILT = 2.2;
+export const PIN_AREAS = ['physical', 'discipline', 'social', 'intellect', 'career', 'mindset'];
+
+function seed(id) {
+  const x = Math.sin(id * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+export function tiltFor(id) {
+  return Math.round((seed(id) * 2 - 1) * MAX_TILT * 10) / 10;
+}
+
+export function pinFor(id) {
+  return PIN_AREAS[Math.floor(seed(id + 7) * PIN_AREAS.length)];
+}
 
 export function groupByMonth(entries) {
   const groups = [];

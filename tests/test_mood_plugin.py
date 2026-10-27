@@ -28,7 +28,7 @@ def test_the_manifest_is_valid_and_lists_what_it_adds(mood):
     client, _ = mood
     item = plugin_state(client, "mood")
     assert item["state"] == "active"
-    assert item["permissions"] == ["api_routes", "questionnaire_block", "ui_panel"]
+    assert item["permissions"] == ["api_routes", "listen_events", "questionnaire_block", "ui_panel"]
     assert item["questionnaire_blocks"] == ["mood"]
     assert item["report_sections"] == ["mood"]
     assert item["entries"][0]["placement"] == "more"

@@ -10,6 +10,7 @@
   let day = $state(untrack(() => entry?.day ?? today));
   let title = $state(untrack(() => entry?.title ?? ''));
   let body = $state(untrack(() => entry?.body ?? ''));
+  let mood = $state(untrack(() => entry?.mood ?? null));
   let error = $state('');
   let busy = $state(false);
   let confirmDelete = $state(false);
@@ -23,7 +24,7 @@
     event.preventDefault();
     busy = true;
     error = '';
-    const payload = { day, title: title.trim() || null, body: body.trim() };
+    const payload = { day, title: title.trim() || null, body: body.trim(), mood };
     try {
       if (entry) await pluginRequest('journal', 'PUT', `/entries/${entry.id}`, payload);
       else await pluginRequest('journal', 'POST', '/entries', payload);
@@ -77,6 +78,23 @@
         placeholder={t(`plugin.journal.prompt.${prompt}`)}
         bind:value={body}
       ></textarea>
+    </div>
+
+    <div>
+      <span class="label" id="entry-mood-label">{t('plugin.journal.mood')}</span>
+      <div class="scale" role="group" aria-labelledby="entry-mood-label">
+        {#each [1, 2, 3, 4, 5] as level}
+          <button
+            class="level"
+            class:on={mood === level}
+            type="button"
+            aria-pressed={mood === level}
+            aria-label={t('plugin.journal.moodLevel', { level })}
+            onclick={() => (mood = mood === level ? null : level)}
+          >{level}</button>
+        {/each}
+      </div>
+      <p class="muted hint">{t('plugin.journal.moodHint')}</p>
     </div>
 
     {#if error}
@@ -136,6 +154,33 @@
     min-height: 220px;
     resize: vertical;
     font: 400 16px/1.6 var(--serif);
+  }
+
+  .scale {
+    display: flex;
+    gap: 10px;
+  }
+
+  .level {
+    width: 42px;
+    height: 42px;
+    border: 1.5px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--ink);
+    font: 500 15px/1 var(--sans);
+    cursor: pointer;
+  }
+
+  .level.on {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+
+  .hint {
+    margin: 8px 0 0;
+    font: 400 13px/1.5 var(--sans);
   }
 
   .actions {

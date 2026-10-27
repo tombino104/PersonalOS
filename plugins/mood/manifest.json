@@ -1,10 +1,10 @@
 {
   "id": "mood",
   "name": "Mood tracker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A mood diary, not a report card: it never enters any average and never changes your scores.",
   "core_api": "1.x",
-  "permissions": ["questionnaire_block", "ui_panel", "api_routes"],
+  "permissions": ["questionnaire_block", "ui_panel", "api_routes", "listen_events"],
   "adds": {
     "questionnaire_blocks": ["mood"],
     "report_sections": ["mood"],
@@ -13,7 +13,7 @@
       { "id": "mood", "label": "Mood", "icon": "smile", "placement": "more", "page": "trend" }
     ]
   },
-  "listens": [],
+  "listens": ["journal.mood_set", "journal.mood_snapshot"],
   "emits": [],
   "migrations": "backend/migrations"
 }

@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 
 LEVELS = (1, 2, 3, 4, 5)
 RECENT_NOTES = 5
+DAY_WEIGHT = 2
+JOURNAL_WEIGHT = 1
 
 
 class Entry(BaseModel):
@@ -12,7 +14,60 @@ class Entry(BaseModel):
     note: str | None = Field(default=None, max_length=300)
 
 
+def _valid_day(value) -> bool:
+    try:
+        date.fromisoformat(value)
+    except (TypeError, ValueError):
+        return False
+    return True
+
+
+def _valid_journal_mood(item) -> bool:
+    return (
+        isinstance(item, dict)
+        and isinstance(item.get("entry_id"), int)
+        and _valid_day(item.get("day"))
+        and isinstance(item.get("mood"), int)
+        and 1 <= item["mood"] <= 5
+    )
+
+
+def blend(day_value: int | None, journal_values: list[int]) -> float | None:
+    parts = []
+    if day_value is not None:
+        parts.append((DAY_WEIGHT, day_value))
+    if journal_values:
+        parts.append((JOURNAL_WEIGHT, sum(journal_values) / len(journal_values)))
+    if not parts:
+        return None
+    return round(sum(weight * value for weight, value in parts) / sum(weight for weight, _ in parts), 2)
+
+
 def setup(api):
+    @api.on("journal.mood_set")
+    def on_journal_mood(ctx, payload):
+        entry_id = payload.get("entry_id")
+        if not isinstance(entry_id, int):
+            return
+        if payload.get("mood") is None:
+            ctx.db.execute("DELETE FROM plg_mood_journal WHERE entry_id = ?", (entry_id,))
+        elif _valid_journal_mood(payload):
+            ctx.db.execute(
+                "INSERT INTO plg_mood_journal (entry_id, day, value) VALUES (?, ?, ?) "
+                "ON CONFLICT (entry_id) DO UPDATE SET day = excluded.day, value = excluded.value",
+                (entry_id, payload["day"], payload["mood"]),
+            )
+
+    @api.on("journal.mood_snapshot")
+    def on_journal_snapshot(ctx, payload):
+        moods = [item for item in payload.get("moods", []) if _valid_journal_mood(item)]
+        with ctx.transaction():
+            ctx.db.execute("DELETE FROM plg_mood_journal")
+            ctx.db.executemany(
+                "INSERT INTO plg_mood_journal (entry_id, day, value) VALUES (?, ?, ?)",
+                [(item["entry_id"], item["day"], item["mood"]) for item in moods],
+            )
+
     @api.router.get("/entries/{day}")
     def get_entry(day: date, ctx=api.ctx):
         row = ctx.db.execute(
@@ -45,16 +100,26 @@ def setup(api):
             "SELECT day, value, note FROM plg_mood_entries WHERE day BETWEEN ? AND ? ORDER BY day",
             (start.isoformat(), end.isoformat()),
         ).fetchall()
+        journal: dict[str, list[int]] = {}
+        for row in ctx.db.execute(
+            "SELECT day, value FROM plg_mood_journal WHERE day BETWEEN ? AND ?",
+            (start.isoformat(), end.isoformat()),
+        ):
+            journal.setdefault(row["day"], []).append(row["value"])
+        own = {row["day"]: row["value"] for row in rows if row["value"] is not None}
+        entries = []
+        for day in sorted(set(own) | set(journal)):
+            value = blend(own.get(day), journal.get(day, []))
+            entries.append({"day": day, "value": value, "journal_entries": len(journal.get(day, []))})
         counts = {level: 0 for level in LEVELS}
-        for row in rows:
-            if row["value"] is not None:
-                counts[row["value"]] += 1
+        for entry in entries:
+            counts[int(entry["value"] + 0.5)] += 1
         notes = [{"day": row["day"], "note": row["note"]} for row in rows if row["note"]]
         return {
             "from": start.isoformat(),
             "to": end.isoformat(),
             "days": days,
-            "entries": [{"day": row["day"], "value": row["value"]} for row in rows if row["value"] is not None],
+            "entries": entries,
             "distribution": [counts[level] for level in LEVELS],
             "notes": list(reversed(notes))[:RECENT_NOTES],
         }

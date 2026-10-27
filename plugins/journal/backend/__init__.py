@@ -5,13 +5,14 @@ from pydantic import BaseModel, Field, field_validator
 
 MAX_ENTRIES = 20000
 MAX_BODY = 20000
-COLUMNS = "id, day, title, body, created_at, updated_at"
+COLUMNS = "id, day, title, body, mood, created_at, updated_at"
 
 
 class EntryBody(BaseModel):
     day: date | None = None
     title: str | None = Field(default=None, max_length=120)
     body: str = Field(max_length=MAX_BODY)
+    mood: int | None = Field(default=None, ge=1, le=5)
 
     @field_validator("title")
     @classmethod
@@ -40,6 +41,7 @@ def _public(row) -> dict:
         "day": row["day"],
         "title": row["title"],
         "body": row["body"],
+        "mood": row["mood"],
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
     }
@@ -50,7 +52,23 @@ def _like(text: str) -> str:
     return f"%{escaped}%"
 
 
+def _announce(api, entry_id: int, day: str, mood: int | None) -> None:
+    api.emit("journal.mood_set", {"entry_id": entry_id, "day": day, "mood": mood})
+
+
 def setup(api):
+    @api.on("plugin.activated")
+    def on_plugin_activated(ctx, payload):
+        if payload.get("plugin") not in ("journal", "mood"):
+            return
+        rows = ctx.db.execute(
+            "SELECT id, day, mood FROM plg_journal_entries WHERE mood IS NOT NULL"
+        ).fetchall()
+        api.emit(
+            "journal.mood_snapshot",
+            {"moods": [{"entry_id": row["id"], "day": row["day"], "mood": row["mood"]} for row in rows]},
+        )
+
     def entry_or_404(ctx, entry_id: int):
         row = ctx.db.execute(
             f"SELECT {COLUMNS} FROM plg_journal_entries WHERE id = ?", (entry_id,)
@@ -103,10 +121,12 @@ def setup(api):
             raise HTTPException(status_code=409, detail="too many entries")
         moment = ctx.now.isoformat(timespec="seconds")
         cursor = ctx.db.execute(
-            "INSERT INTO plg_journal_entries (day, title, body, created_at, updated_at) "
-            "VALUES (?, ?, ?, ?, ?)",
-            (day.isoformat(), body.title, body.body, moment, moment),
+            "INSERT INTO plg_journal_entries (day, title, body, mood, created_at, updated_at) "
+            "VALUES (?, ?, ?, ?, ?, ?)",
+            (day.isoformat(), body.title, body.body, body.mood, moment, moment),
         )
+        if body.mood is not None:
+            _announce(api, cursor.lastrowid, day.isoformat(), body.mood)
         return _public(entry_or_404(ctx, cursor.lastrowid))
 
     @api.router.put("/entries/{entry_id}")
@@ -116,13 +136,17 @@ def setup(api):
         if date.fromisoformat(day) > date.fromisoformat(ctx.today):
             raise HTTPException(status_code=422, detail="an entry cannot be dated in the future")
         ctx.db.execute(
-            "UPDATE plg_journal_entries SET day = ?, title = ?, body = ?, updated_at = ? WHERE id = ?",
-            (day, body.title, body.body, ctx.now.isoformat(timespec="seconds"), entry_id),
+            "UPDATE plg_journal_entries SET day = ?, title = ?, body = ?, mood = ?, updated_at = ? WHERE id = ?",
+            (day, body.title, body.body, body.mood, ctx.now.isoformat(timespec="seconds"), entry_id),
         )
+        if body.mood is not None or current["mood"] is not None:
+            _announce(api, entry_id, day, body.mood)
         return _public(entry_or_404(ctx, entry_id))
 
     @api.router.delete("/entries/{entry_id}")
     def delete_entry(entry_id: int, ctx=api.ctx):
-        entry_or_404(ctx, entry_id)
+        current = entry_or_404(ctx, entry_id)
         ctx.db.execute("DELETE FROM plg_journal_entries WHERE id = ?", (entry_id,))
+        if current["mood"] is not None:
+            _announce(api, entry_id, current["day"], None)
         return {"ok": True}
