@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response
 from starlette.concurrency import run_in_threadpool
 
-from .. import __version__, activities, backup, push, reports, review, settings
+from .. import __version__, activities, backup, push, recap, reports, review, settings
 from ..logical_day import logical_day
 from ..plugins.manifest import RESERVED_PATHS
 from . import backup_routes, export_routes, profile_routes, push_routes, token_routes
@@ -312,6 +312,17 @@ def get_review(
 ) -> dict:
     today = logical_day(now, settings.day_rules(conn))
     return review.summary(conn, user_id, week_start, today)
+
+
+@router.get("/recaps/{period}")
+def get_recap(
+    period: str,
+    conn: sqlite3.Connection = Depends(get_conn),
+    user_id: int = Depends(get_user_id),
+    now: datetime = Depends(get_now),
+) -> dict:
+    today = logical_day(now, settings.day_rules(conn))
+    return recap.summary(conn, user_id, period, today)
 
 
 @router.put("/reviews/{week_start}/note")

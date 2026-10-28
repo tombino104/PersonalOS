@@ -95,6 +95,7 @@ export const api = {
   photoUrl: (version) => `/api/v1/profile/photo?v=${encodeURIComponent(version ?? '')}`,
   today: () => request('GET', '/today'),
   review: (weekStart) => request('GET', `/reviews/${weekStart}`),
+  recap: (period) => request('GET', `/recaps/${period}`),
   saveReviewNote: (weekStart, text) => request('PUT', `/reviews/${weekStart}/note`, { text }),
   areas: () => request('GET', '/areas'),
 

@@ -8,6 +8,7 @@
   import { addDays, formatDate, lastDays } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { playProgress } from '../lib/motion.js';
+  import { homeInvitation, periodLabel } from '../lib/recap.js';
   import { widgets } from '../lib/plugins.svelte.js';
 
   let status = $state('loading');
@@ -118,6 +119,11 @@
   );
   const weekdayLabels = ['2024-01-01', '', '2024-01-03', '', '2024-01-05', '', ''];
 
+  const invitation = $derived.by(() => {
+    const target = today ? homeInvitation(today, true) : null;
+    return target && Object.keys(scoreByDay).some((day) => day.startsWith(target)) ? target : null;
+  });
+
   const pluginWidgets = $derived(widgets().filter((widget) => widget.placement === 'bottom'));
   const topWidgets = $derived(widgets().filter((widget) => widget.placement === 'top'));
   const round = (value) => Math.round(value);
@@ -171,6 +177,13 @@
       <widget.component />
     </section>
   {/each}
+
+  {#if invitation}
+    <Link class="card invite rise" href="/recap?period={invitation}">
+      <span class="invite-text">{t('home.recapInvite', { period: periodLabel(invitation, locale()) })}</span>
+      <span class="invite-go">{t('home.recapOpen')} <Icon name="forward" small /></span>
+    </Link>
+  {/if}
 
   {#if status === 'loading'}
     <p class="lede" aria-live="polite">{t('common.loading')}</p>
@@ -350,6 +363,30 @@
     align-items: center;
     gap: 10px;
     font: 500 21px/1 var(--serif);
+  }
+
+  :global(.invite) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    margin-bottom: 16px;
+    padding: 18px 24px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .invite-text {
+    font: italic 400 19px/1.3 var(--serif);
+  }
+
+  .invite-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: 500 13px/1 var(--sans);
+    color: var(--ink-2);
   }
 
   .dot.small {

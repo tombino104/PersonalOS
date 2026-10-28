@@ -15,6 +15,13 @@ const CORE_ITEMS = [
     match: (path) => path === '/review',
   },
   {
+    key: 'recap',
+    href: '/recap',
+    icon: 'recap',
+    labelKey: 'nav.recap',
+    match: (path) => path === '/recap',
+  },
+  {
     key: 'questionnaire',
     href: '/questionnaire',
     icon: 'pencil',

@@ -4,7 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from .. import activities, auth, backup, profile, reports, review, security, setup
+from .. import activities, auth, backup, profile, recap, reports, review, security, setup
 from ..plugins import registry as plugin_registry
 
 
@@ -30,6 +30,8 @@ _DOMAIN_ERRORS = [
     (reports.FutureDay, 422, "future_day"),
     (review.InvalidWeek, 422, "invalid_week"),
     (review.FutureWeek, 422, "future_week"),
+    (recap.InvalidPeriod, 422, "invalid_period"),
+    (recap.FuturePeriod, 422, "future_period"),
     (reports.ReportNotFound, 404, "not_found"),
     (reports.NotInReport, 404, "not_found"),
     (activities.ActivityNotFound, 404, "not_found"),

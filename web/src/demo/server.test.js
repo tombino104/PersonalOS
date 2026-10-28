@@ -139,6 +139,26 @@ describe('demo server', () => {
     expect(call('GET', `/reviews/${addDays(monday, 7)}`).data.error.code).toBe('future_week');
   });
 
+  it('summarizes a month and a year', () => {
+    const { call } = demo();
+    const month = call('GET', '/recaps/2026-09').data;
+    expect(month.kind).toBe('month');
+    expect(month.days).toHaveLength(30);
+    expect(month.filled_days).toBeGreaterThan(0);
+    expect(month.areas).toHaveLength(6);
+    expect(month.top_habits.length).toBeGreaterThan(0);
+    expect(month.previous_filled_days).toBeGreaterThan(0);
+    const current = call('GET', '/recaps/2026-10').data;
+    expect(current.is_current).toBe(true);
+    expect(current.elapsed_days).toBe(21);
+    const year = call('GET', '/recaps/2026').data;
+    expect(year.kind).toBe('year');
+    expect(year.months).toHaveLength(10);
+    expect(year.filled_days).toBeGreaterThan(month.filled_days);
+    expect(call('GET', '/recaps/2026-13').data.error.code).toBe('invalid_period');
+    expect(call('GET', '/recaps/2026-11').data.error.code).toBe('future_period');
+  });
+
   it('syncs a draft with the current activities', () => {
     const { call } = demo();
     call('POST', '/reports', { day: TODAY });

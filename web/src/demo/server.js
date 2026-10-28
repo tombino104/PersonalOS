@@ -606,6 +606,101 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     };
   }
 
+  function periodOf(period) {
+    const month = /^(\d{4})-(\d{2})$/.exec(period);
+    const year = /^(\d{4})$/.exec(period);
+    if (month && Number(month[2]) >= 1 && Number(month[2]) <= 12) {
+      const first = `${period}-01`;
+      const last = addDays(`${month[2] === '12' ? Number(month[1]) + 1 : month[1]}-${String(month[2] === '12' ? 1 : Number(month[2]) + 1).padStart(2, '0')}-01`, -1);
+      return { kind: 'month', start: first, end: last };
+    }
+    if (year) return { kind: 'year', start: `${period}-01-01`, end: `${period}-12-31` };
+    return refuse(422, 'invalid_period', 'a period is YYYY-MM or YYYY');
+  }
+
+  const spanOf = (start, end) => daysBetween(start, end) + 1;
+
+  protectedRoute('GET', '/recaps/:period', ({ params }) => {
+    const { kind, start, end } = periodOf(params.period);
+    if (start > today()) refuse(422, 'future_period', 'that period has not started yet');
+    const last = end < today() ? end : today();
+    const before = addDays(start, -1);
+    const beforeStart = kind === 'year' ? `${before.slice(0, 4)}-01-01` : `${before.slice(0, 7)}-01`;
+    const reports = completedIn(start, end);
+    const completed = new Set(reports.map((report) => report.day));
+    const current = averagesOf(start, end);
+    const earlier = averagesOf(beforeStart, before);
+    const previous = Object.fromEntries(earlier.areas.map((item) => [item.area, item.average]));
+    const overallOf = (list) => mean(list.map((report) => mean(scoresOf(report).map((entry) => entry.score))));
+    const stats = new Map();
+    for (const report of reports) {
+      for (const item of report.completions) {
+        const entry = stats.get(item.activity_id) ?? { activity_id: item.activity_id, name: item.name, area: item.area, done: 0, total: 0 };
+        entry.done += item.done ? 1 : 0;
+        entry.total += 1;
+        stats.set(item.activity_id, entry);
+      }
+    }
+    const topHabits = [...stats.values()]
+      .filter((item) => item.total >= 3 && item.done > 0)
+      .sort((a, b) => b.done / b.total - a.done / a.total || b.done - a.done || a.activity_id - b.activity_id)
+      .slice(0, 3);
+    const weeks = [];
+    for (let monday = addDays(start, -weekdayOf(start)); monday <= last; monday = addDays(monday, 7)) {
+      const first = monday > start ? monday : start;
+      const final = addDays(monday, 6) < last ? addDays(monday, 6) : last;
+      const possible = spanOf(first, final);
+      const filled = Array.from({ length: possible }, (_, offset) => addDays(first, offset)).filter((day) => completed.has(day)).length;
+      weeks.push({ week_start: monday, filled, possible });
+    }
+    const candidates = weeks.filter((week) => week.filled > 0);
+    const bestWeek = weeks.length < 2 || !candidates.length
+      ? null
+      : candidates.reduce((a, b) => (b.filled > a.filled || (b.filled === a.filled && b.week_start > a.week_start) ? b : a));
+    const lines = reports.filter((report) => (report.reflection ?? '').trim()).map((report) => ({ day: report.day, text: report.reflection }));
+    const result = {
+      period: params.period,
+      kind,
+      start,
+      end,
+      is_current: start <= today() && today() <= end,
+      elapsed_days: spanOf(start, last),
+      filled_days: reports.length,
+      previous_filled_days: earlier.filled,
+      previous_days: spanOf(beforeStart, before),
+      overall: overallOf(reports),
+      previous_overall: overallOf(completedIn(beforeStart, before)),
+      areas: current.areas.map((item) => ({ ...item, previous: previous[item.area] })),
+      top_habits: topHabits,
+      best_week: bestWeek,
+      line_count: lines.length,
+    };
+    if (kind === 'month') {
+      result.days = Array.from({ length: spanOf(start, end) }, (_, offset) => {
+        const day = addDays(start, offset);
+        const report = state.reports.get(day);
+        const done = completed.has(day);
+        return { day, completed: done, overall: done ? mean(scoresOf(report).map((entry) => entry.score)) : null };
+      });
+      result.lines = lines.slice(-5).reverse();
+    } else {
+      result.months = [];
+      for (let number = 1; number <= 12; number += 1) {
+        const first = `${start.slice(0, 4)}-${String(number).padStart(2, '0')}-01`;
+        if (first > today()) break;
+        const next = number === 12 ? `${Number(start.slice(0, 4)) + 1}-01-01` : `${start.slice(0, 4)}-${String(number + 1).padStart(2, '0')}-01`;
+        const final = addDays(next, -1) < today() ? addDays(next, -1) : today();
+        result.months.push({
+          month: first.slice(0, 7),
+          filled: [...completed].filter((day) => day.startsWith(first.slice(0, 7))).length,
+          possible: spanOf(first, final),
+        });
+      }
+      result.lines = [];
+    }
+    return result;
+  });
+
   protectedRoute('GET', '/reviews/:week', ({ params }) => {
     const start = params.week;
     checkWeek(start);

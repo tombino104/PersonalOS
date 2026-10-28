@@ -11,6 +11,7 @@
   import Completion from './routes/Completion.svelte';
   import Archive from './routes/Archive.svelte';
   import Review from './routes/Review.svelte';
+  import Recap from './routes/Recap.svelte';
   import More from './routes/More.svelte';
   import Settings from './routes/Settings.svelte';
   import PluginPage from './routes/PluginPage.svelte';
@@ -30,6 +31,7 @@
     '/questionnaire/done': Completion,
     '/archive': Archive,
     '/review': Review,
+    '/recap': Recap,
     '/more': More,
   };
 

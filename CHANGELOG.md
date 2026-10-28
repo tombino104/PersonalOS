@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-10-28
+
+### Added
+- Monthly and yearly recap (More > Recap, or in the dock if you add it): the days you showed up (a calendar for a month, month-by-month bars for a year), the six areas compared with the period before, the habits kept most often, your fullest week and the lines you wrote. It only describes: a blank day is empty, not zero, and there are no grades. In the first week of a month (and the first two weeks of January) Home shows a card that opens the recap of the period that just ended; it never sends a notification. New route `GET /api/v1/recaps/{period}` with `YYYY-MM` or `YYYY`.
+
 ## [0.23.0] - 2026-10-27
 
 ### Changed
