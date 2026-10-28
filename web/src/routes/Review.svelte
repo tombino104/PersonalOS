@@ -3,6 +3,7 @@
   import Icon from '../components/Icon.svelte';
   import { api } from '../lib/api.js';
   import { AREAS } from '../lib/charts.js';
+  import { isOpen, setOpen } from '../lib/collapse.js';
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { change, groupActivities, mondayOf, signed, weekRange } from '../lib/review.js';
@@ -126,49 +127,62 @@
 
     {#if groups.length > 0}
       <section class="card block rise" aria-label={t('review.habits')}>
-        <h2 class="eyebrow">{t('review.habits')}</h2>
+        <details open={isOpen('review.habits')} ontoggle={(event) => setOpen('review.habits', event.currentTarget.open)}>
+          <summary><h2 class="eyebrow">{t('review.habits')}</h2><span class="chev"><Icon name="down" small /></span></summary>
+          <div class="fold">
         {#each groups as group (group.area)}
           <div class="group" data-area={group.area}>
             <div class="group-head"><span class="dot"></span><span>{t(`area.${group.area}`)}</span></div>
             {#each group.items as item (item.activity_id)}
               <div class="habit">
                 <span class="name">{item.name}</span>
-                <span class="muted">{t('review.habitDays', { done: item.done, total: item.total })}</span>
+                <span class="muted">{t(item.done === 1 ? 'review.habitDaysOne' : 'review.habitDays', { done: item.done, total: item.total })}</span>
               </div>
             {/each}
           </div>
         {/each}
+          </div>
+        </details>
       </section>
     {/if}
 
     {#if lines.length > 0}
       <section class="card block rise" aria-label={t('review.lines')}>
-        <h2 class="eyebrow">{t('review.lines')}</h2>
-        {#each lines as day (day.day)}
-          <div class="line">
-            <div class="eyebrow when">{dayLong(day.day)}</div>
-            <p>«{day.reflection}»</p>
+        <details open={isOpen('review.lines')} ontoggle={(event) => setOpen('review.lines', event.currentTarget.open)}>
+          <summary><h2 class="eyebrow">{t('review.lines')}</h2><span class="chev"><Icon name="down" small /></span></summary>
+          <div class="fold">
+            {#each lines as day (day.day)}
+              <div class="line">
+                <div class="eyebrow when">{dayLong(day.day)}</div>
+                <p>«{day.reflection}»</p>
+              </div>
+            {/each}
           </div>
-        {/each}
+        </details>
       </section>
     {/if}
 
     <section class="card block rise" aria-label={t('review.note')}>
-      <label class="eyebrow" for="week-note">{t('review.note')}</label>
-      <textarea
-        id="week-note"
-        class="field"
-        rows="5"
-        maxlength="5000"
-        placeholder={t('review.notePlaceholder')}
-        bind:value={note}
-        oninput={onInput}
-        onblur={() => timer && save()}
-      ></textarea>
-      <p class="muted foot" aria-live="polite">{saved ? t('review.saved') : ''}</p>
-      {#if failure}
-        <p class="error" role="alert">{failure}</p>
-      {/if}
+      <details open={isOpen('review.note')} ontoggle={(event) => setOpen('review.note', event.currentTarget.open)}>
+        <summary><h2 class="eyebrow">{t('review.note')}</h2><span class="chev"><Icon name="down" small /></span></summary>
+        <div class="fold">
+          <textarea
+            id="week-note"
+            class="field"
+            rows="5"
+            maxlength="5000"
+            aria-label={t('review.note')}
+            placeholder={t('review.notePlaceholder')}
+            bind:value={note}
+            oninput={onInput}
+            onblur={() => timer && save()}
+          ></textarea>
+          <p class="muted foot" aria-live="polite">{saved ? t('review.saved') : ''}</p>
+          {#if failure}
+            <p class="error" role="alert">{failure}</p>
+          {/if}
+        </div>
+      </details>
     </section>
   {/if}
 </div>
@@ -229,10 +243,47 @@
     padding: 24px;
   }
 
-  .block h2,
-  .block > label {
+  .block h2 {
     display: block;
-    margin: 0 0 12px;
+    margin: 0;
+  }
+
+  .block > h2 {
+    margin-bottom: 12px;
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 32px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .chev {
+    display: inline-flex;
+    color: var(--ink-3);
+    transition: transform 0.2s;
+  }
+
+  details[open] .chev {
+    transform: rotate(180deg);
+  }
+
+  .fold {
+    margin-top: 14px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chev {
+      transition: none;
+    }
   }
 
   .area {

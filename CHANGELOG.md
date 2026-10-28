@@ -5,6 +5,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.24.1] - 2026-10-28
+
+### Changed
+- Weekly review: the habits, the lines you wrote and the note for the week are folded by default and open with a tap. The app remembers on this device which ones you opened.
+- Recap: the month calendar now sits next to a large count of the days you showed up, instead of leaving the right half empty.
+
+### Fixed
+- Italian: "1 giorno su N" instead of "1 giorni su N" in the weekly review and the recap.
+
 ## [0.24.0] - 2026-10-28
 
 ### Added

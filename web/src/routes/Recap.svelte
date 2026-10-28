@@ -86,7 +86,7 @@
           {#if data.filled_days === 0}
             {t('recap.ledeEmpty')}
           {:else}
-            {t(data.is_current ? 'recap.ledeSoFar' : 'recap.lede', { filled: data.filled_days, total: data.elapsed_days })}
+            {t(`recap.lede${data.is_current ? 'SoFar' : ''}${data.filled_days === 1 ? 'One' : ''}`, { filled: data.filled_days, total: data.elapsed_days })}
           {/if}
         </p>
       {/if}
@@ -114,6 +114,7 @@
   {:else}
     <section class="card block rise" aria-label={data.kind === 'month' ? t('recap.daysTitle') : t('recap.monthsTitle')}>
       <h2 class="eyebrow">{data.kind === 'month' ? t('recap.daysTitle') : t('recap.monthsTitle')}</h2>
+      <div class="overview">
       {#if data.kind === 'month'}
         <div class="calendar">
           {#each weekdayLabels as label}<span class="wd">{label}</span>{/each}
@@ -138,14 +139,18 @@
           {/each}
         </div>
       {/if}
-      {#if difference !== null}
-        <p class="muted foot">
-          {difference === 0
-            ? t(`recap.vsSame.${kind}`)
-            : t(difference > 0 ? `recap.vsMore.${kind}` : `recap.vsLess.${kind}`, { count: Math.abs(difference) })}
-        </p>
-      {/if}
-      <p class="muted foot">{t('recap.empty')}</p>
+      <div class="facts">
+        <div class="figure"><span class="num">{data.filled_days}</span><span class="of">{t('recap.ofDays', { total: data.elapsed_days })}</span></div>
+        {#if difference !== null}
+          <p class="vs">
+            {difference === 0
+              ? t(`recap.vsSame.${kind}`)
+              : t(difference > 0 ? `recap.vsMore.${kind}` : `recap.vsLess.${kind}`, { count: Math.abs(difference) })}
+          </p>
+        {/if}
+        <p class="muted foot">{t('recap.empty')}</p>
+      </div>
+      </div>
     </section>
 
     {#if data.filled_days > 0}
@@ -174,7 +179,7 @@
             <div class="habit" data-area={item.area}>
               <span class="dot"></span>
               <span class="name">{item.name}</span>
-              <span class="muted">{t('recap.habitDays', { done: item.done, total: item.total })}</span>
+              <span class="muted">{t(item.done === 1 ? 'recap.habitDaysOne' : 'recap.habitDays', { done: item.done, total: item.total })}</span>
             </div>
           {/each}
         </section>
@@ -244,11 +249,43 @@
     margin: 0 0 14px;
   }
 
+  .overview {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 24px 56px;
+  }
+
+  .facts {
+    flex: 1 1 220px;
+    min-width: 0;
+  }
+
+  .figure {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .num {
+    font: 400 64px/1 var(--serif);
+  }
+
+  .of {
+    font: 400 17px/1.3 var(--sans);
+    color: var(--ink-2);
+  }
+
+  .vs {
+    margin: 14px 0 0;
+    font: italic 400 19px/1.4 var(--serif);
+  }
+
   .calendar {
     display: grid;
+    flex: 0 1 420px;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 6px;
-    max-width: 420px;
   }
 
   .wd {
@@ -274,6 +311,7 @@
   }
 
   .months {
+    flex: 1 1 100%;
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: end;
