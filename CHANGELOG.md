@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.24.2] - 2026-10-28
+
+### Changed
+- Recap: the cards now sit in two columns on a wide screen (the days next to the six areas), so the page no longer leaves half of it empty. The big count of days moved above the calendar.
+
 ## [0.24.1] - 2026-10-28
 
 ### Changed

@@ -112,9 +112,19 @@
   {:else if status === 'loading' || !data}
     <p class="lede" aria-live="polite">{t('common.loading')}</p>
   {:else}
-    <section class="card block rise" aria-label={data.kind === 'month' ? t('recap.daysTitle') : t('recap.monthsTitle')}>
+    <div class="grid">
+    <section class="card block rise" class:wide={data.kind === 'year'} aria-label={data.kind === 'month' ? t('recap.daysTitle') : t('recap.monthsTitle')}>
       <h2 class="eyebrow">{data.kind === 'month' ? t('recap.daysTitle') : t('recap.monthsTitle')}</h2>
-      <div class="overview">
+      <div class="facts">
+        <div class="figure"><span class="num">{data.filled_days}</span><span class="of">{t('recap.ofDays', { total: data.elapsed_days })}</span></div>
+        {#if difference !== null}
+          <p class="vs">
+            {difference === 0
+              ? t(`recap.vsSame.${kind}`)
+              : t(difference > 0 ? `recap.vsMore.${kind}` : `recap.vsLess.${kind}`, { count: Math.abs(difference) })}
+          </p>
+        {/if}
+      </div>
       {#if data.kind === 'month'}
         <div class="calendar">
           {#each weekdayLabels as label}<span class="wd">{label}</span>{/each}
@@ -139,18 +149,7 @@
           {/each}
         </div>
       {/if}
-      <div class="facts">
-        <div class="figure"><span class="num">{data.filled_days}</span><span class="of">{t('recap.ofDays', { total: data.elapsed_days })}</span></div>
-        {#if difference !== null}
-          <p class="vs">
-            {difference === 0
-              ? t(`recap.vsSame.${kind}`)
-              : t(difference > 0 ? `recap.vsMore.${kind}` : `recap.vsLess.${kind}`, { count: Math.abs(difference) })}
-          </p>
-        {/if}
-        <p class="muted foot">{t('recap.empty')}</p>
-      </div>
-      </div>
+      <p class="muted foot">{t('recap.empty')}</p>
     </section>
 
     {#if data.filled_days > 0}
@@ -199,7 +198,7 @@
       {/if}
 
       {#if data.line_count > 0}
-        <section class="card block rise" aria-label={t('recap.linesTitle')}>
+        <section class="card block rise wide" aria-label={t('recap.linesTitle')}>
           <h2 class="eyebrow">{t('recap.linesTitle')}</h2>
           <p class="muted count">{t(data.line_count === 1 ? 'recap.lineCountOne' : 'recap.lineCount', { count: data.line_count })}</p>
           {#each data.lines as line (line.day)}
@@ -210,7 +209,9 @@
           {/each}
         </section>
       {/if}
-
+    {/if}
+    </div>
+    {#if data.filled_days > 0}
       <p class="closing">{t('recap.closing')}</p>
     {/if}
   {/if}
@@ -249,16 +250,27 @@
     margin: 0 0 14px;
   }
 
-  .overview {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 24px 56px;
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .grid .block {
+    margin-top: 0;
+  }
+
+  .wide {
+    grid-column: 1 / -1;
   }
 
   .facts {
-    flex: 1 1 220px;
-    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 20px;
+    margin-bottom: 18px;
   }
 
   .figure {
@@ -277,13 +289,12 @@
   }
 
   .vs {
-    margin: 14px 0 0;
-    font: italic 400 19px/1.4 var(--serif);
+    margin: 0;
+    font: italic 400 18px/1.4 var(--serif);
   }
 
   .calendar {
     display: grid;
-    flex: 0 1 420px;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     gap: 6px;
   }
@@ -311,7 +322,6 @@
   }
 
   .months {
-    flex: 1 1 100%;
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     align-items: end;
