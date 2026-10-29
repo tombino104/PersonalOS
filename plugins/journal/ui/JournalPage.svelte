@@ -17,6 +17,7 @@
   let dialogOpen = $state(false);
   let editing = $state(null);
   let expanded = $state(new Set());
+  let reportDays = $state(new Set());
   let reload = $state(0);
   let timer = null;
   let view = $state(storedView());
@@ -62,6 +63,22 @@
       })
       .catch(() => {
         status = 'error';
+      });
+  });
+
+  $effect(() => {
+    if (entries.length === 0) {
+      reportDays = new Set();
+      return;
+    }
+    const days = entries.map((entry) => entry.day).sort();
+    api
+      .scores(days[0], days[days.length - 1])
+      .then((result) => {
+        reportDays = new Set(result.days.map((item) => item.day));
+      })
+      .catch(() => {
+        reportDays = new Set();
       });
   });
 
@@ -205,7 +222,12 @@
                 <h3>{entry.title}</h3>
               {/if}
             </div>
-            <button class="btn" type="button" onclick={() => open(entry)}>{t('plugin.journal.editShort')}</button>
+            <div class="actions">
+              {#if reportDays.has(entry.day)}
+                <Link class="btn" href={`/archive?day=${entry.day}`}>{t('plugin.journal.openReport')}</Link>
+              {/if}
+              <button class="btn" type="button" onclick={() => open(entry)}>{t('plugin.journal.editShort')}</button>
+            </div>
           </div>
           {#if entry.mood}
             <p class="muted entry-mood">{t('plugin.journal.moodShort', { level: entry.mood })}</p>
@@ -229,7 +251,7 @@
 
 {#if dialogOpen}
   {#key editing?.id ?? 'new'}
-    <EntryDialog entry={editing} {today} onsaved={saved} onclose={() => (dialogOpen = false)} />
+    <EntryDialog entry={editing} {today} reportDay={editing && reportDays.has(editing.day) ? editing.day : null} onsaved={saved} onclose={() => (dialogOpen = false)} />
   {/key}
 {/if}
 
@@ -391,6 +413,13 @@
   .entry {
     margin-bottom: 12px;
     padding: 20px 24px;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
   }
 
   .entry-head {

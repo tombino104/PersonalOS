@@ -195,6 +195,9 @@ describe('demo server', () => {
     expect(created.status).toBe(201);
     expect(created.data).toMatchObject({ body: 'Found my rhythm', title: 'Rhythm', day: TODAY });
     expect(call('GET', '/plugins/journal/entries?q=RHYTHM').data.total).toBe(1);
+    const one = call('GET', `/plugins/journal/entries?start=${TODAY}&end=${TODAY}`).data;
+    expect(one.total).toBe(1);
+    expect(one.entries[0].day).toBe(TODAY);
     expect(call('POST', '/plugins/journal/entries', { body: '  ' }).status).toBe(422);
     expect(call('POST', '/plugins/journal/entries', { body: 'x', day: addDays(TODAY, 1) }).status).toBe(422);
     const changed = call('PUT', `/plugins/journal/entries/${created.data.id}`, { body: 'Changed' });

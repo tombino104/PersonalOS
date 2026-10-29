@@ -26,6 +26,8 @@
   "moodHint": "Optional. It counts toward your mood average, with less weight than the mood of the day.",
   "moodLevel": "Mood {level} out of 5",
   "moodShort": "mood {level} of 5",
+  "reportTitle": "Journal",
+  "openReport": "Report of this day",
   "view": "View",
   "viewBoard": "Board",
   "viewList": "List",

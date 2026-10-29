@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-29
+
+### Added
+- Journal and report are linked by the date, with nothing to set up. A past report (More > Past reports) now shows the journal entries written that day, one or more, with their mood. In the journal, each entry has a "Report of this day" link when that day has a report, and the edit window has it too.
+- Past reports can be opened on a given day with `/archive?day=YYYY-MM-DD`, including days older than the 60 shown in the list.
+
 ## [0.24.2] - 2026-10-28
 
 ### Changed

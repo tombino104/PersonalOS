@@ -1,10 +1,11 @@
 <script>
   import { onMount, untrack } from 'svelte';
   import { ApiError, pluginRequest } from '$core/lib/api.js';
+  import Link from '$core/components/Link.svelte';
   import { t } from '$core/lib/i18n.svelte.js';
   import { pickPrompt } from './journal.js';
 
-  let { entry = null, today, onsaved, onclose } = $props();
+  let { entry = null, today, reportDay = null, onsaved, onclose } = $props();
 
   let dialog;
   let day = $state(untrack(() => entry?.day ?? today));
@@ -55,6 +56,9 @@
 <dialog bind:this={dialog} class="card" aria-labelledby="entry-dialog-title" {onclose}>
   <form onsubmit={save}>
     <h2 id="entry-dialog-title">{entry ? t('plugin.journal.edit') : t('plugin.journal.write')}</h2>
+    {#if reportDay}
+      <p class="report-link"><Link href={`/archive?day=${reportDay}`}>{t('plugin.journal.openReport')}</Link></p>
+    {/if}
 
     <div class="row">
       <div class="grow">
@@ -129,6 +133,11 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+
+  .report-link {
+    margin: -4px 0 12px;
+    font: 500 13px/1 var(--sans);
   }
 
   h2 {

@@ -37,6 +37,7 @@ def test_the_manifest_is_valid_and_it_is_off_until_turned_on(tmp_path, monkeypat
         assert item["permissions"] == ["api_routes", "listen_events", "ui_panel"]
         assert item["entries"][0]["placement"] == "dock"
         assert item["pages"] == ["entries"]
+        assert item["report_sections"] == ["journal"]
 
 
 def test_the_plugin_cannot_read_reports_or_scores(journal):
@@ -82,6 +83,17 @@ def test_several_entries_can_share_a_day_and_the_newest_comes_first(journal):
     listing = client.get(f"{JOURNAL}/entries").json()
     assert listing["total"] == 3
     assert [item["id"] for item in listing["entries"]] == [second["id"], first["id"], older["id"]]
+
+
+def test_the_entries_of_one_day_can_be_listed_for_the_report(journal):
+    client, _ = journal
+    write(client, "Other day", day="2026-10-10")
+    morning = write(client, "Morning", day="2026-10-12")
+    evening = write(client, "Evening", day="2026-10-12")
+    write(client, "Next day", day="2026-10-13")
+    listing = client.get(f"{JOURNAL}/entries", params={"start": "2026-10-12", "end": "2026-10-12", "limit": 100}).json()
+    assert listing["total"] == 2
+    assert [item["id"] for item in listing["entries"]] == [evening["id"], morning["id"]]
 
 
 def test_an_entry_is_read_changed_and_deleted(journal):

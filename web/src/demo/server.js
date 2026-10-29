@@ -876,8 +876,11 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const offset = Number(query.get('offset') ?? 0);
     if (!Number.isInteger(limit) || limit < 1 || limit > 100 || !Number.isInteger(offset) || offset < 0) invalid();
     const text = (query.get('q') ?? '').trim().toLowerCase();
+    const start = query.get('start');
+    const end = query.get('end');
     const matching = state.journal
       .filter((entry) => !text || likeAny(entry, text))
+      .filter((entry) => (!start || entry.day >= start) && (!end || entry.day <= end))
       .sort((a, b) => (a.day === b.day ? b.id - a.id : a.day < b.day ? 1 : -1));
     return { entries: matching.slice(offset, offset + limit).map((entry) => ({ ...entry })), total: matching.length };
   });

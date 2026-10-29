@@ -1,11 +1,12 @@
 {
   "id": "journal",
   "name": "Journal",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A private journal for longer writing, apart from the evening questionnaire. Its entries never enter your scores and never create points; a mood you attach to an entry only counts in the mood tracker.",
   "core_api": "1.x",
   "permissions": ["ui_panel", "api_routes", "listen_events"],
   "adds": {
+    "report_sections": ["journal"],
     "pages": ["entries"],
     "entries": [
       { "id": "journal", "label": "Journal", "icon": "book", "placement": "dock", "page": "entries" }

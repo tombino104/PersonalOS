@@ -6,6 +6,7 @@
   import { addDays, formatDate, lastDays } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { reportSections } from '../lib/plugins.svelte.js';
+  import { router } from '../lib/router.svelte.js';
 
   const SPAN = 60;
 
@@ -13,10 +14,11 @@
   let today = $state('');
   let scoreByDay = $state({});
   let selected = $state('');
+  let pinned = $state('');
   let detail = $state(null);
   let detailStatus = $state('idle');
 
-  const days = $derived(today ? lastDays(today, SPAN).reverse() : []);
+  const days = $derived(today ? [...(pinned ? [pinned] : []), ...lastDays(today, SPAN).reverse()] : []);
   const yesterday = $derived(today ? addDays(today, -1) : '');
   const round = (value) => Math.round(value);
 
@@ -25,14 +27,23 @@
       today = (await api.today()).day;
       const result = await api.scores(addDays(today, -(SPAN - 1)), today);
       const byDay = {};
-      for (const entry of result.days) {
+      const add = (entry) => {
         byDay[entry.day] = {
           overall: entry.overall,
           areas: Object.fromEntries(entry.areas.map((area) => [area.area, area.score])),
         };
+      };
+      result.days.forEach(add);
+      const asked = router.query.get('day');
+      if (asked && /^\d{4}-\d{2}-\d{2}$/.test(asked) && asked <= today && !byDay[asked]) {
+        try {
+          (await api.scores(asked, asked)).days.forEach(add);
+        } catch {
+        }
+        if (byDay[asked]) pinned = asked;
       }
       scoreByDay = byDay;
-      selected = days.find((day) => byDay[day]) ?? today;
+      selected = asked && byDay[asked] ? asked : (days.find((day) => byDay[day]) ?? today);
       status = 'ready';
     } catch {
       status = 'error';

@@ -28,6 +28,8 @@
   "moodHint": "Facoltativo. Conta nella media dell'umore, con meno peso dell'umore della giornata.",
   "moodLevel": "Umore {level} su 5",
   "moodShort": "umore {level} su 5",
+  "reportTitle": "Diario",
+  "openReport": "Report di questo giorno",
   "view": "Vista",
   "viewBoard": "Bacheca",
   "viewList": "Elenco",
