@@ -9,9 +9,7 @@
   import Stella from './routes/Stella.svelte';
   import Questionnaire from './routes/Questionnaire.svelte';
   import Completion from './routes/Completion.svelte';
-  import Archive from './routes/Archive.svelte';
   import Review from './routes/Review.svelte';
-  import Recap from './routes/Recap.svelte';
   import More from './routes/More.svelte';
   import Settings from './routes/Settings.svelte';
   import PluginPage from './routes/PluginPage.svelte';
@@ -29,9 +27,9 @@
     '/stella': Stella,
     '/questionnaire': Questionnaire,
     '/questionnaire/done': Completion,
-    '/archive': Archive,
+    '/archive': Review,
     '/review': Review,
-    '/recap': Recap,
+    '/recap': Review,
     '/more': More,
   };
 

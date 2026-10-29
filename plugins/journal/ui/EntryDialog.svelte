@@ -57,7 +57,7 @@
   <form onsubmit={save}>
     <h2 id="entry-dialog-title">{entry ? t('plugin.journal.edit') : t('plugin.journal.write')}</h2>
     {#if reportDay}
-      <p class="report-link"><Link href={`/archive?day=${reportDay}`}>{t('plugin.journal.openReport')}</Link></p>
+      <p class="report-link"><Link href={`/review?day=${reportDay}`}>{t('plugin.journal.openReport')}</Link></p>
     {/if}
 
     <div class="row">

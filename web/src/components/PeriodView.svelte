@@ -1,44 +1,19 @@
 <script>
-  import { onMount } from 'svelte';
-  import Icon from '../components/Icon.svelte';
+  import DayReport from './DayReport.svelte';
   import { api } from '../lib/api.js';
   import { heatLevel } from '../lib/charts.js';
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
-  import { router } from '../lib/router.svelte.js';
   import { change, signed } from '../lib/review.js';
-  import {
-    currentPeriod,
-    dayCountChange,
-    monthName,
-    monthOffset,
-    periodKind,
-    periodLabel,
-    readingOf,
-    shiftPeriod,
-    switchKind,
-  } from '../lib/recap.js';
+  import { dayCountChange, monthName, monthOffset, readingOf } from '../lib/recap.js';
 
-  let today = $state('');
-  let period = $state('');
+  let { period, today, wantedDay = '', onzoom } = $props();
+
   let data = $state(null);
   let status = $state('loading');
-
-  const kind = $derived(period ? periodKind(period) : 'month');
-  const isLatest = $derived(Boolean(period) && period === currentPeriod(kind, today));
-
-  onMount(async () => {
-    try {
-      today = (await api.today()).day;
-      const asked = router.query.get('period');
-      period = asked && /^\d{4}(-\d{2})?$/.test(asked) ? asked : currentPeriod('month', today);
-    } catch {
-      status = 'error';
-    }
-  });
+  let selected = $state('');
 
   $effect(() => {
-    if (!period) return;
     const requested = period;
     status = 'loading';
     api
@@ -46,6 +21,7 @@
       .then((result) => {
         if (requested !== period) return;
         data = result;
+        selected = result.days?.some((item) => item.day === wantedDay && item.day <= today) ? wantedDay : '';
         status = 'ready';
       })
       .catch(() => {
@@ -54,6 +30,7 @@
   });
 
   const round = (value) => Math.round(value);
+  const kind = $derived(data ? data.kind : 'month');
   const reading = $derived(data ? readingOf(data.areas) : null);
   const difference = $derived(data ? dayCountChange(data) : null);
   const weekdayLabels = $derived(
@@ -71,47 +48,25 @@
         ]
       : [],
   );
+  const selectedFilled = $derived(Boolean(data?.days?.find((item) => item.day === selected)?.completed));
   const dayLong = (day) => formatDate(day, locale(), { weekday: 'long', day: 'numeric', month: 'long' });
 </script>
 
-<div class="content stagger">
-  <header class="header-row">
-    <div>
-      <div class="eyebrow">{t('nav.recap')}</div>
-      <h1 class="title">
-        {t('recap.titleLead')} <em>{period ? periodLabel(period, locale()) : ''}</em>
-      </h1>
-      {#if data}
-        <p class="lede">
-          {#if data.filled_days === 0}
-            {t('recap.ledeEmpty')}
-          {:else}
-            {t(`recap.lede${data.is_current ? 'SoFar' : ''}${data.filled_days === 1 ? 'One' : ''}`, { filled: data.filled_days, total: data.elapsed_days })}
-          {/if}
-        </p>
-      {/if}
-    </div>
-    <div class="controls">
-      <div class="segmented" role="group" aria-label={t('recap.periods')}>
-        <button class="seg" class:on={kind === 'month'} aria-pressed={kind === 'month'} disabled={!today} onclick={() => (period = switchKind(period, 'month', today))}>{t('recap.month')}</button>
-        <button class="seg" class:on={kind === 'year'} aria-pressed={kind === 'year'} disabled={!today} onclick={() => (period = switchKind(period, 'year', today))}>{t('recap.year')}</button>
-      </div>
-      <div class="nav" role="group" aria-label={t('recap.choose')}>
-        <button class="btn" type="button" aria-label={t('recap.previous')} disabled={!period} onclick={() => (period = shiftPeriod(period, -1))}>
-          <Icon name="back" small />
-        </button>
-        <button class="btn" type="button" aria-label={t('recap.next')} disabled={isLatest || !period} onclick={() => (period = shiftPeriod(period, 1))}>
-          <Icon name="forward" small />
-        </button>
-      </div>
-    </div>
-  </header>
+<div class="view">
 
   {#if status === 'error'}
     <p class="error" role="alert">{t('error.generic')}</p>
   {:else if status === 'loading' || !data}
     <p class="lede" aria-live="polite">{t('common.loading')}</p>
   {:else}
+    <p class="lede">
+      {#if data.filled_days === 0}
+        {t('recap.ledeEmpty')}
+      {:else}
+        {t(`recap.lede${data.is_current ? 'SoFar' : ''}${data.filled_days === 1 ? 'One' : ''}`, { filled: data.filled_days, total: data.elapsed_days })}
+      {/if}
+    </p>
+
     <div class="grid">
     <section class="card block rise" class:wide={data.kind === 'year'} aria-label={data.kind === 'month' ? t('recap.daysTitle') : t('recap.monthsTitle')}>
       <h2 class="eyebrow">{data.kind === 'month' ? t('recap.daysTitle') : t('recap.monthsTitle')}</h2>
@@ -132,25 +87,44 @@
             {#if cell.kind === 'blank'}
               <span></span>
             {:else}
-              <span class="cell {cell.kind === 'filled' ? cell.level : cell.kind}" class:future={cell.kind === 'future'} title={dayLong(cell.day)}>
+              <button
+                class="cell {cell.kind === 'filled' ? cell.level : cell.kind}"
+                class:future={cell.kind === 'future'}
+                class:sel={selected === cell.day}
+                type="button"
+                title={dayLong(cell.day)}
+                aria-pressed={selected === cell.day}
+                disabled={cell.kind === 'future'}
+                onclick={() => (selected = cell.day)}
+              >
                 <span class="n">{Number(cell.day.slice(8))}</span>
-              </span>
+              </button>
             {/if}
           {/each}
         </div>
       {:else}
         <div class="months">
           {#each data.months as month (month.month)}
-            <div class="month">
+            <button class="month" type="button" title={monthName(month.month, locale())} onclick={() => onzoom(month.month)}>
               <span class="bar" aria-hidden="true"><span style:height="{month.possible ? round((month.filled / month.possible) * 100) : 0}%"></span></span>
               <span class="mcount">{month.filled}</span>
               <span class="mname">{monthName(month.month, locale())}</span>
-            </div>
+            </button>
           {/each}
         </div>
       {/if}
       <p class="muted foot">{t('recap.empty')}</p>
     </section>
+
+    {#if data.kind === 'month'}
+      <div class="wide">
+        {#if selected}
+          <DayReport day={selected} {today} filled={selectedFilled} />
+        {:else}
+          <p class="muted pick">{t('recap.pickDay')}</p>
+        {/if}
+      </div>
+    {/if}
 
     {#if data.filled_days > 0}
       <section class="card block rise" aria-label={t('recap.areasTitle')}>
@@ -218,23 +192,6 @@
 </div>
 
 <style>
-  .controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .nav {
-    display: flex;
-    gap: 8px;
-  }
-
-  .nav .btn {
-    width: 44px;
-    padding: 0;
-  }
-
   .foot {
     margin: 12px 2px 0;
     font: 400 13px/1.5 var(--sans);
@@ -309,6 +266,27 @@
   .calendar .cell {
     display: grid;
     place-items: center;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .calendar .cell:not(.empty):not(.today) {
+    border: 0;
+  }
+
+  .calendar .cell:disabled {
+    cursor: default;
+  }
+
+  .calendar .cell.sel {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .pick {
+    margin: 4px 2px 0;
+    font: 400 14px/1.5 var(--sans);
   }
 
   .n {
@@ -329,6 +307,11 @@
   }
 
   .month {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
     display: flex;
     flex: 0 1 84px;
     flex-direction: column;

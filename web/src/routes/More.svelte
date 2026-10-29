@@ -61,14 +61,6 @@
           <span class="go"><Icon name="forward" small /></span>
         </Link>
       {/each}
-      <Link class="entry" href="/archive">
-        <span class="ico"><Icon name="archive" /></span>
-        <span class="text">
-          <span class="entry-title">{t('nav.archive')}</span>
-          <span class="entry-note">{t('more.archiveNote')}</span>
-        </span>
-        <span class="go"><Icon name="forward" small /></span>
-      </Link>
       <Link class="entry" href="/settings">
         <span class="ico"><Icon name="sliders" /></span>
         <span class="text">

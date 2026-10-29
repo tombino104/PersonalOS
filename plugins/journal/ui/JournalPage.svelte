@@ -224,7 +224,7 @@
             </div>
             <div class="actions">
               {#if reportDays.has(entry.day)}
-                <Link class="btn" href={`/archive?day=${entry.day}`}>{t('plugin.journal.openReport')}</Link>
+                <Link class="btn" href={`/review?day=${entry.day}`}>{t('plugin.journal.openReport')}</Link>
               {/if}
               <button class="btn" type="button" onclick={() => open(entry)}>{t('plugin.journal.editShort')}</button>
             </div>

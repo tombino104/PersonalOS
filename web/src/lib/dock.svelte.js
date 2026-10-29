@@ -12,14 +12,7 @@ const CORE_ITEMS = [
     href: '/review',
     icon: 'chart',
     labelKey: 'nav.review',
-    match: (path) => path === '/review',
-  },
-  {
-    key: 'recap',
-    href: '/recap',
-    icon: 'recap',
-    labelKey: 'nav.recap',
-    match: (path) => path === '/recap',
+    match: (path) => ['/review', '/recap', '/archive'].includes(path),
   },
   {
     key: 'questionnaire',
@@ -34,7 +27,7 @@ const CORE_ITEMS = [
     href: '/more',
     icon: 'more',
     labelKey: 'nav.more',
-    match: (path) => ['/more', '/archive'].includes(path) || path.startsWith('/settings'),
+    match: (path) => path === '/more' || path.startsWith('/settings'),
   },
 ];
 

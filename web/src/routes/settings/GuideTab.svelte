@@ -1,7 +1,7 @@
 <script>
   import { t } from '../../lib/i18n.svelte.js';
 
-  const SECTIONS = ['basics', 'evening', 'score', 'activities', 'home', 'review', 'recap', 'calendar', 'plugins', 'mascot', 'backups', 'phone', 'account', 'data'];
+  const SECTIONS = ['basics', 'evening', 'score', 'activities', 'home', 'review', 'calendar', 'plugins', 'mascot', 'backups', 'phone', 'account', 'data'];
   let open = $state('basics');
 
   const paragraphs = (id) => t(`guide.${id}.body`).split('\n');

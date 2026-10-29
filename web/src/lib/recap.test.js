@@ -89,3 +89,47 @@ describe('homeInvitation', () => {
     expect(homeInvitation('2026-10-03', false)).toBeNull();
   });
 });
+
+import { canGoBack, latestPeriod, periodFor, shiftView, switchView, viewOf } from './recap.js';
+
+describe('views', () => {
+  it('tells a week, a month and a year apart', () => {
+    expect(viewOf('2026-10-26')).toBe('week');
+    expect(viewOf('2026-10')).toBe('month');
+    expect(viewOf('2026')).toBe('year');
+  });
+
+  it('finds the period that holds a day', () => {
+    expect(periodFor('week', '2026-10-28')).toBe('2026-10-26');
+    expect(periodFor('month', '2026-10-28')).toBe('2026-10');
+    expect(periodFor('year', '2026-10-28')).toBe('2026');
+    expect(latestPeriod('week', '2026-10-29')).toBe('2026-10-26');
+  });
+
+  it('moves a week, a month or a year at a time', () => {
+    expect(shiftView('week', '2026-10-26', -1)).toBe('2026-10-19');
+    expect(shiftView('week', '2026-10-26', 1)).toBe('2026-11-02');
+    expect(shiftView('month', '2026-01', -1)).toBe('2025-12');
+    expect(shiftView('year', '2026', -1)).toBe('2025');
+  });
+
+  it('does not go back before the first day', () => {
+    expect(canGoBack('week', '2026-10-19', '2026-10-21')).toBe(false);
+    expect(canGoBack('week', '2026-10-26', '2026-10-21')).toBe(true);
+    expect(canGoBack('month', '2026-10', '2026-10-21')).toBe(false);
+    expect(canGoBack('year', '2026', '2025-12-31')).toBe(true);
+    expect(canGoBack('month', '2026-10', null)).toBe(false);
+  });
+
+  it('keeps its place when the view changes', () => {
+    const today = '2026-10-29';
+    expect(switchView('week', 'month', '2026-10-19', today)).toBe('2026-10');
+    expect(switchView('week', 'year', '2026-10-19', today)).toBe('2026');
+    expect(switchView('month', 'week', '2026-10', today)).toBe('2026-10-26');
+    expect(switchView('month', 'week', '2026-09', today)).toBe('2026-08-31');
+    expect(switchView('year', 'month', '2026', today)).toBe('2026-10');
+    expect(switchView('year', 'month', '2025', today)).toBe('2025-12');
+    expect(switchView('year', 'week', '2025', today)).toBe('2024-12-30');
+    expect(switchView('month', 'month', '2026-03', today)).toBe('2026-03');
+  });
+});

@@ -121,7 +121,7 @@
       <h1 class="title">{fullDate}</h1>
       <p class="lede">{t('questionnaire.closed')}</p>
     </header>
-    <Link class="btn" href="/archive">{t('nav.archive')}</Link>
+    <Link class="btn" href="/review">{t('nav.review')}</Link>
   {:else}
     <header class="stagger">
       <div class="eyebrow">{t('questionnaire.eyebrow')}</div>

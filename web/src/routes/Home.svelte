@@ -179,7 +179,7 @@
   {/each}
 
   {#if invitation}
-    <Link class="card invite rise" href="/recap?period={invitation}">
+    <Link class="card invite rise" href="/review?period={invitation}">
       <span class="invite-text">{t('home.recapInvite', { period: periodLabel(invitation, locale()) })}</span>
       <span class="invite-go">{t('home.recapOpen')} <Icon name="forward" small /></span>
     </Link>

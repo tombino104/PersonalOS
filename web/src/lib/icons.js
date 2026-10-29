@@ -15,7 +15,6 @@ export const icons = {
     { tag: 'circle', attrs: { cx: 9, cy: 17, r: 2.5 } },
   ],
   chart: [path('M5 19.5V11M12 19.5V5M19 19.5v-6')],
-  recap: [path('M4.5 12a7.5 7.5 0 1 0 2.2-5.3'), path('M4.5 4.5v3.6h3.6'), path('M12 8.5V12l2.5 1.5')],
   up: [path('m6 14.5 6-6 6 6')],
   down: [path('m6 9.5 6 6 6-6')],
   check: [path('m5 12.5 4.5 4.5L19 7.5')],

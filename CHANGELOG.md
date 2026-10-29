@@ -5,6 +5,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-10-29
+
+### Changed
+- The weekly review, the monthly and yearly recap and the past reports are now one page, **Review**. Switch between Week, Month and Year, and move with the arrows or the "This week / month / year" button. In a week or a month, tap a day to read that evening's report (with your journal and other plugin sections) right under it; in a year, tap a month to open it. The free note for the week stays in the week view.
+- The "Past reports" entry in More and the separate "Recap" dock item are gone. The old addresses `/archive` and `/recap` still open the review, on the right day or period.
+- Past reports reach back to your first day, one week at a time.
+
 ## [0.27.0] - 2026-10-29
 
 ### Changed
