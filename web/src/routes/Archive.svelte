@@ -1,53 +1,71 @@
 <script>
   import { onMount } from 'svelte';
+  import Icon from '../components/Icon.svelte';
   import Link from '../components/Link.svelte';
   import { api } from '../lib/api.js';
   import { AREAS } from '../lib/charts.js';
-  import { addDays, formatDate, lastDays } from '../lib/dates.js';
+  import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { reportSections } from '../lib/plugins.svelte.js';
   import { router } from '../lib/router.svelte.js';
-
-  const SPAN = 60;
+  import { mondayOf, weekRange } from '../lib/review.js';
 
   let status = $state('loading');
   let today = $state('');
+  let firstDay = $state(null);
+  let weekStart = $state('');
   let scoreByDay = $state({});
   let selected = $state('');
-  let pinned = $state('');
   let detail = $state(null);
   let detailStatus = $state('idle');
+  let wanted = '';
 
-  const days = $derived(today ? [...(pinned ? [pinned] : []), ...lastDays(today, SPAN).reverse()] : []);
+  const currentWeek = $derived(today ? mondayOf(today) : '');
+  const isCurrent = $derived(Boolean(weekStart) && weekStart === currentWeek);
+  const canGoBack = $derived(Boolean(weekStart) && Boolean(firstDay) && weekStart > mondayOf(firstDay));
+  const days = $derived(
+    weekStart ? Array.from({ length: 7 }, (_, offset) => addDays(weekStart, offset)).filter((day) => day <= today) : [],
+  );
   const yesterday = $derived(today ? addDays(today, -1) : '');
   const round = (value) => Math.round(value);
 
   onMount(async () => {
     try {
-      today = (await api.today()).day;
-      const result = await api.scores(addDays(today, -(SPAN - 1)), today);
-      const byDay = {};
-      const add = (entry) => {
-        byDay[entry.day] = {
-          overall: entry.overall,
-          areas: Object.fromEntries(entry.areas.map((area) => [area.area, area.score])),
-        };
-      };
-      result.days.forEach(add);
+      const info = await api.today();
+      today = info.day;
+      firstDay = info.first_day;
       const asked = router.query.get('day');
-      if (asked && /^\d{4}-\d{2}-\d{2}$/.test(asked) && asked <= today && !byDay[asked]) {
-        try {
-          (await api.scores(asked, asked)).days.forEach(add);
-        } catch {
-        }
-        if (byDay[asked]) pinned = asked;
-      }
-      scoreByDay = byDay;
-      selected = asked && byDay[asked] ? asked : (days.find((day) => byDay[day]) ?? today);
-      status = 'ready';
+      if (asked && /^\d{4}-\d{2}-\d{2}$/.test(asked) && asked <= today) wanted = asked;
+      weekStart = mondayOf(wanted || today);
     } catch {
       status = 'error';
     }
+  });
+
+  $effect(() => {
+    if (!weekStart) return;
+    const requested = weekStart;
+    api
+      .scores(requested, addDays(requested, 6))
+      .then((result) => {
+        if (requested !== weekStart) return;
+        const byDay = {};
+        for (const entry of result.days) {
+          byDay[entry.day] = {
+            overall: entry.overall,
+            areas: Object.fromEntries(entry.areas.map((area) => [area.area, area.score])),
+          };
+        }
+        scoreByDay = byDay;
+        const shown = Array.from({ length: 7 }, (_, offset) => addDays(requested, offset)).filter((day) => day <= today);
+        const keep = wanted && shown.includes(wanted) ? wanted : '';
+        wanted = '';
+        selected = keep || [...shown].reverse().find((day) => byDay[day]) || shown[shown.length - 1];
+        status = 'ready';
+      })
+      .catch(() => {
+        status = 'error';
+      });
   });
 
   $effect(() => {
@@ -106,6 +124,19 @@
   {:else if status === 'error'}
     <p class="error" role="alert">{t('error.generic')}</p>
   {:else}
+    <div class="weekbar">
+      <span class="range">{weekRange(weekStart, locale())}</span>
+      <div class="nav" role="group" aria-label={t('archive.weeks')}>
+        <button class="btn" type="button" aria-label={t('archive.previous')} disabled={!canGoBack} onclick={() => (weekStart = addDays(weekStart, -7))}>
+          <Icon name="back" small />
+        </button>
+        <button class="btn" type="button" disabled={isCurrent} onclick={() => (weekStart = currentWeek)}>{t('archive.thisWeek')}</button>
+        <button class="btn" type="button" aria-label={t('archive.next')} disabled={isCurrent} onclick={() => (weekStart = addDays(weekStart, 7))}>
+          <Icon name="forward" small />
+        </button>
+      </div>
+    </div>
+
     <div class="layout">
       <section class="card days rise" aria-label={t('archive.days')}>
         {#each days as day (day)}
@@ -178,6 +209,29 @@
 </div>
 
 <style>
+  .weekbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .range {
+    font: italic 400 20px/1.3 var(--serif);
+  }
+
+  .nav {
+    display: flex;
+    gap: 8px;
+  }
+
+  .nav .btn:not(:nth-child(2)) {
+    width: 44px;
+    padding: 0;
+  }
+
   .layout {
     display: flex;
     flex-wrap: wrap;

@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-10-29
+
+### Changed
+- Past reports show one week at a time instead of a long list of 60 days: a week range, previous and next buttons, and "This week". It now reaches back to your first day, and the link from a journal entry opens the right week.
+- Recap, year view: the month bars are centered.
+
 ## [0.26.0] - 2026-10-29
 
 ### Changed

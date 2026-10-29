@@ -322,17 +322,19 @@
   }
 
   .months {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    align-items: end;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
     gap: 6px;
   }
 
   .month {
     display: flex;
+    flex: 0 1 84px;
     flex-direction: column;
     align-items: center;
     gap: 6px;
+    min-width: 0;
   }
 
   .bar {
