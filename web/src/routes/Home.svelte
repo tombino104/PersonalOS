@@ -154,7 +154,7 @@
   <header class="header-row">
     <div>
       <div class="greeting">
-        <Link href="/settings/mascot" aria-label={t('settings.mascot')}><Avatar size={40} /></Link>
+        <Link href="/settings/account/mascot" aria-label={t('settings.mascot')}><Avatar size={40} /></Link>
       </div>
       <h1 class="title">
         {weekday.charAt(0).toUpperCase() + weekday.slice(1)}, <em>{dateText}</em>

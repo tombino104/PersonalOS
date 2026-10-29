@@ -45,7 +45,7 @@ If the app was off at the chosen time, a reminder up to three hours late is stil
 
 ## Backups
 
-Everything lives in the data folder, so a backup is a copy of it. The app also does it for you: a backup is made every day (at a time you choose, 03:00 by default; if the device was off, as soon as it is on again; the last 7 are kept) in `data/backups`. **Settings > Backups** lets you make one now and download it, or restore from a saved backup or an uploaded `.zip`. Before a restore the app backs up the current state first. Backups never contain the setup code.
+Everything lives in the data folder, so a backup is a copy of it. The app also does it for you: a backup is made every day (at a time you choose, 03:00 by default; if the device was off, as soon as it is on again; the last 7 are kept) in `data/backups`. **Settings > Account > Backups** lets you make one now and download it, or restore from a saved backup or an uploaded `.zip`. Before a restore the app backs up the current state first. Backups never contain the setup code.
 
 ## Settings
 

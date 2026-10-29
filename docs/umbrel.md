@@ -14,7 +14,7 @@ Personal OS is not specific to umbrelOS: it is a plain Docker image (`ghcr.io/to
 2. In umbrelOS: App Store, menu at the top right, **Community App Stores**, add the repository address.
 3. Install **Personal OS** from that store.
 4. Open it from the umbrelOS home screen. umbrelOS asks for your umbrelOS password first, then the app shows a few welcome screens that end with the creation of your account (a name and a password, typed twice). No code is needed on umbrelOS, because the umbrelOS login already protects that page.
-5. Backups are in the `backups` folder of the app's data folder (in the Files app: `Apps/tombino104-personal-os/data`), and in Settings > Backups. The file `setup-code.txt` next to them holds the code needed to erase all data (Settings > Account, or the "start over" link on the login page); after erasing, the app starts again from the welcome screens.
+5. Backups are in the `backups` folder of the app's data folder (in the Files app: `Apps/tombino104-personal-os/data`), and in Settings > Account > Backups. The file `setup-code.txt` next to them holds the code needed to erase all data (Settings > Account, or the "start over" link on the login page); after erasing, the app starts again from the welcome screens.
 
 ## Where the data lives
 

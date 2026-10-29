@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-10-29
+
+### Changed
+- Settings now has five entries instead of nine: Activities, Account, Appearance, Plugins and Help. Inside a few of them, a small row of sections tells you where you are: Account holds Login, Mascot and Backups; Appearance holds Theme and language, and the Dock; Help holds the Guide and the Community page.
+- The old addresses (`/settings/mascot`, `/settings/backups`, `/settings/dock`, `/settings/guide`, `/settings/community`) still work and lead to the new place. The guide and the docs name the new paths.
+
 ## [0.25.0] - 2026-10-29
 
 ### Added
