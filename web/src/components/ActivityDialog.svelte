@@ -4,6 +4,7 @@
   import { AREAS } from '../lib/charts.js';
   import { weekdayInitials } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
+  import { SUGGESTIONS } from '../lib/suggestions.js';
 
   let { activity = null, area = 'physical', onsaved, onclose } = $props();
 
@@ -15,6 +16,15 @@
   let days = $state(untrack(() => activity?.days ?? [0, 1, 2, 3, 4, 5, 6]));
   let times = $state(untrack(() => activity?.times_per_week ?? 0));
   const initials = $derived(weekdayInitials(locale()));
+  let ideasOpen = $state(false);
+  const ideas = $derived(SUGGESTIONS[chosenArea] ?? []);
+
+  function pick(idea) {
+    name = t(`suggestion.${chosenArea}.${idea.id}`);
+    weight = idea.weight;
+    times = idea.times;
+    ideasOpen = false;
+  }
 
   function toggleDay(index) {
     if (days.includes(index)) {
@@ -84,6 +94,17 @@
     <div>
       <label class="label" for="activity-name">{t('activity.name')}</label>
       <input id="activity-name" class="field" type="text" maxlength="100" required bind:value={name} />
+      {#if !activity}
+        <button class="ideas-toggle" type="button" aria-expanded={ideasOpen} onclick={() => (ideasOpen = !ideasOpen)}>{t('activity.ideas')}</button>
+        {#if ideasOpen}
+          <div class="chips" role="group" aria-label={t('activity.ideas')}>
+            {#each ideas as idea (idea.id)}
+              <button class="chip" type="button" onclick={() => pick(idea)}>{t(`suggestion.${chosenArea}.${idea.id}`)}</button>
+            {/each}
+          </div>
+          <p class="muted help">{t('activity.ideasHelp')}</p>
+        {/if}
+      {/if}
     </div>
 
     <div>
@@ -216,6 +237,40 @@
 
   .segmented {
     width: fit-content;
+  }
+
+  .ideas-toggle {
+    margin-top: 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--ink-2);
+    font: 500 13px/1 var(--sans);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .chip {
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font: 400 13.5px/1.2 var(--sans);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .chip:hover {
+    border-color: var(--ink);
   }
 
   .days {

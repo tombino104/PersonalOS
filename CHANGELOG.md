@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-10-30
+
+### Added
+- New activity: a "Need ideas?" link under the name opens a few suggestions for the chosen area (about five per area: for example "Write to someone I care about", "Call a friend or a family member" twice a week, "See someone in person" once a week). Tapping one fills the name, the weight and the weekly goal; you can change everything before saving. Suggestions are in English and Italian.
+
 ## [0.28.0] - 2026-10-29
 
 ### Changed
