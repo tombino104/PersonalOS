@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.29.0"
+version: "0.30.0"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,6 +24,6 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  New activity: a Need ideas? link suggests a few habits for each area, with weight and weekly goal already filled in.
+  New People plugin (names and birthdays), and the review keeps its controls in place and folds the report of a day under the six areas.
 submitter: tombino104
 submission: ""
