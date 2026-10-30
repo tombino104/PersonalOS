@@ -69,7 +69,7 @@ More about running it (settings, password reset, command line): [docs/running.md
 - An evening questionnaire, with optional days of the week per activity and an optional time before which it stays closed
 - Trends, a six-month heatmap, the "star" of the six areas, a review of any week, month or year (with the report of each day)
 - Habits by weekday, or with a goal of N times a week
-- Plugins: calendar, mood tracker, journal, daily quote, health (daily steps sent from your phone); [write your own](docs/plugins.md)
+- Plugins: calendar, mood tracker, journal, daily quote, people (names and birthdays), health (daily steps sent from your phone); [write your own](docs/plugins.md)
 - Light and dark theme, English and Italian
 - A dock you arrange yourself: up to seven pages, in the order you like
 - Backups and restore from Settings, export to CSV and JSON, a built-in guide

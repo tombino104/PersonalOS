@@ -231,6 +231,17 @@ export function seedSteps(state, today) {
   });
 }
 
+export function seedPeople(state, today) {
+  const month = (offset) => addDays(today, offset).slice(5);
+  const people = [
+    { name: 'Alex', birthday: month(3) },
+    { name: 'Sam', birthday: `1994-${month(41)}` },
+    { name: 'Jordan', birthday: month(120) },
+    { name: 'Riley', birthday: null },
+  ];
+  for (const person of people) state.people.push({ id: state.nextPersonId++, ...person });
+}
+
 export function seedEvents(state, today) {
   for (const event of EVENTS) {
     state.events.push({

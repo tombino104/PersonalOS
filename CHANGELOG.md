@@ -5,6 +5,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-10-30
+
+### Added
+- People plugin (off until you turn it on in Settings > Plugins): a private list of people with their name and birthday, sorted by the next birthday, with "turns N" when you know the year. It never creates points and never sends a notification. Routes under `/api/v1/plugins/people`.
+
+### Changed
+- Review: the view buttons and the arrows now sit below the title and no longer move when the title gets longer or shorter; the "This week / month / year" button keeps its width.
+- Review: the report of a day is a folded card placed under the six areas. It opens when you tap a day (and scrolls into view), and the app remembers whether you left it open. In the month view it no longer leaves an empty space next to the calendar.
+
 ## [0.29.0] - 2026-10-30
 
 ### Added

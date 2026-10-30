@@ -71,7 +71,7 @@
 </script>
 
 <div class="content stagger">
-  <header class="header-row">
+  <header>
     <div>
       <div class="eyebrow">{t('nav.review')}</div>
       <h1 class="title">
@@ -117,6 +117,7 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 12px;
+    margin: 20px 0 24px;
   }
 
   .nav {
@@ -127,5 +128,9 @@
   .nav .btn:not(:nth-child(2)) {
     width: 44px;
     padding: 0;
+  }
+
+  .nav .btn:nth-child(2) {
+    min-width: 10.5rem;
   }
 </style>

@@ -1,10 +1,11 @@
 <script>
-  import { onDestroy } from 'svelte';
+  import { onDestroy, tick } from 'svelte';
   import DayReport from './DayReport.svelte';
   import Icon from './Icon.svelte';
   import { api } from '../lib/api.js';
   import { AREAS } from '../lib/charts.js';
   import { isOpen, setOpen } from '../lib/collapse.js';
+  import { prefersReducedMotion } from '../lib/motion.js';
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { change, groupActivities, signed } from '../lib/review.js';
@@ -17,6 +18,7 @@
   let saved = $state(false);
   let failure = $state('');
   let selected = $state('');
+  let dayOpen = $state(isOpen('review.day'));
   let timer = null;
 
   onDestroy(() => {
@@ -45,6 +47,13 @@
   });
 
   const round = (value) => Math.round(value);
+
+  async function pick(day) {
+    selected = day;
+    dayOpen = true;
+    await tick();
+    document.getElementById('day-report')?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+  }
   const groups = $derived(data ? groupActivities(data.activities.filter((item) => !item.archived), AREAS) : []);
   const lines = $derived(data ? data.days.filter((day) => day.reflection) : []);
   const selectedFilled = $derived(Boolean(data?.days.find((day) => day.day === selected)?.completed));
@@ -91,7 +100,7 @@
           title={dayLong(day.day)}
           aria-pressed={selected === day.day}
           disabled={day.day > today}
-          onclick={() => (selected = day.day)}
+          onclick={() => pick(day.day)}
         >
           <span class="wd">{weekday(day.day)}</span>
           <span class="num">{dayNumber(day.day)}</span>
@@ -100,10 +109,6 @@
       {/each}
     </section>
     <p class="muted foot">{t('review.empty')}</p>
-
-    {#if selected}
-      <DayReport day={selected} {today} filled={selectedFilled} />
-    {/if}
 
     <section class="card block rise" aria-label={t('review.areas')}>
       <h2 class="eyebrow">{t('review.areas')}</h2>
@@ -119,6 +124,10 @@
       {/each}
       <p class="muted foot">{t('review.areasNote')}</p>
     </section>
+
+    {#if selected}
+      <DayReport day={selected} {today} filled={selectedFilled} bind:open={dayOpen} />
+    {/if}
 
     {#if groups.length > 0}
       <section class="card block rise" aria-label={t('review.habits')}>

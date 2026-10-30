@@ -1,6 +1,9 @@
 <script>
   import DayReport from './DayReport.svelte';
+  import { tick } from 'svelte';
   import { api } from '../lib/api.js';
+  import { isOpen } from '../lib/collapse.js';
+  import { prefersReducedMotion } from '../lib/motion.js';
   import { heatLevel } from '../lib/charts.js';
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
@@ -12,6 +15,7 @@
   let data = $state(null);
   let status = $state('loading');
   let selected = $state('');
+  let dayOpen = $state(isOpen('review.day'));
 
   $effect(() => {
     const requested = period;
@@ -30,6 +34,13 @@
   });
 
   const round = (value) => Math.round(value);
+
+  async function pick(day) {
+    selected = day;
+    dayOpen = true;
+    await tick();
+    document.getElementById('day-report')?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'start' });
+  }
   const kind = $derived(data ? data.kind : 'month');
   const reading = $derived(data ? readingOf(data.areas) : null);
   const difference = $derived(data ? dayCountChange(data) : null);
@@ -95,7 +106,7 @@
                 title={dayLong(cell.day)}
                 aria-pressed={selected === cell.day}
                 disabled={cell.kind === 'future'}
-                onclick={() => (selected = cell.day)}
+                onclick={() => pick(cell.day)}
               >
                 <span class="n">{Number(cell.day.slice(8))}</span>
               </button>
@@ -114,17 +125,10 @@
         </div>
       {/if}
       <p class="muted foot">{t('recap.empty')}</p>
+      {#if data.kind === 'month' && data.filled_days > 0}
+        <p class="muted foot">{t('recap.pickDay')}</p>
+      {/if}
     </section>
-
-    {#if data.kind === 'month'}
-      <div class="wide">
-        {#if selected}
-          <DayReport day={selected} {today} filled={selectedFilled} />
-        {:else}
-          <p class="muted pick">{t('recap.pickDay')}</p>
-        {/if}
-      </div>
-    {/if}
 
     {#if data.filled_days > 0}
       <section class="card block rise" aria-label={t('recap.areasTitle')}>
@@ -144,6 +148,12 @@
         {/if}
         <p class="muted foot">{t('recap.areasNote')}</p>
       </section>
+
+      {#if data.kind === 'month' && selected}
+        <div class="wide">
+          <DayReport day={selected} {today} filled={selectedFilled} bind:open={dayOpen} />
+        </div>
+      {/if}
 
       {#if data.top_habits.length > 0}
         <section class="card block rise" aria-label={t('recap.habitsTitle')}>
@@ -282,11 +292,6 @@
   .calendar .cell.sel {
     outline: 2px solid var(--ink);
     outline-offset: 2px;
-  }
-
-  .pick {
-    margin: 4px 2px 0;
-    font: 400 14px/1.5 var(--sans);
   }
 
   .n {

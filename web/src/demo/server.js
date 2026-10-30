@@ -10,7 +10,7 @@ import {
   occurrences,
   weekdayOf,
 } from './dates.js';
-import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory, seedJournal, seedSteps } from './seed.js';
+import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory, seedJournal, seedPeople, seedSteps } from './seed.js';
 
 const manifests = import.meta.glob('../../../plugins/*/manifest.json', { eager: true, import: 'default' });
 
@@ -87,6 +87,8 @@ function freshState() {
     nextEventId: 1,
     mood: new Map(),
     journal: [],
+    people: [],
+    nextPersonId: 1,
     steps: new Map(),
     nextEntryId: 1,
     reviews: new Map(),
@@ -135,6 +137,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     seedEvents(state, current);
     seedJournal(state, current);
     seedSteps(state, current);
+    seedPeople(state, current);
   }
 
   function blank() {
@@ -781,6 +784,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     if (params.id === 'mood') state.mood = new Map();
     if (params.id === 'journal') state.journal = [];
     if (params.id === 'health') state.steps = new Map();
+    if (params.id === 'people') state.people = [];
     return { plugins: pluginList() };
   });
 
@@ -914,6 +918,71 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
   guarded('journal', 'DELETE', '/entries/:id', ({ params }) => {
     const entry = entryOf(params.id);
     state.journal = state.journal.filter((candidate) => candidate !== entry);
+    return { ok: true };
+  });
+
+  function birthdayOf(value) {
+    const text = (value ?? '').trim();
+    if (!text) return null;
+    const match = /^(?:(\d{4})-)?(\d{2})-(\d{2})$/.exec(text);
+    if (!match) return invalid();
+    const year = match[1] ? Number(match[1]) : null;
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const probe = new Date(Date.UTC(year ?? 2000, month - 1, day));
+    if (probe.getUTCMonth() !== month - 1 || probe.getUTCDate() !== day) return invalid();
+    if (year !== null && (year < 1900 || year > 2100)) return invalid();
+    return text;
+  }
+
+  function personView(person) {
+    const view = { id: person.id, name: person.name, birthday: person.birthday, next_birthday: null, days_until: null, turning: null };
+    if (!person.birthday) return view;
+    const [, year, month, day] = /^(?:(\d{4})-)?(\d{2})-(\d{2})$/.exec(person.birthday);
+    const current = today();
+    let upcoming = `${current.slice(0, 4)}-${month}-${day}`;
+    if (!isDay(upcoming)) upcoming = `${current.slice(0, 4)}-02-28`;
+    if (upcoming < current) {
+      const next = Number(current.slice(0, 4)) + 1;
+      upcoming = `${next}-${month}-${day}`;
+      if (!isDay(upcoming)) upcoming = `${next}-02-28`;
+    }
+    view.next_birthday = upcoming;
+    view.days_until = daysBetween(current, upcoming);
+    view.turning = year ? Number(upcoming.slice(0, 4)) - Number(year) : null;
+    return view;
+  }
+
+  const personOf = (id) => state.people.find((person) => person.id === Number(id)) ?? notFound('person not found');
+
+  function checkPerson(body) {
+    const name = String(body?.name ?? '').trim();
+    if (!name || name.length > 100) invalid();
+    return { name, birthday: birthdayOf(body?.birthday) };
+  }
+
+  guarded('people', 'GET', '/people', () => ({
+    people: state.people
+      .map(personView)
+      .sort((a, b) => (a.days_until === null) - (b.days_until === null) || (a.days_until ?? 0) - (b.days_until ?? 0) || a.name.localeCompare(b.name)),
+  }));
+
+  guarded('people', 'POST', '/people', ({ body }) => {
+    if (state.people.length >= 500) refuse(409, 'conflict', 'too many people');
+    const person = { id: state.nextPersonId++, ...checkPerson(body) };
+    state.people.push(person);
+    return { status: 201, data: personView(person) };
+  });
+
+  guarded('people', 'PUT', '/people/:id', ({ params, body }) => {
+    const person = personOf(params.id);
+    Object.assign(person, checkPerson(body));
+    return personView(person);
+  });
+
+  guarded('people', 'DELETE', '/people/:id', ({ params }) => {
+    const person = personOf(params.id);
+    state.people = state.people.filter((candidate) => candidate !== person);
     return { ok: true };
   });
 

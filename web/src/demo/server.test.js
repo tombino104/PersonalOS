@@ -159,6 +159,23 @@ describe('demo server', () => {
     expect(call('GET', '/recaps/2026-11').data.error.code).toBe('future_period');
   });
 
+  it('keeps a list of people with birthdays', () => {
+    const { call } = demo();
+    const listing = call('GET', '/plugins/people/people').data.people;
+    expect(listing.length).toBeGreaterThan(2);
+    expect(listing[0].days_until).toBe(3);
+    expect(listing[listing.length - 1].days_until).toBeNull();
+    const created = call('POST', '/plugins/people/people', { name: ' Casey ', birthday: '02-29' });
+    expect(created.status).toBe(201);
+    expect(created.data).toMatchObject({ name: 'Casey', birthday: '02-29' });
+    expect(call('POST', '/plugins/people/people', { name: 'x', birthday: '02-30' }).status).toBe(422);
+    expect(call('POST', '/plugins/people/people', { name: '  ' }).status).toBe(422);
+    const changed = call('PUT', `/plugins/people/people/${created.data.id}`, { name: 'Casey R.', birthday: null });
+    expect(changed.data).toMatchObject({ name: 'Casey R.', birthday: null, days_until: null });
+    expect(call('DELETE', `/plugins/people/people/${created.data.id}`).data).toEqual({ ok: true });
+    expect(call('DELETE', `/plugins/people/people/${created.data.id}`).status).toBe(404);
+  });
+
   it('syncs a draft with the current activities', () => {
     const { call } = demo();
     call('POST', '/reports', { day: TODAY });
@@ -170,7 +187,7 @@ describe('demo server', () => {
   it('serves the plugins and their data', () => {
     const { call } = demo();
     const plugins = call('GET', '/plugins').data.plugins;
-    expect(plugins.map((plugin) => plugin.id)).toEqual(['calendar', 'health', 'journal', 'mood', 'quotes']);
+    expect(plugins.map((plugin) => plugin.id)).toEqual(['calendar', 'health', 'journal', 'mood', 'people', 'quotes']);
     expect(plugins.every((plugin) => plugin.active)).toBe(true);
     const events = call('GET', `/plugins/calendar/events?start=${TODAY}&end=${addDays(TODAY, 30)}`).data;
     expect(events.occurrences.length).toBeGreaterThan(3);

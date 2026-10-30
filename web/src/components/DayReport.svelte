@@ -1,12 +1,14 @@
 <script>
+  import Icon from './Icon.svelte';
   import Link from './Link.svelte';
   import { api } from '../lib/api.js';
   import { AREAS } from '../lib/charts.js';
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
+  import { setOpen } from '../lib/collapse.js';
   import { reportSections } from '../lib/plugins.svelte.js';
 
-  let { day, today, filled } = $props();
+  let { day, today, filled, open = $bindable(false) } = $props();
 
   let detail = $state(null);
   let detailStatus = $state('idle');
@@ -44,18 +46,18 @@
   const longTitle = $derived(formatDate(day, locale(), { weekday: 'long', day: 'numeric', month: 'long' }));
 </script>
 
-<section class="card detail rise" aria-label={t('archive.detail')}>
-  <div class="detail-head">
-    <div>
-      <div class="eyebrow">{formatDate(day, locale(), { weekday: 'long' })}</div>
-      <h2>{longTitle}</h2>
-    </div>
-    {#if editable}
-      <Link class="btn solid" href={`/questionnaire?day=${day}`}>{filled ? t('archive.edit') : t('archive.fill')}</Link>
-    {/if}
-  </div>
+<section class="card detail rise" id="day-report" aria-label={t('archive.detail')}>
+  <details {open} ontoggle={(event) => { open = event.currentTarget.open; setOpen('review.day', open); }}>
+    <summary>
+      <span class="stitle">{longTitle}</span>
+      <span class="chev"><Icon name="down" small /></span>
+    </summary>
+    <div class="fold">
   {#if editable}
-    <p class="muted note">{t(day === today ? 'archive.editToday' : 'archive.editYesterday')}</p>
+    <div class="edit-row">
+      <p class="muted note">{t(day === today ? 'archive.editToday' : 'archive.editYesterday')}</p>
+      <Link class="btn solid" href={`/questionnaire?day=${day}`}>{filled ? t('archive.edit') : t('archive.fill')}</Link>
+    </div>
   {/if}
 
   {#if detailStatus === 'empty'}
@@ -91,30 +93,60 @@
       {/each}
     {/key}
   {/if}
+    </div>
+  </details>
 </section>
 
 <style>
   .detail {
     min-width: 0;
     margin-top: 16px;
-    padding: 24px 28px;
+    padding: 16px 24px;
   }
 
-  .detail-head {
+  summary {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
+    min-height: 36px;
+    cursor: pointer;
+    list-style: none;
   }
 
-  .detail-head h2 {
-    margin: 8px 0 0;
-    font: 400 32px/1.1 var(--serif);
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .stitle {
+    font: 400 22px/1.2 var(--serif);
+  }
+
+  .chev {
+    display: inline-flex;
+    color: var(--ink-3);
+    transition: transform 0.2s;
+  }
+
+  details[open] .chev {
+    transform: rotate(180deg);
+  }
+
+  .fold {
+    margin-top: 8px;
+  }
+
+  .edit-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 4px;
   }
 
   .note {
-    margin: 12px 0 0;
+    margin: 0;
     font: 400 13px/1.5 var(--sans);
   }
 

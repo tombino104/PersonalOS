@@ -1,0 +1,17 @@
+{
+  "id": "people",
+  "name": "People",
+  "version": "0.1.0",
+  "description": "A private list of the people you care about, with their birthdays. It never creates points and never sends a notification.",
+  "core_api": "1.x",
+  "permissions": ["ui_panel", "api_routes"],
+  "adds": {
+    "pages": ["list"],
+    "entries": [
+      { "id": "people", "label": "People", "icon": "tree", "placement": "more", "page": "list" }
+    ]
+  },
+  "listens": [],
+  "emits": [],
+  "migrations": "backend/migrations"
+}
