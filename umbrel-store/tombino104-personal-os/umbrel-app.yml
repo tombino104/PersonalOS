@@ -2,7 +2,7 @@ manifestVersion: 1
 id: tombino104-personal-os
 category: productivity
 name: Personal OS
-version: "0.28.0"
+version: "0.29.0"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -28,5 +28,5 @@ gallery:
   - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
-  The weekly review, the monthly and yearly recap and the past reports are now one Review page: switch between week, month and year, and tap a day to read its report.
+  New activity: a Need ideas? link suggests a few habits for each area, with weight and weekly goal already filled in.
 submitter: tombino104
