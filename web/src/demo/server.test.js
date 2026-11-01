@@ -176,6 +176,28 @@ describe('demo server', () => {
     expect(call('DELETE', `/plugins/people/people/${created.data.id}`).status).toBe(404);
   });
 
+  it('keeps the nights you log and your sleep target', () => {
+    const { call } = demo();
+    const listing = call('GET', '/plugins/sleep/nights').data.nights;
+    expect(listing.length).toBeGreaterThan(5);
+    expect(listing[0].day).toBe(TODAY);
+    expect(listing[0].minutes).toBeGreaterThan(300);
+    const day = addDays(TODAY, 1);
+    const first = call('PUT', `/plugins/sleep/nights/${day}`, { lights_off: '23:30' });
+    expect(first.data).toEqual({ day, lights_off: '23:30', woke_up: null, minutes: null });
+    const both = call('PUT', `/plugins/sleep/nights/${day}`, { woke_up: '06:30' });
+    expect(both.data.minutes).toBe(420);
+    expect(call('PUT', `/plugins/sleep/nights/${addDays(TODAY, 2)}`, { lights_off: '23:30' }).status).toBe(422);
+    expect(call('PUT', `/plugins/sleep/nights/${day}`, { lights_off: '25:00' }).status).toBe(422);
+    expect(call('PUT', `/plugins/sleep/nights/${day}`, { lights_off: '12:00', woke_up: '05:00' }).status).toBe(422);
+    expect(call('GET', `/plugins/sleep/nights/${addDays(TODAY, -40)}`).data.minutes).toBeNull();
+    expect(call('DELETE', `/plugins/sleep/nights/${day}`).data).toEqual({ ok: true });
+    expect(call('DELETE', `/plugins/sleep/nights/${day}`).status).toBe(404);
+    expect(call('GET', '/plugins/sleep/settings').data).toEqual({ target_minutes: 420 });
+    expect(call('PUT', '/plugins/sleep/settings', { target_minutes: 480 }).data).toEqual({ target_minutes: 480 });
+    expect(call('PUT', '/plugins/sleep/settings', { target_minutes: 10 }).status).toBe(422);
+  });
+
   it('syncs a draft with the current activities', () => {
     const { call } = demo();
     call('POST', '/reports', { day: TODAY });
@@ -187,7 +209,7 @@ describe('demo server', () => {
   it('serves the plugins and their data', () => {
     const { call } = demo();
     const plugins = call('GET', '/plugins').data.plugins;
-    expect(plugins.map((plugin) => plugin.id)).toEqual(['calendar', 'health', 'journal', 'mood', 'people', 'quotes']);
+    expect(plugins.map((plugin) => plugin.id)).toEqual(['calendar', 'health', 'journal', 'mood', 'people', 'quotes', 'sleep']);
     expect(plugins.every((plugin) => plugin.active)).toBe(true);
     const events = call('GET', `/plugins/calendar/events?start=${TODAY}&end=${addDays(TODAY, 30)}`).data;
     expect(events.occurrences.length).toBeGreaterThan(3);

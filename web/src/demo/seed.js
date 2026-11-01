@@ -231,6 +231,25 @@ export function seedSteps(state, today) {
   });
 }
 
+const NIGHTS = [
+  ['23:20', '06:50'],
+  ['23:45', '07:10'],
+  ['00:10', '07:30'],
+  ['23:30', '06:40'],
+  ['23:15', '07:00'],
+  ['00:40', '08:05'],
+  ['23:50', '07:20'],
+  ['23:25', '06:55'],
+  ['23:35', '07:15'],
+  ['23:10', '06:45'],
+];
+
+export function seedSleep(state, today) {
+  NIGHTS.forEach(([lightsOff, wokeUp], index) => {
+    state.sleep.set(addDays(today, -index), { lights_off: lightsOff, woke_up: wokeUp });
+  });
+}
+
 export function seedPeople(state, today) {
   const month = (offset) => addDays(today, offset).slice(5);
   const people = [

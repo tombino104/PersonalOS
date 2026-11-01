@@ -5,6 +5,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.31.0] - 2026-11-01
+
+### Added
+- Sleep plugin (off until you turn it on in Settings > Plugins): log when you turned the lights off and when you got up, by hand at any time (the app does not need to be on when you wake) or with a tap on "Lights off now" and "I'm up now". A night belongs to the day you woke up. Routes under `/api/v1/plugins/sleep`.
+- Sleep: a battery on Home and on the Sleep page. It is an estimate from a simplified two-process model of sleep pressure (it rises while you are awake and falls while you sleep), shown with the word "estimate", never as a measurement. Next to it: last night against a target you choose (7 hours to start), the average of the last 7 nights and the range of your bedtimes. No points, no colours, no streaks, no reminders.
+- Sleep: the report of a day shows the night before it.
+
 ## [0.30.0] - 2026-10-30
 
 ### Added

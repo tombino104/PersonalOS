@@ -1,0 +1,19 @@
+{
+  "id": "sleep",
+  "name": "Sleep",
+  "version": "0.1.0",
+  "description": "When you turned the lights off and when you got up, logged by hand or with a tap, and a battery that is only an estimate. It never creates points and never ticks anything for you.",
+  "core_api": "1.x",
+  "permissions": ["ui_panel", "api_routes"],
+  "adds": {
+    "report_sections": ["night"],
+    "widgets": ["battery"],
+    "pages": ["nights"],
+    "entries": [
+      { "id": "sleep", "label": "Sleep", "icon": "moon", "placement": "more", "page": "nights" }
+    ]
+  },
+  "listens": [],
+  "emits": [],
+  "migrations": "backend/migrations"
+}

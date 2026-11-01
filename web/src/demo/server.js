@@ -10,7 +10,7 @@ import {
   occurrences,
   weekdayOf,
 } from './dates.js';
-import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory, seedJournal, seedPeople, seedSteps } from './seed.js';
+import { AREAS, completionsFor, sampleActivities, seedEvents, seedHistory, seedJournal, seedPeople, seedSleep, seedSteps } from './seed.js';
 
 const manifests = import.meta.glob('../../../plugins/*/manifest.json', { eager: true, import: 'default' });
 
@@ -90,6 +90,8 @@ function freshState() {
     people: [],
     nextPersonId: 1,
     steps: new Map(),
+    sleep: new Map(),
+    sleepTarget: 420,
     nextEntryId: 1,
     reviews: new Map(),
   };
@@ -138,6 +140,7 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     seedJournal(state, current);
     seedSteps(state, current);
     seedPeople(state, current);
+    seedSleep(state, current);
   }
 
   function blank() {
@@ -785,6 +788,10 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     if (params.id === 'journal') state.journal = [];
     if (params.id === 'health') state.steps = new Map();
     if (params.id === 'people') state.people = [];
+    if (params.id === 'sleep') {
+      state.sleep = new Map();
+      state.sleepTarget = 420;
+    }
     return { plugins: pluginList() };
   });
 
@@ -984,6 +991,72 @@ export function createDemoServer({ now = () => new Date(), version = 'demo', emp
     const person = personOf(params.id);
     state.people = state.people.filter((candidate) => candidate !== person);
     return { ok: true };
+  });
+
+  const sleepMinutes = (night) => {
+    if (!night.lights_off || !night.woke_up) return null;
+    const [offHours, offMinutes] = night.lights_off.split(':').map(Number);
+    const [upHours, upMinutes] = night.woke_up.split(':').map(Number);
+    const start = offHours * 60 + offMinutes;
+    const end = upHours * 60 + upMinutes;
+    return end > start ? end - start : end - start + 1440;
+  };
+
+  const sleepView = (day, night) => ({
+    day,
+    lights_off: night?.lights_off ?? null,
+    woke_up: night?.woke_up ?? null,
+    minutes: night ? sleepMinutes(night) : null,
+  });
+
+  guarded('sleep', 'GET', '/nights', ({ query }) => {
+    const limit = Number(query.get('limit') ?? 60);
+    if (!Number.isInteger(limit) || limit < 1 || limit > 400) invalid();
+    const start = query.get('start');
+    const end = query.get('end');
+    if ((start && !isDay(start)) || (end && !isDay(end))) invalid();
+    const nights = [...state.sleep.entries()]
+      .filter(([day]) => (!start || day >= start) && (!end || day <= end))
+      .sort(([a], [b]) => (a < b ? 1 : -1))
+      .slice(0, limit)
+      .map(([day, night]) => sleepView(day, night));
+    return { nights };
+  });
+
+  guarded('sleep', 'GET', '/nights/:day', ({ params }) => {
+    if (!isDay(params.day)) invalid();
+    return sleepView(params.day, state.sleep.get(params.day));
+  });
+
+  guarded('sleep', 'PUT', '/nights/:day', ({ params, body }) => {
+    if (!isDay(params.day) || params.day > addDays(today(), 1)) invalid();
+    const current = state.sleep.get(params.day) ?? { lights_off: null, woke_up: null };
+    const next = { ...current };
+    for (const field of ['lights_off', 'woke_up']) {
+      if (body && field in body) {
+        if (body[field] !== null && !isTime(String(body[field]).trim())) invalid();
+        next[field] = body[field] === null ? null : String(body[field]).trim();
+      }
+    }
+    const length = sleepMinutes(next);
+    if (length !== null && length > 960) invalid();
+    if (!next.lights_off && !next.woke_up) state.sleep.delete(params.day);
+    else state.sleep.set(params.day, next);
+    return sleepView(params.day, next);
+  });
+
+  guarded('sleep', 'DELETE', '/nights/:day', ({ params }) => {
+    if (!state.sleep.delete(params.day)) notFound('night not found');
+    return { ok: true };
+  });
+
+  guarded('sleep', 'GET', '/settings', () => ({ target_minutes: state.sleepTarget }));
+
+  guarded('sleep', 'PUT', '/settings', ({ body }) => {
+    const minutes = body?.target_minutes;
+    if (!Number.isInteger(minutes) || minutes < 240 || minutes > 840) invalid();
+    state.sleepTarget = minutes;
+    return { target_minutes: minutes };
   });
 
   guarded('health', 'GET', '/days', ({ query }) => {
