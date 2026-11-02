@@ -19,13 +19,13 @@ dependencies: []
 repo: https://github.com/tombino104/PersonalOS
 support: https://github.com/tombino104/PersonalOS/issues
 port: 8473
-icon: https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/icon.svg
+icon: https://raw.githubusercontent.com/tombino104/tombino104-store/main/tombino104-personal-os/icon.svg
 gallery:
-  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/1-home.png
-  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/2-questionnaire.png
-  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/3-stella.png
-  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/4-archive.png
-  - https://raw.githubusercontent.com/tombino104/personalos-umbrel-store/main/tombino104-personal-os/gallery/5-home-dark.png
+  - https://raw.githubusercontent.com/tombino104/tombino104-store/main/tombino104-personal-os/gallery/1-home.png
+  - https://raw.githubusercontent.com/tombino104/tombino104-store/main/tombino104-personal-os/gallery/2-questionnaire.png
+  - https://raw.githubusercontent.com/tombino104/tombino104-store/main/tombino104-personal-os/gallery/3-stella.png
+  - https://raw.githubusercontent.com/tombino104/tombino104-store/main/tombino104-personal-os/gallery/4-archive.png
+  - https://raw.githubusercontent.com/tombino104/tombino104-store/main/tombino104-personal-os/gallery/5-home-dark.png
 path: ""
 releaseNotes: >-
   New Sleep plugin: log when you turned the lights off and got up, by hand or with a tap, and see an estimated battery on Home.
