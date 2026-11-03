@@ -5,7 +5,7 @@
   import { api } from '../lib/api.js';
   import { AREAS } from '../lib/charts.js';
   import { isOpen, setOpen } from '../lib/collapse.js';
-  import { prefersReducedMotion } from '../lib/motion.js';
+  import { grow, prefersReducedMotion } from '../lib/motion.js';
   import { addDays, formatDate } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { change, groupActivities, signed } from '../lib/review.js';
@@ -112,12 +112,12 @@
 
     <section class="card block rise" aria-label={t('review.areas')}>
       <h2 class="eyebrow">{t('review.areas')}</h2>
-      {#each data.areas as item (item.area)}
+      {#each data.areas as item, index (item.area)}
         {@const diff = change(item.average, item.previous)}
         <div class="area" data-area={item.area}>
           <span class="dot"></span>
           <span class="name">{t(`area.${item.area}`)}</span>
-          <span class="bar" aria-hidden="true"><span style:width="{item.average === null ? 0 : round(item.average)}%"></span></span>
+          <span class="bar" aria-hidden="true"><span use:grow={{ value: item.average === null ? 0 : round(item.average), key: selected, delay: index * 70 }}></span></span>
           <span class="value">{item.average === null ? '–' : `${round(item.average)} %`}</span>
           <span class="diff muted">{diff === null ? '' : t('review.change', { value: signed(diff) })}</span>
         </div>

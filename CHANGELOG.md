@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.31.5] - 2026-11-03
+
+### Changed
+- Review: the bars of the six areas now grow smoothly from empty, one after another, when you open the review, change week or month, or tap a day. With "reduce motion" turned on in your device they simply appear.
+
 ## [0.31.4] - 2026-11-03
 
 ### Fixed
