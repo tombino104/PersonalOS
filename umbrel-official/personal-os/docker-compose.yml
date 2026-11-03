@@ -8,7 +8,7 @@ services:
       PROXY_AUTH_WHITELIST: "/apple-touch-icon.png,/icon-192.png,/icon-512.png,/icon-maskable-512.png,/favicon.svg"
 
   web:
-    image: ghcr.io/tombino104/personalos:0.31.4@sha256:40f0f542674b2f771b5514283fded1279547d23ed66383f0cb2587fbc6540ed7
+    image: ghcr.io/tombino104/personalos:0.31.5@sha256:fde92ecf98cfc0694f7043be2dde3d79a03226bcfa007c13ea5bc9daca87328f
     restart: on-failure
     stop_grace_period: 1m
     environment:
