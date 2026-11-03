@@ -47,7 +47,16 @@
 
   onMount(() => {
     const timer = setInterval(() => (now = wallMinutes(new Date())), 60000);
-    return () => clearInterval(timer);
+    const visible = () => {
+      if (document.visibilityState !== 'visible') return;
+      now = wallMinutes(new Date());
+      reload += 1;
+    };
+    document.addEventListener('visibilitychange', visible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', visible);
+    };
   });
 
   const battery = $derived(batteryAt(nights, now, target));
@@ -141,8 +150,12 @@
         <span class="bar" role="img" aria-label="{battery.percent}%"><i style:width="{battery.percent}%"></i></span>
       </div>
       <p class="muted small">
-        {t('plugin.sleep.batteryAwake', { hours: hoursText(battery.awake) })}{#if battery.estimated}
-          · {t('plugin.sleep.batteryGuessed')}{/if}
+        {#if battery.asleep}
+          {t('plugin.sleep.batteryAsleep', { time: battery.since })}
+        {:else}
+          {t('plugin.sleep.batteryAwake', { hours: hoursText(battery.awake) })}{#if battery.estimated}
+            · {t('plugin.sleep.batteryGuessed')}{/if}
+        {/if}
       </p>
     {:else}
       <p class="lede none">{t('plugin.sleep.batteryEmpty')}</p>

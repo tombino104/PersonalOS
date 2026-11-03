@@ -2,20 +2,30 @@
   import { onMount, untrack } from 'svelte';
   import { ApiError, pluginRequest } from '$core/lib/api.js';
   import { addDays } from '$core/lib/dates.js';
-  import { t } from '$core/lib/i18n.svelte.js';
-  import { localDay } from './sleep.js';
+  import { locale, t } from '$core/lib/i18n.svelte.js';
+  import { formatDate } from '$core/lib/dates.js';
+  import { defaultNightDay, hoursText, localDay, nightDays, nightMinutes } from './sleep.js';
 
   let { night = null, nights = [], onsaved, onclose } = $props();
 
   const today = localDay();
   let dialog;
-  let day = $state(untrack(() => night?.day ?? today));
+  let day = $state(untrack(() => night?.day ?? defaultNightDay()));
   let lightsOff = $state(untrack(() => night?.lights_off ?? ''));
   let wokeUp = $state(untrack(() => night?.woke_up ?? ''));
   let error = $state('');
   let busy = $state(false);
   let confirmDelete = $state(false);
   const exists = $derived(nights.some((item) => item.day === day));
+  const preview = $derived.by(() => {
+    if (!day || !lightsOff || !wokeUp) return null;
+    const days = nightDays(day, lightsOff, wokeUp);
+    const long = (value) => formatDate(value, locale(), { weekday: 'short', day: 'numeric', month: 'long' });
+    return {
+      text: t('plugin.sleep.preview', { from: long(days.lightsOffDay), lightsOff, to: long(days.wokeUpDay), wokeUp }),
+      length: hoursText(nightMinutes({ lights_off: lightsOff, woke_up: wokeUp })),
+    };
+  });
 
   onMount(() => {
     dialog.showModal();
@@ -83,6 +93,9 @@
       </div>
     </div>
     <p class="muted help hint">{t('plugin.sleep.timesHint')}</p>
+    {#if preview}
+      <p class="preview" aria-live="polite">{preview.text} · {t('plugin.sleep.previewLength', { hours: preview.length })}</p>
+    {/if}
 
     {#if error}
       <p class="error" role="alert">{error}</p>
@@ -136,6 +149,12 @@
 
   .hint {
     margin: -8px 0 0;
+  }
+
+  .preview {
+    margin: -8px 0 0;
+    font: 500 14px/1.5 var(--sans);
+    color: var(--ink-2);
   }
 
   .actions {

@@ -9,15 +9,27 @@
   let target = $state(DEFAULT_TARGET);
   let now = $state(wallMinutes(new Date()));
 
-  onMount(() => {
+  function refresh() {
+    now = wallMinutes(new Date());
     loadSleep()
       .then((result) => {
         nights = result.nights;
         target = result.target;
       })
       .catch(() => {});
+  }
+
+  onMount(() => {
+    refresh();
     const timer = setInterval(() => (now = wallMinutes(new Date())), 60000);
-    return () => clearInterval(timer);
+    const visible = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', visible);
+    return () => {
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', visible);
+    };
   });
 
   const battery = $derived(batteryAt(nights, now, target));
@@ -33,7 +45,9 @@
     <span class="percent">{battery.percent}%</span>
     <span class="bar" role="img" aria-label="{battery.percent}%"><i style:width="{battery.percent}%"></i></span>
   </div>
-  {#if last}
+  {#if battery.asleep}
+    <p class="muted line">{t('plugin.sleep.batteryAsleep', { time: battery.since })}</p>
+  {:else if last}
     <p class="muted line">{t('plugin.sleep.lastNight')} {hoursText(nightMinutes(last))} · {t('plugin.sleep.target', { hours: hoursText(target) })}</p>
   {/if}
 {:else}

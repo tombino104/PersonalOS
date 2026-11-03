@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.31.1] - 2026-11-03
+
+### Fixed
+- Sleep: the battery now charges while you sleep. When you have logged "Lights off" but not the wake-up yet, it shows "Asleep since ..." and goes up, instead of ignoring the night and keeping on falling.
+- Sleep: the Log a night window proposes tomorrow when you open it in the evening, and shows the whole night in words ("From Mon 2 November at 23:30 to Tue 3 November at 07:00"), so a night saved under the wrong day is easy to spot. The battery reads a night saved a day too early as a very long time awake.
+
 ## [0.31.0] - 2026-11-01
 
 ### Added

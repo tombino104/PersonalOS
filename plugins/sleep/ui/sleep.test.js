@@ -3,10 +3,13 @@ import {
   averageMinutes,
   batteryAt,
   bedtimeRange,
+  defaultNightDay,
   hoursText,
   lastNight,
+  nightDays,
   nightMinutes,
   nightOfLightsOff,
+  openSleep,
   spanOf,
   toMinutes,
   toTime,
@@ -88,7 +91,7 @@ describe('batteryAt', () => {
   it('says nothing without a recent night', () => {
     const wake = at('2026-10-20', '07:00');
     expect(batteryAt([], wake)).toBeNull();
-    expect(batteryAt([night('2026-10-20', '23:00', null)], wake)).toBeNull();
+    expect(batteryAt([night('2026-10-20', '23:00', null)], wake + 20 * 60)).toBeNull();
     expect(batteryAt([full], wake + 37 * 60)).toBeNull();
     expect(batteryAt([full], wake - 60)).toBeNull();
   });
@@ -98,6 +101,60 @@ describe('batteryAt', () => {
     const result = batteryAt([full], wake + 36 * 60);
     expect(result.percent).toBeGreaterThanOrEqual(0);
     expect(result.percent).toBeLessThanOrEqual(100);
+  });
+});
+
+describe('batteryAt while you sleep', () => {
+  const before = night('2026-11-02', '23:00', '07:00');
+
+  it('goes up while the lights are off and the wake-up is not logged yet', () => {
+    const evening = batteryAt([before], at('2026-11-02', '23:00')).percent;
+    const sleeping = batteryAt([before, night('2026-11-03', '23:00', null)], at('2026-11-03', '03:00'));
+    expect(sleeping.asleep).toBe(true);
+    expect(sleeping.since).toBe('23:00');
+    expect(sleeping.percent).toBeGreaterThan(evening);
+  });
+
+  it('works after midnight too', () => {
+    const result = batteryAt([before, night('2026-11-03', '00:30', null)], at('2026-11-03', '03:30'));
+    expect(result.asleep).toBe(true);
+  });
+
+  it('forgets a lights-off that is more than sixteen hours old', () => {
+    const lights = night('2026-11-03', '23:00', null);
+    const start = at('2026-11-03', '23:00') - 1440;
+    expect(batteryAt([before, lights], start + 16 * 60).asleep).toBe(true);
+    expect(batteryAt([before, lights], start + 16 * 60 + 1).asleep).toBe(false);
+  });
+
+  it('works with nothing but a lights-off', () => {
+    expect(batteryAt([night('2026-11-03', '23:00', null)], at('2026-11-03', '03:00')).asleep).toBe(true);
+  });
+
+  it('drops back to awake once the wake-up is logged', () => {
+    const result = batteryAt([before, night('2026-11-03', '23:00', '07:00')], at('2026-11-03', '09:00'));
+    expect(result.asleep).toBe(false);
+    expect(result.awake).toBe(120);
+  });
+});
+
+describe('openSleep', () => {
+  it('ignores a lights-off from before the last wake-up', () => {
+    expect(openSleep([night('2026-11-03', '23:00', null)], at('2026-11-03', '03:00'), at('2026-11-03', '03:00'))).toBeNull();
+  });
+});
+
+describe('nightDays', () => {
+  it('puts the lights-off on the day before when the night crosses midnight', () => {
+    expect(nightDays('2026-11-03', '23:30', '07:00')).toEqual({ lightsOffDay: '2026-11-02', wokeUpDay: '2026-11-03' });
+    expect(nightDays('2026-11-03', '00:30', '07:00')).toEqual({ lightsOffDay: '2026-11-03', wokeUpDay: '2026-11-03' });
+  });
+});
+
+describe('defaultNightDay', () => {
+  it('proposes tomorrow in the evening and today otherwise', () => {
+    expect(defaultNightDay(new Date(2026, 10, 2, 22, 0))).toBe('2026-11-03');
+    expect(defaultNightDay(new Date(2026, 10, 3, 14, 0))).toBe('2026-11-03');
   });
 });
 

@@ -4,6 +4,7 @@ export const FALL_MINUTES = 4.2 * 60;
 export const WINDOW_DAYS = 4;
 export const STALE_AWAKE_MINUTES = 36 * 60;
 export const RECENT_NIGHTS = 7;
+export const MAX_NIGHT_MINUTES = 960;
 
 const DAY_MINUTES = 1440;
 const START_PRESSURE = 0.75;
@@ -73,28 +74,59 @@ function fall(pressure, minutes) {
   return pressure * Math.exp(-minutes / FALL_MINUTES);
 }
 
+export function openSleep(nights, now, after = -Infinity) {
+  let found = null;
+  for (const night of nights) {
+    const off = toMinutes(night.lights_off);
+    if (night.woke_up || off === null) continue;
+    const start = dayStart(night.day) + (off >= 720 ? off - DAY_MINUTES : off);
+    if (start > now || now - start > MAX_NIGHT_MINUTES || start < after) continue;
+    if (!found || start > found.start) found = { start, time: night.lights_off };
+  }
+  return found;
+}
+
+function percentOf(pressure) {
+  return Math.max(0, Math.min(100, Math.round((1 - pressure) * 100)));
+}
+
 export function batteryAt(nights, now, target = DEFAULT_TARGET) {
   const spans = nights
     .map((night) => spanOf(night, target))
     .filter((span) => span && span.wake <= now && span.wake >= now - WINDOW_DAYS * DAY_MINUTES)
     .sort((a, b) => a.wake - b.wake);
-  if (spans.length === 0) return null;
-  const last = spans[spans.length - 1];
-  if (now - last.wake > STALE_AWAKE_MINUTES) return null;
+  const last = spans.length > 0 ? spans[spans.length - 1] : null;
+  const asleep = openSleep(nights, now, last ? last.wake : -Infinity);
+  if (!last && !asleep) return null;
+  if (!asleep && now - last.wake > STALE_AWAKE_MINUTES) return null;
   let pressure = START_PRESSURE;
-  let clock = spans[0].off;
+  let clock = spans.length > 0 ? spans[0].off : asleep.start;
   for (const span of spans) {
     const off = Math.max(span.off, clock);
     pressure = rise(pressure, off - clock);
     pressure = fall(pressure, Math.max(span.wake - off, 0));
     clock = Math.max(span.wake, clock);
   }
+  if (asleep) {
+    pressure = rise(pressure, Math.max(asleep.start - clock, 0));
+    pressure = fall(pressure, now - asleep.start);
+    return { percent: percentOf(pressure), awake: 0, asleep: true, since: asleep.time, estimated: false };
+  }
   pressure = rise(pressure, now - clock);
-  return {
-    percent: Math.max(0, Math.min(100, Math.round((1 - pressure) * 100))),
-    awake: now - last.wake,
-    estimated: last.estimated,
-  };
+  return { percent: percentOf(pressure), awake: now - last.wake, asleep: false, since: null, estimated: last.estimated };
+}
+
+export function nightDays(day, lightsOff, wokeUp) {
+  const start = toMinutes(lightsOff);
+  const end = toMinutes(wokeUp);
+  const crosses = start !== null && end !== null ? end <= start : start !== null && start >= 720;
+  const before = new Date(dayStart(day) * 60000 - (crosses ? DAY_MINUTES * 60000 : 0));
+  return { lightsOffDay: before.toISOString().slice(0, 10), wokeUpDay: day };
+}
+
+export function defaultNightDay(date = new Date()) {
+  const next = new Date(date.getFullYear(), date.getMonth(), date.getDate() + (date.getHours() >= 18 ? 1 : 0));
+  return localDay(next);
 }
 
 function latest(nights, count) {
