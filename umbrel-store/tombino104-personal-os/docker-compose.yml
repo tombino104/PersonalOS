@@ -5,9 +5,10 @@ services:
     environment:
       APP_HOST: tombino104-personal-os_web_1
       APP_PORT: 3000
+      PROXY_AUTH_WHITELIST: "/apple-touch-icon.png,/icon-192.png,/icon-512.png,/icon-maskable-512.png,/favicon.svg"
 
   web:
-    image: ghcr.io/tombino104/personalos:0.31.3@sha256:d4708f091d4a1685eeba6663598a3bb55d4c0c1d43a0abe1bbc20fcc07febcf7
+    image: ghcr.io/tombino104/personalos:0.31.4@sha256:40f0f542674b2f771b5514283fded1279547d23ed66383f0cb2587fbc6540ed7
     restart: on-failure
     stop_grace_period: 1m
     environment:

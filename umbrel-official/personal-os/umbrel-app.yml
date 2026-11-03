@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.31.3"
+version: "0.31.4"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,6 +24,6 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  The interface files are now sent compressed, so the app loads faster on a slow connection such as a phone on 5G.
+  The app icon now shows when you add Personal OS to the iPhone Home Screen: the five icon images no longer need the Umbrel login. Everything else still does.
 submitter: tombino104
 submission: ""
