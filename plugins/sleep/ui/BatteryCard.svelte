@@ -3,7 +3,7 @@
   import Link from '$core/components/Link.svelte';
   import { t } from '$core/lib/i18n.svelte.js';
   import { loadSleep } from './data.js';
-  import { DEFAULT_TARGET, batteryAt, hoursText, lastNight, nightMinutes, wallMinutes } from './sleep.js';
+  import { DEFAULT_TARGET, batteryAt, hoursText, lastNight, localDay, nightMinutes, wallMinutes } from './sleep.js';
 
   let nights = $state([]);
   let target = $state(DEFAULT_TARGET);
@@ -48,7 +48,7 @@
   {#if battery.asleep}
     <p class="muted line">{t('plugin.sleep.batteryAsleep', { time: battery.since })}</p>
   {:else if last}
-    <p class="muted line">{t('plugin.sleep.lastNight')} {hoursText(nightMinutes(last))} · {t('plugin.sleep.target', { hours: hoursText(target) })}</p>
+    <p class="muted line">{last.day === localDay() ? t('plugin.sleep.lastNight') : t('plugin.sleep.lastLogged')} {hoursText(nightMinutes(last))} · {t('plugin.sleep.target', { hours: hoursText(target) })}</p>
   {/if}
 {:else}
   <p class="muted line none">{t('plugin.sleep.widgetEmpty')}</p>

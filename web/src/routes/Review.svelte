@@ -4,6 +4,7 @@
   import PeriodView from '../components/PeriodView.svelte';
   import WeekView from '../components/WeekView.svelte';
   import { api } from '../lib/api.js';
+  import { setOpen } from '../lib/collapse.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { router } from '../lib/router.svelte.js';
   import { weekRange } from '../lib/review.js';
@@ -28,6 +29,7 @@
       if (asked && /^\d{4}(-\d{2})?$/.test(asked)) {
         kind = viewOf(asked);
         period = asked;
+        setOpen(`home.recap.${asked}`, true);
       } else if (router.path === '/recap') {
         kind = VIEWS.includes(view) && view !== 'week' ? view : 'month';
         period = periodFor(kind, validDay || today);

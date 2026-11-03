@@ -2,7 +2,7 @@ export const DEFAULT_TARGET = 420;
 export const RISE_MINUTES = 18.2 * 60;
 export const FALL_MINUTES = 4.2 * 60;
 export const WINDOW_DAYS = 4;
-export const STALE_AWAKE_MINUTES = 36 * 60;
+export const STALE_AWAKE_MINUTES = 24 * 60;
 export const RECENT_NIGHTS = 7;
 export const MAX_NIGHT_MINUTES = 960;
 

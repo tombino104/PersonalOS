@@ -5,6 +5,7 @@
   import Link from '../components/Link.svelte';
   import { api } from '../lib/api.js';
   import { AREAS, buildHeatGrid, easeInOut, trendFrame, trendGeometry } from '../lib/charts.js';
+  import { isOpen, setOpen } from '../lib/collapse.js';
   import { addDays, formatDate, lastDays } from '../lib/dates.js';
   import { locale, t } from '../lib/i18n.svelte.js';
   import { playProgress } from '../lib/motion.js';
@@ -119,10 +120,18 @@
   );
   const weekdayLabels = ['2024-01-01', '', '2024-01-03', '', '2024-01-05', '', ''];
 
+  let hiddenInvitations = $state([]);
+
   const invitation = $derived.by(() => {
     const target = today ? homeInvitation(today, true) : null;
-    return target && Object.keys(scoreByDay).some((day) => day.startsWith(target)) ? target : null;
+    if (!target || hiddenInvitations.includes(target) || isOpen(`home.recap.${target}`)) return null;
+    return Object.keys(scoreByDay).some((day) => day.startsWith(target)) ? target : null;
   });
+
+  function hideInvitation(period) {
+    setOpen(`home.recap.${period}`, true);
+    hiddenInvitations = [...hiddenInvitations, period];
+  }
 
   const pluginWidgets = $derived(widgets().filter((widget) => widget.placement === 'bottom'));
   const topWidgets = $derived(widgets().filter((widget) => widget.placement === 'top'));
@@ -179,10 +188,13 @@
   {/each}
 
   {#if invitation}
-    <Link class="card invite rise" href="/review?period={invitation}">
-      <span class="invite-text">{t('home.recapInvite', { period: periodLabel(invitation, locale()) })}</span>
-      <span class="invite-go">{t('home.recapOpen')} <Icon name="forward" small /></span>
-    </Link>
+    <div class="invite-row rise">
+      <Link class="card invite" href="/review?period={invitation}">
+        <span class="invite-text">{t('home.recapInvite', { period: periodLabel(invitation, locale()) })}</span>
+        <span class="invite-go">{t('home.recapOpen')} <Icon name="forward" small /></span>
+      </Link>
+      <button class="invite-hide" type="button" aria-label={t('home.recapHide')} onclick={() => hideInvitation(invitation)}>×</button>
+    </div>
   {/if}
 
   {#if status === 'loading'}
@@ -365,16 +377,39 @@
     font: 500 21px/1 var(--serif);
   }
 
+  .invite-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
   :global(.invite) {
     display: flex;
+    flex: 1 1 auto;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 8px 16px;
-    margin-bottom: 16px;
     padding: 18px 24px;
     color: var(--ink);
     text-decoration: none;
+  }
+
+  .invite-hide {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--ink-3);
+    font: 400 22px/1 var(--sans);
+    cursor: pointer;
+  }
+
+  .invite-hide:hover {
+    color: var(--ink);
   }
 
   .invite-text {

@@ -92,13 +92,14 @@ describe('batteryAt', () => {
     const wake = at('2026-10-20', '07:00');
     expect(batteryAt([], wake)).toBeNull();
     expect(batteryAt([night('2026-10-20', '23:00', null)], wake + 20 * 60)).toBeNull();
-    expect(batteryAt([full], wake + 37 * 60)).toBeNull();
+    expect(batteryAt([full], wake + 24 * 60 + 1)).toBeNull();
+    expect(batteryAt([full], wake + 24 * 60)).not.toBeNull();
     expect(batteryAt([full], wake - 60)).toBeNull();
   });
 
   it('never leaves the 0 to 100 range', () => {
     const wake = at('2026-10-20', '07:00');
-    const result = batteryAt([full], wake + 36 * 60);
+    const result = batteryAt([full], wake + 24 * 60);
     expect(result.percent).toBeGreaterThanOrEqual(0);
     expect(result.percent).toBeLessThanOrEqual(100);
   });
@@ -124,7 +125,7 @@ describe('batteryAt while you sleep', () => {
     const lights = night('2026-11-03', '23:00', null);
     const start = at('2026-11-03', '23:00') - 1440;
     expect(batteryAt([before, lights], start + 16 * 60).asleep).toBe(true);
-    expect(batteryAt([before, lights], start + 16 * 60 + 1).asleep).toBe(false);
+    expect(batteryAt([before, lights], start + 16 * 60 + 1)?.asleep).toBeFalsy();
   });
 
   it('works with nothing but a lights-off', () => {

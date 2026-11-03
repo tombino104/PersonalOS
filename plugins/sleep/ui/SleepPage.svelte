@@ -158,17 +158,21 @@
         {/if}
       </p>
     {:else}
-      <p class="lede none">{t('plugin.sleep.batteryEmpty')}</p>
+      <p class="lede none">{last && last.day !== localDay() ? t('plugin.sleep.batteryMissing') : t('plugin.sleep.batteryEmpty')}</p>
+      <button class="btn" type="button" onclick={() => open(null)}>{t('plugin.sleep.logNight')}</button>
     {/if}
     <p class="muted small note">{t('plugin.sleep.batteryNote')}</p>
   </section>
 
   <section class="stats">
     <div class="card stat">
-      <div class="eyebrow">{t('plugin.sleep.lastNight')}</div>
+      <div class="eyebrow">{last && last.day !== localDay() ? t('plugin.sleep.lastLogged') : t('plugin.sleep.lastNight')}</div>
       {#if last}
         <div class="value">{hoursText(nightMinutes(last))}</div>
-        <div class="muted small">{t('plugin.sleep.target', { hours: hoursText(target) })}</div>
+        <div class="muted small">
+          {t('plugin.sleep.target', { hours: hoursText(target) })}{#if last.day !== localDay()}
+            · {dayText(last.day)}{/if}
+        </div>
       {:else}
         <div class="muted small">—</div>
       {/if}

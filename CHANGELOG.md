@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.31.2] - 2026-11-03
+
+### Changed
+- Home: the card that invites you to read last month's recap can be hidden with a cross, and it goes away by itself once you have opened that recap. It still only shows in the first week of a month (two weeks in January for the year).
+- Sleep: the battery no longer shows a number when your last logged wake-up is more than 24 hours old. A night you forgot to log made it look as if you had been awake for a day and a half. It now asks you to log last night, and says "Last night logged" with its date when the newest night is not today's.
+
 ## [0.31.1] - 2026-11-03
 
 ### Fixed
