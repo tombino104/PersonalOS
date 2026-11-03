@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.31.4] - 2026-11-03
+
+### Fixed
+- Umbrel: the five icon images (`apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` and `favicon.svg`) are now served without the Umbrel login. An iPhone asks for the icon without being signed in, so before this it received the login page and added a plain placeholder to the Home Screen. Nothing else is opened: every other path still needs the Umbrel login.
+
 ## [0.31.3] - 2026-11-03
 
 ### Changed
