@@ -5,6 +5,11 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.31.3] - 2026-11-03
+
+### Changed
+- The interface files (scripts and styles) are now sent compressed when the browser accepts it, about three times smaller. This helps most on a slow connection, such as a phone on 5G, each time a new version is downloaded. The API, fonts and images are left as they are.
+
 ## [0.31.2] - 2026-11-03
 
 ### Changed

@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 
 from . import __version__, auth, config, db, seed, setup
@@ -94,6 +95,26 @@ async def security_headers(request: Request, call_next):
     if not request.url.path.startswith(("/docs", "/openapi.json")):
         response.headers.setdefault("Content-Security-Policy", CONTENT_SECURITY_POLICY)
     return response
+
+
+UNCOMPRESSED_SUFFIXES = (".woff", ".woff2", ".png", ".jpg", ".jpeg", ".webp", ".zip")
+
+
+class CompressWeb:
+    def __init__(self, app):
+        self.app = app
+        self.compressed = GZipMiddleware(app, minimum_size=1024)
+
+    async def __call__(self, scope, receive, send):
+        plain = (
+            scope["type"] != "http"
+            or scope["path"].startswith("/api/")
+            or scope["path"].endswith(UNCOMPRESSED_SUFFIXES)
+        )
+        await (self.app if plain else self.compressed)(scope, receive, send)
+
+
+app.add_middleware(CompressWeb)
 
 
 def web_dir() -> Path:

@@ -12,6 +12,8 @@ def site(tmp_path, monkeypatch):
     (web / "assets" / "app.js").write_text("console.log(1)", encoding="utf-8")
     (web / "sw.js").write_text("self.skipWaiting()", encoding="utf-8")
     (web / "manifest.webmanifest").write_text('{"name": "Personal OS"}', encoding="utf-8")
+    (web / "assets" / "big.js").write_bytes(b"const value = 1;\n" * 400)
+    (web / "assets" / "font.woff2").write_bytes(b"w" * 4000)
     (web / "icon-192.png").write_bytes(b"png")
     (tmp_path / "secret.txt").write_text("top secret", encoding="utf-8")
     monkeypatch.setenv("WEB_DIR", str(web))
@@ -39,6 +41,21 @@ def test_assets_are_cached_for_a_long_time(site):
     assert response.status_code == 200
     assert response.text == "console.log(1)"
     assert "immutable" in response.headers["cache-control"]
+
+
+def test_big_interface_files_are_compressed_when_the_browser_accepts_it(site):
+    response = site.get("/assets/big.js", headers={"Accept-Encoding": "gzip"})
+    assert response.headers["content-encoding"] == "gzip"
+    assert response.content == b"const value = 1;\n" * 400
+    assert "immutable" in response.headers["cache-control"]
+    assert "content-encoding" not in site.get("/assets/big.js", headers={"Accept-Encoding": "identity"}).headers
+
+
+def test_fonts_images_and_the_api_are_not_compressed(site):
+    headers = {"Accept-Encoding": "gzip"}
+    assert "content-encoding" not in site.get("/icon-192.png", headers=headers).headers
+    assert "content-encoding" not in site.get("/assets/font.woff2", headers=headers).headers
+    assert "content-encoding" not in site.get("/api/v1/nope", headers=headers).headers
 
 
 def test_unknown_api_paths_stay_json_404s(site):
