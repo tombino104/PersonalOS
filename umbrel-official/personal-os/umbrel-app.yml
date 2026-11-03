@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.31.1"
+version: "0.31.2"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,6 +24,6 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  Sleep: the battery now goes up while you sleep, and the Log a night window shows the whole night in words so it is saved under the right day.
+  The recap card on Home can be hidden, and the sleep battery asks you to log last night instead of showing a wrong number when a night is missing.
 submitter: tombino104
 submission: ""
