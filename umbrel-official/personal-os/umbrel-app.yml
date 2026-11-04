@@ -2,7 +2,7 @@ manifestVersion: 1
 id: personal-os
 category: productivity
 name: Personal OS
-version: "0.31.6"
+version: "0.31.7"
 tagline: Discipline, without the dopamine tricks
 description: >-
   A free, self-hosted daily check-in for six areas of your life: physical, discipline, social, intellect, career and
@@ -24,6 +24,6 @@ path: ""
 defaultUsername: ""
 defaultPassword: ""
 releaseNotes: >-
-  The sleep battery now sits at the top of Home next to the daily quote, with buttons to log lights off and wake-up without opening the Sleep page.
+  Pressing Esc while writing a journal entry no longer throws the text away: the dialog stays open, and what you type is kept as a draft on this device.
 submitter: tombino104
 submission: ""
