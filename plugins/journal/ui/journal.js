@@ -42,6 +42,36 @@ export function pickPrompt(random = Math.random()) {
   return Math.min(PROMPT_COUNT, Math.floor(random * PROMPT_COUNT) + 1);
 }
 
+const DRAFT_PREFIX = 'pos-draft:journal:';
+
+export function draftKey(entry) {
+  return DRAFT_PREFIX + (entry ? entry.id : 'new');
+}
+
+export function loadDraft(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    const draft = raw ? JSON.parse(raw) : null;
+    return draft && typeof draft.body === 'string' ? draft : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveDraft(key, draft) {
+  try {
+    localStorage.setItem(key, JSON.stringify(draft));
+  } catch {
+  }
+}
+
+export function clearDraft(key) {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+  }
+}
+
 export function mergeEntries(current, next) {
   const known = new Set(current.map((entry) => entry.id));
   return [...current, ...next.filter((entry) => !known.has(entry.id))];

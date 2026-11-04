@@ -1,5 +1,19 @@
-import { describe, expect, it } from 'vitest';
-import { MAX_TILT, PIN_AREAS, PROMPT_COUNT, excerpt, groupByMonth, mergeEntries, pickPrompt, pinFor, tiltFor } from './journal.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  MAX_TILT,
+  PIN_AREAS,
+  PROMPT_COUNT,
+  clearDraft,
+  draftKey,
+  excerpt,
+  groupByMonth,
+  loadDraft,
+  mergeEntries,
+  pickPrompt,
+  pinFor,
+  saveDraft,
+  tiltFor,
+} from './journal.js';
 
 describe('sheets', () => {
   it('tilts and pins a sheet the same way every time', () => {
@@ -66,5 +80,64 @@ describe('mergeEntries', () => {
   it('appends only entries it does not already have', () => {
     const merged = mergeEntries([{ id: 1 }, { id: 2 }], [{ id: 2 }, { id: 3 }]);
     expect(merged.map((entry) => entry.id)).toEqual([1, 2, 3]);
+  });
+});
+
+describe('drafts', () => {
+  function stubStorage() {
+    const data = new Map();
+    vi.stubGlobal('localStorage', {
+      getItem: (key) => (data.has(key) ? data.get(key) : null),
+      setItem: (key, value) => data.set(key, String(value)),
+      removeItem: (key) => data.delete(key),
+    });
+    return data;
+  }
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('keeps a separate key for a new entry and for each saved one', () => {
+    expect(draftKey(null)).not.toBe(draftKey({ id: 4 }));
+    expect(draftKey({ id: 4 })).not.toBe(draftKey({ id: 5 }));
+  });
+
+  it('stores and restores what was typed', () => {
+    stubStorage();
+    const key = draftKey(null);
+    saveDraft(key, { day: '2026-11-04', title: 'T', body: 'text', mood: 3 });
+    expect(loadDraft(key)).toEqual({ day: '2026-11-04', title: 'T', body: 'text', mood: 3 });
+  });
+
+  it('forgets a draft once cleared', () => {
+    stubStorage();
+    const key = draftKey(null);
+    saveDraft(key, { body: 'text' });
+    clearDraft(key);
+    expect(loadDraft(key)).toBeNull();
+  });
+
+  it('ignores damaged data', () => {
+    const data = stubStorage();
+    data.set(draftKey(null), '{not json');
+    expect(loadDraft(draftKey(null))).toBeNull();
+    data.set(draftKey(null), '{"title":"x"}');
+    expect(loadDraft(draftKey(null))).toBeNull();
+  });
+
+  it('works when storage is unavailable', () => {
+    vi.stubGlobal('localStorage', {
+      getItem: () => {
+        throw new Error('blocked');
+      },
+      setItem: () => {
+        throw new Error('blocked');
+      },
+      removeItem: () => {
+        throw new Error('blocked');
+      },
+    });
+    expect(loadDraft('k')).toBeNull();
+    expect(() => saveDraft('k', { body: 'x' })).not.toThrow();
+    expect(() => clearDraft('k')).not.toThrow();
   });
 });

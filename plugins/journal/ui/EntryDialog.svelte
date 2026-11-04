@@ -3,23 +3,54 @@
   import { ApiError, pluginRequest } from '$core/lib/api.js';
   import Link from '$core/components/Link.svelte';
   import { t } from '$core/lib/i18n.svelte.js';
-  import { pickPrompt } from './journal.js';
+  import { clearDraft, draftKey, loadDraft, pickPrompt, saveDraft } from './journal.js';
 
   let { entry = null, today, reportDay = null, onsaved, onclose } = $props();
 
   let dialog;
-  let day = $state(untrack(() => entry?.day ?? today));
-  let title = $state(untrack(() => entry?.title ?? ''));
-  let body = $state(untrack(() => entry?.body ?? ''));
-  let mood = $state(untrack(() => entry?.mood ?? null));
+  const key = untrack(() => draftKey(entry));
+  const start = untrack(() => ({
+    day: entry?.day ?? today,
+    title: entry?.title ?? '',
+    body: entry?.body ?? '',
+    mood: entry?.mood ?? null,
+  }));
+  const draft = loadDraft(key);
+  const restored = !!draft && (draft.day !== start.day || (draft.title ?? '') !== start.title || draft.body !== start.body || (draft.mood ?? null) !== start.mood);
+  const initial = restored ? { ...start, ...draft } : start;
+
+  let day = $state(initial.day);
+  let title = $state(initial.title ?? '');
+  let body = $state(initial.body);
+  let mood = $state(initial.mood ?? null);
   let error = $state('');
   let busy = $state(false);
   let confirmDelete = $state(false);
+  let kept = $state(false);
   const prompt = pickPrompt();
+
+  const dirty = $derived(day !== start.day || title !== start.title || body !== start.body || mood !== start.mood);
+
+  $effect(() => {
+    if (dirty) saveDraft(key, { day, title, body, mood });
+    else clearDraft(key);
+  });
 
   onMount(() => {
     dialog.showModal();
   });
+
+  function guard(event) {
+    if (dirty) {
+      event.preventDefault();
+      kept = true;
+    }
+  }
+
+  function discard() {
+    clearDraft(key);
+    dialog.close();
+  }
 
   async function save(event) {
     event.preventDefault();
@@ -29,6 +60,7 @@
     try {
       if (entry) await pluginRequest('journal', 'PUT', `/entries/${entry.id}`, payload);
       else await pluginRequest('journal', 'POST', '/entries', payload);
+      clearDraft(key);
       onsaved();
     } catch (failure) {
       error = failure instanceof ApiError && failure.status === 422 ? t('plugin.journal.invalid') : t('error.generic');
@@ -45,6 +77,7 @@
     error = '';
     try {
       await pluginRequest('journal', 'DELETE', `/entries/${entry.id}`);
+      clearDraft(key);
       onsaved();
     } catch {
       error = t('error.generic');
@@ -53,7 +86,7 @@
   }
 </script>
 
-<dialog bind:this={dialog} class="card" aria-labelledby="entry-dialog-title" {onclose}>
+<dialog bind:this={dialog} class="card" aria-labelledby="entry-dialog-title" {onclose} oncancel={guard}>
   <form onsubmit={save}>
     <h2 id="entry-dialog-title">{entry ? t('plugin.journal.edit') : t('plugin.journal.write')}</h2>
     {#if reportDay}
@@ -103,11 +136,15 @@
 
     {#if error}
       <p class="error" role="alert">{error}</p>
+    {:else if kept}
+      <p class="muted hint" role="status">{t('plugin.journal.kept')}</p>
+    {:else if restored}
+      <p class="muted hint" role="status">{t('plugin.journal.restored')}</p>
     {/if}
 
     <div class="actions">
       <button class="btn solid" type="submit" disabled={busy || body.trim() === ''}>{t('common.save')}</button>
-      <button class="btn" type="button" onclick={() => dialog.close()}>{t('common.cancel')}</button>
+      <button class="btn" type="button" onclick={discard}>{t('common.cancel')}</button>
       {#if entry}
         <button class="btn remove" type="button" disabled={busy} onclick={remove}>
           {confirmDelete ? t('plugin.journal.deleteSure') : t('plugin.journal.delete')}

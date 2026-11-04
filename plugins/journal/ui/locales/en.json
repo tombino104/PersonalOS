@@ -32,6 +32,8 @@
   "viewBoard": "Board",
   "viewList": "List",
   "invalid": "Please check the day and the text.",
+  "kept": "Esc does not close while there is unsaved text. Save it, or press Cancel to discard it.",
+  "restored": "Draft restored from your last unsaved session.",
   "delete": "Delete",
   "deleteSure": "Delete for good?",
   "prompt.1": "What is on your mind right now?",

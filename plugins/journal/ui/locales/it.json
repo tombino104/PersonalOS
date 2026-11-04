@@ -34,6 +34,8 @@
   "viewBoard": "Bacheca",
   "viewList": "Elenco",
   "invalid": "Controlla il giorno e il testo.",
+  "kept": "Esc non chiude finché c'è testo non salvato. Salvalo, oppure premi Annulla per scartarlo.",
+  "restored": "Bozza recuperata dall'ultima volta che non hai salvato.",
   "delete": "Elimina",
   "deleteSure": "Eliminare per sempre?",
   "prompt.1": "Cosa hai in mente in questo momento?",
