@@ -1,4 +1,4 @@
-# tombino104's-store
+# tombino104-store
 
 A community app store for umbrelOS. It currently contains one app, **Personal OS**.
 
