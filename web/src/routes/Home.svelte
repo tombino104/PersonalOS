@@ -181,11 +181,15 @@
     </div>
   </header>
 
-  {#each topWidgets as widget (widget.pluginId + widget.widgetId)}
-    <section class="card widget rise">
-      <widget.component />
-    </section>
-  {/each}
+  {#if topWidgets.length > 0}
+    <div class="top-row">
+      {#each topWidgets as widget (widget.pluginId + widget.widgetId)}
+        <section class="card widget">
+          <widget.component />
+        </section>
+      {/each}
+    </div>
+  {/if}
 
   {#if invitation}
     <div class="invite-row rise">
@@ -298,6 +302,12 @@
 <style>
   .widget {
     padding: 22px 24px;
+  }
+
+  .top-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    gap: 16px;
   }
 
   .defs {

@@ -4,7 +4,7 @@
   import Link from '$core/components/Link.svelte';
   import { formatDate } from '$core/lib/dates.js';
   import { locale, t } from '$core/lib/i18n.svelte.js';
-  import { loadSleep } from './data.js';
+  import { loadSleep, tapNow } from './data.js';
   import NightDialog from './NightDialog.svelte';
   import {
     DEFAULT_TARGET,
@@ -14,9 +14,7 @@
     hoursText,
     lastNight,
     localDay,
-    localTime,
     nightMinutes,
-    nightOfLightsOff,
     wallMinutes,
   } from './sleep.js';
 
@@ -75,11 +73,10 @@
     reload += 1;
   }
 
-  async function tap(day, field, text) {
-    const time = localTime();
+  async function tap(field, text) {
     failed = false;
     try {
-      await pluginRequest('sleep', 'PUT', `/nights/${day}`, { [field]: time });
+      const time = await tapNow(field);
       message = t(text, { time });
       reload += 1;
     } catch {
@@ -131,10 +128,10 @@
   <p class="lede" aria-live="polite">{t('common.loading')}</p>
 {:else}
   <div class="quick">
-    <button class="btn" type="button" onclick={() => tap(nightOfLightsOff(), 'lights_off', 'plugin.sleep.savedLightsOff')}>
+    <button class="btn" type="button" onclick={() => tap('lights_off', 'plugin.sleep.savedLightsOff')}>
       {t('plugin.sleep.lightsOffNow')}
     </button>
-    <button class="btn" type="button" onclick={() => tap(localDay(), 'woke_up', 'plugin.sleep.savedWokeUp')}>
+    <button class="btn" type="button" onclick={() => tap('woke_up', 'plugin.sleep.savedWokeUp')}>
       {t('plugin.sleep.wokeUpNow')}
     </button>
     {#if message}

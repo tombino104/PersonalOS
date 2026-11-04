@@ -5,6 +5,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.31.6] - 2026-11-04
+
+### Changed
+- Home: the top of the page is now a row that can hold two cards side by side (stacked on a phone). The sleep battery moved there, next to the daily quote, instead of sitting at the bottom.
+- Sleep: the battery card on Home has the "Lights off now" and "I'm up now" buttons, so you can log your evening and your morning without opening the Sleep page. The percentage is smaller, with "estimate" in the title, so it reads as information and not as a score.
+
 ## [0.31.5] - 2026-11-03
 
 ### Changed

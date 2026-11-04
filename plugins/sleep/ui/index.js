@@ -6,4 +6,5 @@ export default {
   pages: { nights: SleepPage },
   reportSections: { night: ReportSection },
   widgets: { battery: BatteryCard },
+  widgetPlacement: { battery: 'top' },
 };

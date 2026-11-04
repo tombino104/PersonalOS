@@ -2,12 +2,15 @@
   import { onMount } from 'svelte';
   import Link from '$core/components/Link.svelte';
   import { t } from '$core/lib/i18n.svelte.js';
-  import { loadSleep } from './data.js';
+  import { loadSleep, tapNow } from './data.js';
   import { DEFAULT_TARGET, batteryAt, hoursText, lastNight, localDay, nightMinutes, wallMinutes } from './sleep.js';
 
   let nights = $state([]);
   let target = $state(DEFAULT_TARGET);
   let now = $state(wallMinutes(new Date()));
+  let busy = $state(false);
+  let message = $state('');
+  let failed = $state(false);
 
   function refresh() {
     now = wallMinutes(new Date());
@@ -32,6 +35,20 @@
     };
   });
 
+  async function tap(field, text) {
+    busy = true;
+    failed = false;
+    try {
+      const time = await tapNow(field);
+      message = t(text, { time });
+      refresh();
+    } catch {
+      failed = true;
+      message = t('error.generic');
+    }
+    busy = false;
+  }
+
   const battery = $derived(batteryAt(nights, now, target));
   const last = $derived(lastNight(nights));
 </script>
@@ -53,6 +70,17 @@
 {:else}
   <p class="muted line none">{t('plugin.sleep.widgetEmpty')}</p>
 {/if}
+<div class="quick">
+  <button class="btn" type="button" disabled={busy} onclick={() => tap('lights_off', 'plugin.sleep.savedLightsOff')}>
+    {t('plugin.sleep.lightsOffNow')}
+  </button>
+  <button class="btn" type="button" disabled={busy} onclick={() => tap('woke_up', 'plugin.sleep.savedWokeUp')}>
+    {t('plugin.sleep.wokeUpNow')}
+  </button>
+  {#if message}
+    <span class="muted note" class:error={failed} role="status">{message}</span>
+  {/if}
+</div>
 
 <style>
   .head {
@@ -72,17 +100,17 @@
   .level {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     margin-top: 10px;
   }
 
   .percent {
-    font: 400 34px/1 var(--serif);
+    font: 400 26px/1 var(--serif);
   }
 
   .bar {
     flex: 1 1 auto;
-    height: 12px;
+    height: 10px;
     border: 1.5px solid var(--ink-2);
     border-radius: 4px;
     overflow: hidden;
@@ -101,5 +129,23 @@
 
   .none {
     margin-top: 10px;
+  }
+
+  .quick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+    margin-top: 14px;
+  }
+
+  .quick .btn {
+    min-height: 36px;
+    padding: 0 16px;
+    font-size: 13px;
+  }
+
+  .note {
+    font: 400 13px/1.4 var(--sans);
   }
 </style>
