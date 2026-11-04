@@ -5,6 +5,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versio
 
 ## [Unreleased]
 
+## [0.31.7] - 2026-11-04
+
 ### Fixed
 - Journal: pressing Esc no longer throws away an entry you were writing. Esc does not close the dialog while there is unsaved text, and what you type is also kept as a draft on this device, so it comes back if the dialog is closed anyway. Cancel still discards it.
 
